@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+docling
+openai
+supabase
+python-dotenv
+tiktoken
