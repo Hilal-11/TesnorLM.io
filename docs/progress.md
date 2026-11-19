@@ -26,3 +26,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Button, IconButton, SplitButton, CopyButton per spec; Tooltip, Kbd and DropdownMenu pulled forward (buttons need them).
 - Custom hover/active/focus-visible variants also match data-force, so the showcase shows every state statically.
 - Verified: 17 tests incl. axe; screenshots at 4 widths in both themes. Test stack: jsdom + Testing Library + axe-core (vitest-axe is unmaintained).
+
+## 2026-11-19 — P1.2 — Inputs
+
+- Field wiring, Input, SearchInput, Textarea, Select, Combobox, Checkbox, RadioCard, Switch, SegmentedControl.
+- Verified: 13 tests incl. keyboard paths and axe on a full form.
