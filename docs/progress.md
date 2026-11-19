@@ -146,3 +146,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `app/parse.py`: Docling with tables and picture crops (144 dpi); OCR only when validation found scanned pages, with RapidOCR on ONNX Runtime (models ship in the wheel / are baked into the image); honest page progress from Docling's `progress_callback` ("Reading page i of n", or "Running OCR on page i of n" over scanned pages); `document_timeout` + elapsed check → `parse_timeout`; no body text → `no_text_found`; at most two converters per process. Decisions recorded in spec section 9/17.
 - Verified on real Docling: born-digital paper never enters `ocr` (`ocr_used = false`); the scanned fixture shows "Running OCR on page 1 of 1", becomes Ready and its known word is in a chunk; the blank scan fails with `no_text_found`.
+
+## 2026-11-20 — P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
+
+- `app/chunking.py`: Docling HybridChunker with the embedding model's tokenizer (tiktoken cl100k_base, 400 tokens), Markdown tables (`kind = table`), headings, `page_start/page_end` within 1..page_count, bboxes converted to top-left PDF points (spec section 10), contextual embedding text ("Document: title" + heading path + text); running headers/footers (repeated short lines) and page numbers moved to furniture and dropped. `app/embed.py`: batches of 96, backoff on 429/5xx (5 tries), 1536-dim check, per-document token cap.
+- Verified: paper_basic chunks all have valid pages, bboxes, headings, a table chunk; no "Preprint" header or page numbers in any chunk; embedding retry/batching/dimension tests.

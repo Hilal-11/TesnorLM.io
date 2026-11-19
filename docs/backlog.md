@@ -74,7 +74,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 - [ ] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs
 - [x] P3.6 — Worker: page count + file validation; stage column updates
 - [x] P3.7 — OCR fallback for scanned pages
-- [ ] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
+- [x] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
 - [ ] P3.9 — Figures: extract and store; caption and embed
 - [ ] P3.10 — Upload flow (resumable) + upload modal
 - [ ] P3.11 — Live pipeline progress (notebook sources view)
