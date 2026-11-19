@@ -89,7 +89,7 @@ export function NavigationSection() {
     <ShowcaseSection
       id="navigation"
       title="Navigation"
-      usage="Cobalt marks where you are: the active tab underline and the active sidebar item's left edge. Section labels are sentence case. Collapsed items keep their names in tooltips."
+      usage="Primary marks where you are: the active tab underline and the active sidebar item's left edge. Section labels are sentence case. Collapsed items keep their names in tooltips."
     >
       <Demo title="Page tabs">
         <Tabs defaultValue="sources">
@@ -118,7 +118,7 @@ export function NavigationSection() {
           segments={[
             {
               label: "Study group",
-              badge: <Badge variant="cobalt">Pro</Badge>,
+              badge: <Badge variant="primary">Pro</Badge>,
               menuLabel: "Workspaces",
               options: WORKSPACES.map((w) => ({ value: w.id, label: w.name })),
               value: "study",

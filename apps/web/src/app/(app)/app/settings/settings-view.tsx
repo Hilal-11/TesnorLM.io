@@ -114,7 +114,7 @@ export function SettingsView({
 
   return (
     <>
-      <SettingsSection title="Profile" description="How you appear in TensorLM.">
+      <SettingsSection id="profile" title="Profile" description="How you appear in TensorLM.">
         <SettingsGroup>
           <div className="flex flex-wrap items-start gap-4 p-4">
             <Avatar name={name || email} src={avatarUrl ?? undefined} size={40} />
@@ -140,7 +140,11 @@ export function SettingsView({
         </SettingsGroup>
       </SettingsSection>
 
-      <SettingsSection title="Preferences" description="Changes save as you make them.">
+      <SettingsSection
+        id="preferences"
+        title="Preferences"
+        description="Changes save as you make them."
+      >
         <SettingsGroup>
           <SettingsItem
             label="Explanation level"
@@ -177,6 +181,7 @@ export function SettingsView({
       </SettingsSection>
 
       <SettingsSection
+        id="linked-accounts"
         title="Linked accounts"
         description="Sign in with any connected method; they all open the same account."
       >
@@ -244,7 +249,7 @@ export function SettingsView({
         )}
       </SettingsSection>
 
-      <SettingsSection title="Sessions" description="Where you're signed in.">
+      <SettingsSection id="sessions" title="Sessions" description="Where you're signed in.">
         <SettingsGroup>
           <SettingsItem
             label="Sign out of all devices"

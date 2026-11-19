@@ -69,7 +69,10 @@ export function SidebarSection({ label, children }: { label?: string; children: 
 /** Sentence case, graphite, no caps or tracking. */
 export function SidebarSectionLabel({ className, ...props }: React.ComponentProps<"p">) {
   return (
-    <p className={cn("px-3 pb-1 text-small font-medium text-graphite", className)} {...props} />
+    <p
+      className={cn("px-2.5 pt-2 pb-1 text-caption font-medium text-graphite", className)}
+      {...props}
+    />
   );
 }
 
@@ -85,7 +88,7 @@ type SidebarNavItemProps = {
   "data-force"?: string;
 };
 
-/** 36px row: icon, label, optional count. Active: cobalt-soft fill, 2px cobalt left edge. */
+/** 36px row: icon, label, optional count. Active: accent fill, 2px primary left edge. */
 export function SidebarNavItem({
   icon: Icon,
   label,
@@ -105,15 +108,14 @@ export function SidebarNavItem({
       aria-label={collapsed ? label : undefined}
       data-force={force}
       className={cn(
-        "group relative flex h-9 items-center gap-3 rounded-sm px-3 text-body text-ink interactive hover:bg-cobalt-soft/50 active:scale-98",
-        "before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-cobalt before:opacity-0",
-        "aria-[current=page]:bg-cobalt-soft aria-[current=page]:font-medium aria-[current=page]:before:opacity-100",
-        collapsed && "size-9 justify-center px-0",
+        "group relative flex h-8 items-center gap-2.5 rounded-sm px-2.5 text-body text-graphite interactive hover:bg-muted hover:text-ink active:scale-98",
+        "aria-[current=page]:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-ink",
+        collapsed && "size-8 justify-center px-0",
       )}
     >
       <Icon
         aria-hidden
-        className="size-4.5 shrink-0 text-graphite group-aria-[current=page]:text-ink"
+        className="size-4 shrink-0 text-graphite group-hover:text-ink group-aria-[current=page]:text-ink"
       />
       {!collapsed && (
         <>
@@ -162,9 +164,9 @@ export function SidebarGroup({
       <CollapsiblePrimitive.Root open={open} onOpenChange={setOpen}>
         <CollapsiblePrimitive.Trigger
           aria-controls={regionId}
-          className="group flex h-9 w-full cursor-pointer items-center gap-3 rounded-sm px-3 text-body text-ink interactive hover:bg-cobalt-soft/50 active:scale-98"
+          className="group flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-sm px-2.5 text-body text-graphite interactive hover:bg-muted hover:text-ink active:scale-98"
         >
-          <Icon aria-hidden className="size-4.5 shrink-0 text-graphite" />
+          <Icon aria-hidden className="size-4 shrink-0 text-graphite group-hover:text-ink" />
           <span className="flex-1 truncate text-left">{label}</span>
           <ChevronRight
             aria-hidden

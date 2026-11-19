@@ -4,6 +4,9 @@ import { firstName } from "@/lib/profile";
 import { AppShell, type ShellUser } from "./_components/app-shell";
 import { ShellSkeleton } from "./_components/shell-skeleton";
 
+// Reads the session at request time, so it can't be an instant (prerendered) navigation.
+export const instant = false;
+
 /**
  * The signed-in app. The session is read inside a Suspense boundary (Cache Components); the proxy
  * already redirected signed-out requests, and requireOnboarded() checks again here.

@@ -5,7 +5,7 @@ import { Checkbox as CheckboxPrimitive } from "radix-ui";
 import { useId, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** 16px r-xs box; checked and indeterminate fill cobalt. */
+/** 16px r-xs box; checked and indeterminate fill primary. */
 export function Checkbox({
   className,
   ...props
@@ -14,7 +14,7 @@ export function Checkbox({
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "group inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-xs border border-graphite bg-sheet text-primary-foreground interactive hover:border-ink disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger data-[state=checked]:border-cobalt data-[state=checked]:bg-cobalt data-[state=indeterminate]:border-cobalt data-[state=indeterminate]:bg-cobalt",
+        "group inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-xs border border-graphite bg-sheet text-primary-foreground interactive hover:border-ink disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=indeterminate]:border-primary data-[state=indeterminate]:bg-primary",
         className,
       )}
       {...props}

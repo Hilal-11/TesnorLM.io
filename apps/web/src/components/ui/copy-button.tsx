@@ -64,7 +64,7 @@ export function CopyButton({
           onClick={copy}
           className={cn(
             iconButtonVariants({ variant: "ghost", size }),
-            "hover:text-cobalt",
+            "hover:text-primary",
             showLabel && "w-auto gap-2 px-3 text-small font-medium",
             className,
           )}

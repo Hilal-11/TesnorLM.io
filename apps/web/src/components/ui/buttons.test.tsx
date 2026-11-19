@@ -8,7 +8,7 @@ import { SplitButton } from "@/components/ui/split-button";
 import { expectNoAxeViolations } from "@/test/axe";
 import { renderUI } from "@/test/render";
 
-const VARIANTS = ["primary", "dark", "secondary", "ghost", "danger", "link"] as const;
+const VARIANTS = ["primary", "secondary", "ghost", "danger", "link"] as const;
 
 describe("Button", () => {
   it.each(VARIANTS)("renders the %s variant", (variant) => {

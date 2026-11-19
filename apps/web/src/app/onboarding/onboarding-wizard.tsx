@@ -1,22 +1,31 @@
 "use client";
 
 import {
+  Atom,
   BookOpen,
+  Brain,
+  Check,
   Code,
+  Cpu,
+  Dna,
   FileUp,
   GraduationCap,
   Microscope,
   NotebookText,
+  Plus,
   Presentation,
+  Sigma,
   Sprout,
+  type LucideIcon,
 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { LogoMark } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { ProgressDots } from "@/components/ui/progress";
+import { ProgressBar } from "@/components/ui/progress";
 import { RadioCard, RadioCardGroup } from "@/components/ui/radio-card";
-import { SelectableTag } from "@/components/ui/tag";
+import { cn } from "@/lib/utils";
 import { finishOnboarding, saveOnboardingStep } from "./actions";
 
 type Role = "student" | "instructor" | "developer" | "researcher";
@@ -31,24 +40,31 @@ export type OnboardingInitial = {
   firstSource: Source | null;
 };
 
-const SUBJECTS = [
-  "Machine learning & AI",
-  "Computer science",
-  "Mathematics",
-  "Physics",
-  "Biology",
-  "Electronics",
+const SUBJECTS: { name: string; icon: LucideIcon }[] = [
+  { name: "Machine learning & AI", icon: Brain },
+  { name: "Computer science", icon: Code },
+  { name: "Mathematics", icon: Sigma },
+  { name: "Physics", icon: Atom },
+  { name: "Biology", icon: Dna },
+  { name: "Electronics", icon: Cpu },
 ];
+const SUBJECT_NAMES = SUBJECTS.map((s) => s.name);
 const MAX_SUBJECTS = 8;
 
-const QUESTIONS = [
-  "What brings you to TensorLM?",
-  "What are you studying?",
-  "How should explanations feel?",
-  "Add your first source",
+const STEPS = [
+  {
+    title: "What brings you to TensorLM?",
+    subtitle: "We'll shape explanations around how you'll use them.",
+  },
+  { title: "What are you studying?", subtitle: "Pick any that fit. You can change these later." },
+  {
+    title: "How should explanations feel?",
+    subtitle: "The same idea, explained three ways. Pick the one that reads best.",
+  },
+  { title: "Add your first source", subtitle: "Start with a sample, or bring your own paper." },
 ];
 
-/** Same idea, three levels (step 3), in the reading face. */
+/** Same idea, three levels (step 3). */
 const ATTENTION = {
   beginner:
     "When reading a sentence, the model looks back at the other words and decides which ones help it understand the current word.",
@@ -57,6 +73,52 @@ const ATTENTION = {
   expert:
     "softmax(QKᵀ/√dₖ)V: queries and keys give scaled dot-product scores; the softmax weights combine the value vectors.",
 };
+
+/** A multi-select card (pressed / not pressed) with an icon tile. */
+function ChoiceCard({
+  icon: Icon,
+  label,
+  selected,
+  disabled,
+  onToggle,
+}: {
+  icon: LucideIcon;
+  label: string;
+  selected: boolean;
+  disabled?: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      disabled={disabled}
+      onClick={onToggle}
+      className={cn(
+        "relative flex cursor-pointer flex-col items-center gap-3 rounded-md border bg-sheet px-3 py-5 text-center shadow-1 interactive active:scale-98 disabled:cursor-not-allowed disabled:opacity-50",
+        selected ? "border-ink ring-1 ring-ink" : "border-rule hover:border-rule-strong",
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-10 items-center justify-center rounded-md",
+          selected ? "bg-ink text-paper" : "bg-muted text-ink",
+        )}
+      >
+        <Icon aria-hidden className="size-5" />
+      </span>
+      <span className="text-body font-medium text-ink">{label}</span>
+      {selected && (
+        <span
+          aria-hidden
+          className="absolute top-2 right-2 flex size-4 items-center justify-center rounded-full bg-ink text-paper"
+        >
+          <Check strokeWidth={3} className="size-2.5" />
+        </span>
+      )}
+    </button>
+  );
+}
 
 export function OnboardingWizard({
   firstName,
@@ -68,15 +130,18 @@ export function OnboardingWizard({
   const [step, setStep] = useState(Math.max(1, Math.min(4, initial.step)));
   const [role, setRole] = useState<Role | null>(initial.role);
   const [subjects, setSubjects] = useState<string[]>(initial.subjects);
-  const [other, setOther] = useState(initial.subjects.find((s) => !SUBJECTS.includes(s)) ?? "");
+  const [other, setOther] = useState(
+    initial.subjects.find((s) => !SUBJECT_NAMES.includes(s)) ?? "",
+  );
   const [otherOn, setOtherOn] = useState(Boolean(other));
   const [level, setLevel] = useState<Level>(initial.level);
   const [source, setSource] = useState<Source | null>(initial.firstSource);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const picked = subjects.filter((s) => SUBJECTS.includes(s));
+  const picked = subjects.filter((s) => SUBJECT_NAMES.includes(s));
   const allSubjects = [...picked, ...(otherOn && other.trim() ? [other.trim()] : [])];
+  const full = allSubjects.length >= MAX_SUBJECTS;
 
   const canContinue =
     (step === 1 && role !== null) || step === 2 || step === 3 || (step === 4 && source !== null);
@@ -113,189 +178,193 @@ export function OnboardingWizard({
     });
   }
 
+  const { title, subtitle } = STEPS[step - 1];
+
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-[560px] flex-col gap-8 px-6 py-12 md:py-24">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-body font-semibold text-ink">TensorLM</p>
+    <div className="flex min-h-dvh flex-col bg-paper">
+      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-rule px-4 md:px-6">
+        <LogoMark />
+        <div className="mx-auto flex w-full max-w-xs items-center gap-3">
+          <span className="shrink-0 text-caption font-medium text-graphite tabular-nums">
+            Step {step} of 4
+          </span>
+          <ProgressBar value={step} max={4} label={`Step ${step} of 4`} />
+        </div>
         <Button variant="ghost" size="sm" onClick={skip} disabled={pending}>
           Skip for now
         </Button>
-      </div>
+      </header>
 
-      <form
-        className="flex flex-col gap-8"
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit();
-        }}
-      >
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <ProgressDots steps={4} current={step} />
-            <span className="text-small text-graphite">Step {step} of 4</span>
-          </div>
-          <div className="flex flex-col gap-1">
+      <main className="flex flex-1 flex-col">
+        <form
+          className="mx-auto flex w-full max-w-[640px] flex-1 flex-col gap-8 px-4 py-10 md:py-16"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
+          <div className="flex flex-col items-center gap-2 text-center">
             {step === 1 && firstName && (
-              <p className="text-body text-graphite">Welcome, {firstName}.</p>
+              <p className="text-small font-medium text-graphite">Welcome, {firstName}</p>
             )}
-            <h1 className="text-h1 text-ink">{QUESTIONS[step - 1]}</h1>
+            <h1 className="text-h1 text-ink">{title}</h1>
+            <p className="max-w-md text-body text-graphite">{subtitle}</p>
           </div>
-        </div>
 
-        {step === 1 && (
-          <RadioCardGroup
-            aria-label={QUESTIONS[0]}
-            value={role ?? ""}
-            onValueChange={(v) => setRole(v as Role)}
-            className="sm:grid-cols-2"
-          >
-            <RadioCard
-              value="student"
-              icon={GraduationCap}
-              title="Student"
-              description="Courses, exams and papers."
-            />
-            <RadioCard
-              value="instructor"
-              icon={Presentation}
-              title="Instructor"
-              description="Teaching and preparing material."
-            />
-            <RadioCard
-              value="developer"
-              icon={Code}
-              title="Developer"
-              description="Building with models and APIs."
-            />
-            <RadioCard
-              value="researcher"
-              icon={Microscope}
-              title="Researcher"
-              description="Reading and writing papers."
-            />
-          </RadioCardGroup>
-        )}
-
-        {step === 2 && (
-          <div className="flex flex-col gap-4">
-            <p className="text-body text-graphite">
-              Pick any that fit. You can change these later.
-            </p>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Subjects">
-              {SUBJECTS.map((subject) => (
-                <SelectableTag
-                  key={subject}
-                  className="h-9 px-3 text-body"
-                  selected={picked.includes(subject)}
-                  disabled={!picked.includes(subject) && allSubjects.length >= MAX_SUBJECTS}
-                  onSelectedChange={(on) =>
-                    setSubjects((s) => (on ? [...s, subject] : s.filter((x) => x !== subject)))
-                  }
-                >
-                  {subject}
-                </SelectableTag>
-              ))}
-              <SelectableTag
-                className="h-9 px-3 text-body"
-                selected={otherOn}
-                onSelectedChange={setOtherOn}
-              >
-                Other
-              </SelectableTag>
-            </div>
-            {otherOn && (
-              <Field label="Other subject">
-                <Input
-                  value={other}
-                  maxLength={60}
-                  onChange={(e) => setOther(e.target.value)}
-                  autoFocus
-                />
-              </Field>
-            )}
-          </div>
-        )}
-
-        {step === 3 && (
-          <RadioCardGroup
-            aria-label={QUESTIONS[2]}
-            value={level}
-            onValueChange={(v) => setLevel(v as Level)}
-            className="grid-cols-1 sm:grid-cols-1"
-          >
-            {(
-              [
-                ["beginner", "Beginner", Sprout],
-                ["intermediate", "Intermediate", BookOpen],
-                ["expert", "Expert", GraduationCap],
-              ] as const
-            ).map(([value, title, Icon]) => (
-              <RadioCard
-                key={value}
-                value={value}
-                icon={Icon}
-                title={title}
-                description={
-                  <span className="text-body-read text-ink">
-                    <span className="text-small text-graphite">What attention does: </span>
-                    {ATTENTION[value]}
-                  </span>
-                }
-              />
-            ))}
-          </RadioCardGroup>
-        )}
-
-        {/* TODO(Phase 3): wire "sample paper" and "upload my own" to real uploads (docs/backlog.md). */}
-        {step === 4 && (
-          <div className="flex flex-col gap-4">
-            <p className="text-body text-graphite">
-              Uploading arrives in the next update; we&apos;ll remember your choice.
-            </p>
+          {step === 1 && (
             <RadioCardGroup
-              aria-label={QUESTIONS[3]}
-              value={source ?? ""}
-              onValueChange={(v) => setSource(v as Source)}
-              className="grid-cols-1 sm:grid-cols-1"
+              aria-label={title}
+              value={role ?? ""}
+              onValueChange={(v) => setRole(v as Role)}
+              className="sm:grid-cols-2"
             >
               <RadioCard
-                value="sample"
-                icon={NotebookText}
-                title="Start with a sample paper"
-                description="Attention Is All You Need: the paper behind today's language models."
+                value="student"
+                icon={GraduationCap}
+                title="Student"
+                description="Courses, exams and papers."
               />
               <RadioCard
-                value="upload"
-                icon={FileUp}
-                title="I'll upload my own"
-                description="PDFs, notes, images or CSVs."
+                value="instructor"
+                icon={Presentation}
+                title="Instructor"
+                description="Teaching and preparing material."
+              />
+              <RadioCard
+                value="developer"
+                icon={Code}
+                title="Developer"
+                description="Building with models and APIs."
+              />
+              <RadioCard
+                value="researcher"
+                icon={Microscope}
+                title="Researcher"
+                description="Reading and writing papers."
               />
             </RadioCardGroup>
-          </div>
-        )}
-
-        {error && (
-          <p role="alert" className="text-small text-danger-strong">
-            {error}
-          </p>
-        )}
-
-        <div className="flex items-center gap-3">
-          {step > 1 && (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setStep(step - 1)}
-              disabled={pending}
-            >
-              Back
-            </Button>
           )}
-          <Button type="submit" loading={pending} disabled={!canContinue}>
-            {step === 4 ? "Finish" : "Continue"}
-          </Button>
-        </div>
-      </form>
-    </main>
+
+          {step === 2 && (
+            <div className="flex flex-col gap-4">
+              <div
+                className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+                role="group"
+                aria-label="Subjects"
+              >
+                {SUBJECTS.map(({ name, icon }) => {
+                  const selected = picked.includes(name);
+                  return (
+                    <ChoiceCard
+                      key={name}
+                      icon={icon}
+                      label={name}
+                      selected={selected}
+                      disabled={!selected && full}
+                      onToggle={() =>
+                        setSubjects((s) => (selected ? s.filter((x) => x !== name) : [...s, name]))
+                      }
+                    />
+                  );
+                })}
+                <ChoiceCard
+                  icon={Plus}
+                  label="Other"
+                  selected={otherOn}
+                  onToggle={() => setOtherOn((v) => !v)}
+                />
+              </div>
+              {otherOn && (
+                <Field label="Other subject">
+                  <Input
+                    value={other}
+                    maxLength={60}
+                    onChange={(e) => setOther(e.target.value)}
+                    autoFocus
+                  />
+                </Field>
+              )}
+            </div>
+          )}
+
+          {step === 3 && (
+            <RadioCardGroup
+              aria-label={title}
+              value={level}
+              onValueChange={(v) => setLevel(v as Level)}
+              className="grid-cols-1 sm:grid-cols-1"
+            >
+              {(
+                [
+                  ["beginner", "Beginner", Sprout],
+                  ["intermediate", "Intermediate", BookOpen],
+                  ["expert", "Expert", GraduationCap],
+                ] as const
+              ).map(([value, label, Icon]) => (
+                <RadioCard
+                  key={value}
+                  value={value}
+                  icon={Icon}
+                  title={label}
+                  description={<span className="text-body text-ink">{ATTENTION[value]}</span>}
+                />
+              ))}
+            </RadioCardGroup>
+          )}
+
+          {/* TODO(Phase 3): wire "sample paper" and "upload my own" to real uploads (docs/backlog.md). */}
+          {step === 4 && (
+            <div className="flex flex-col gap-3">
+              <RadioCardGroup
+                aria-label={title}
+                value={source ?? ""}
+                onValueChange={(v) => setSource(v as Source)}
+                className="sm:grid-cols-2"
+              >
+                <RadioCard
+                  value="sample"
+                  icon={NotebookText}
+                  title="Start with a sample paper"
+                  description="Attention Is All You Need: the paper behind today's language models."
+                />
+                <RadioCard
+                  value="upload"
+                  icon={FileUp}
+                  title="I'll upload my own"
+                  description="PDFs, notes, images or CSVs."
+                />
+              </RadioCardGroup>
+              <p className="text-center text-small text-graphite">
+                Uploading arrives in the next update; we&apos;ll remember your choice.
+              </p>
+            </div>
+          )}
+
+          {error && (
+            <p role="alert" className="text-center text-small text-danger-strong">
+              {error}
+            </p>
+          )}
+
+          <div className="mt-auto flex items-center justify-between gap-3 border-t border-rule pt-6">
+            {step > 1 ? (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setStep(step - 1)}
+                disabled={pending}
+              >
+                Back
+              </Button>
+            ) : (
+              <span />
+            )}
+            <Button type="submit" loading={pending} disabled={!canContinue}>
+              {step === 4 ? "Finish" : "Continue"}
+            </Button>
+          </div>
+        </form>
+      </main>
+    </div>
   );
 }

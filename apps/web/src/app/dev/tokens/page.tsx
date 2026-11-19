@@ -13,8 +13,8 @@ const CORE_COLOURS = [
   { name: "ink", role: "Primary text and icons" },
   { name: "graphite", role: "Secondary text" },
   { name: "rule", role: "Borders and dividers" },
-  { name: "cobalt", role: "Actions, links, focus" },
-  { name: "cobalt-soft", role: "Selected and hover fills" },
+  { name: "primary", role: "Actions, links, focus" },
+  { name: "accent", role: "Selected and hover fills" },
   { name: "marker", role: "Source evidence only" },
 ];
 
@@ -233,7 +233,7 @@ function ThemeColumn({ theme, title }: { theme: "light" | "dark"; title: string 
               </span>
               <span aria-hidden className="relative h-4 w-48 rounded-full bg-muted">
                 <span
-                  className={`${className} absolute top-0 left-0 size-4 rounded-full bg-cobalt transition-transform duration-(--dur-slow) group-hover:translate-x-44 group-focus-visible:translate-x-44`}
+                  className={`${className} absolute top-0 left-0 size-4 rounded-full bg-primary transition-transform duration-(--dur-slow) group-hover:translate-x-44 group-focus-visible:translate-x-44`}
                 />
               </span>
             </button>

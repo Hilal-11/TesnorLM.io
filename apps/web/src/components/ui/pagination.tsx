@@ -83,7 +83,7 @@ export function Pagination({
                   aria-label={`Page ${item}`}
                   aria-current={item === page ? "page" : undefined}
                   onClick={() => onPageChange(item)}
-                  className="size-8 cursor-pointer rounded-sm text-small text-ink tabular-nums interactive hover:bg-cobalt-soft/50 active:scale-94 aria-[current=page]:bg-cobalt-soft aria-[current=page]:font-medium aria-[current=page]:text-cobalt"
+                  className="size-8 cursor-pointer rounded-sm text-small text-ink tabular-nums interactive hover:bg-accent/50 active:scale-94 aria-[current=page]:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-primary"
                 >
                   {item}
                 </button>

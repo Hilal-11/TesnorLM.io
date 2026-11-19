@@ -25,7 +25,7 @@ type AvatarProps = {
   className?: string;
 };
 
-/** Photo with an initials fallback (ink on cobalt-soft). */
+/** Photo with an initials fallback (ink on accent). */
 export function Avatar({ name, src, size = 32, decorative = false, className }: AvatarProps) {
   return (
     <AvatarPrimitive.Root
@@ -34,7 +34,7 @@ export function Avatar({ name, src, size = 32, decorative = false, className }: 
       aria-label={decorative ? undefined : name}
       aria-hidden={decorative || undefined}
       className={cn(
-        "relative inline-flex shrink-0 overflow-hidden rounded-full bg-cobalt-soft select-none",
+        "relative inline-flex shrink-0 overflow-hidden rounded-full bg-accent select-none",
         SIZES[size],
         className,
       )}

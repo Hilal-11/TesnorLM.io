@@ -45,12 +45,14 @@ const ratio = (theme: Theme, fg: string, bg: string) =>
 const TEXT_PAIRS: [fg: string, bg: string][] = [
   ["ink", "paper"],
   ["graphite", "paper"],
-  ["cobalt", "paper"],
+  ["primary", "paper"],
+  ["graphite", "subtle"],
   ["ink", "sheet"],
   ["graphite", "sheet"],
   ["ink", "sheet-2"],
   ["graphite", "muted"],
-  ["primary-foreground", "cobalt"],
+  ["primary-foreground", "primary"],
+  ["ink", "accent"],
   ["danger-foreground", "danger"],
 ];
 
@@ -82,8 +84,26 @@ describe.each(["light", "dark"] as const)("%s theme contrast", (theme) => {
 });
 
 describe("token values", () => {
+  it("are pure white and pure black where the brief asks", () => {
+    expect(colour("light", "paper")).toBe("#ffffff");
+    expect(colour("dark", "paper")).toBe("#000000");
+    expect(colour("light", "primary")).toBe(colour("light", "ink"));
+    expect(colour("dark", "primary")).toBe(colour("dark", "ink"));
+  });
+
   it("define every core and status colour as hex in both themes", () => {
-    const names = ["paper", "sheet", "sheet-2", "ink", "graphite", "rule", "cobalt", "cobalt-soft"];
+    const names = [
+      "paper",
+      "subtle",
+      "sheet",
+      "sheet-2",
+      "muted",
+      "ink",
+      "graphite",
+      "rule",
+      "primary",
+      "accent",
+    ];
     for (const theme of ["light", "dark"] as const) {
       for (const name of [...names, "marker", "success", "warning", "danger"]) {
         expect(colour(theme, name), `${theme} --${name}`).toMatch(/^#[0-9a-f]{6}$/i);
@@ -96,7 +116,6 @@ describe("token values", () => {
       const series = [1, 2, 3, 4, 5].map((i) => colour(theme, `chart-${i}`));
       expect(new Set(series).size).toBe(5);
     }
-    expect(colour("light", "chart-1")).toBe(colour("light", "cobalt"));
   });
 });
 

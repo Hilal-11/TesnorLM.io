@@ -10,7 +10,7 @@ import { signOut } from "../../../(auth)/actions";
 import { PRIMARY_NAV, SECONDARY_NAV } from "./nav";
 
 const item =
-  "flex h-10 cursor-pointer items-center gap-3 rounded-sm px-3 text-body text-ink outline-none select-none data-[selected=true]:bg-cobalt-soft [&_svg]:size-4 [&_svg]:text-graphite";
+  "flex h-10 cursor-pointer items-center gap-3 rounded-sm px-3 text-body text-ink outline-none select-none data-[selected=true]:bg-accent [&_svg]:size-4 [&_svg]:text-graphite";
 
 /** Ctrl/⌘ K: go to a page, switch theme, sign out. Full search arrives with notebooks. */
 export function CommandPalette({

@@ -22,7 +22,7 @@ type SplitButtonProps = {
   label: string;
   onClick: () => void;
   options: SplitButtonOption[];
-  variant?: "primary" | "secondary" | "dark";
+  variant?: "primary" | "secondary";
   size?: "sm" | "md" | "lg";
   leadingIcon?: LucideIcon;
   disabled?: boolean;

@@ -12,9 +12,9 @@ export const iconButtonVariants = cva(
     variants: {
       variant: buttonColors,
       size: {
-        sm: "size-8 [&_svg]:size-4",
-        md: "size-9 [&_svg]:size-4",
-        lg: "size-11 [&_svg]:size-4.5",
+        sm: "size-7 [&_svg]:size-3.5",
+        md: "size-8 [&_svg]:size-4",
+        lg: "size-9 [&_svg]:size-4",
       },
     },
     defaultVariants: { variant: "ghost", size: "md" },

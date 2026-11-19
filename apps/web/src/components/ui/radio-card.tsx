@@ -25,7 +25,7 @@ type RadioCardProps = Omit<React.ComponentProps<typeof RadioGroupPrimitive.Item>
   "data-force"?: string;
 };
 
-/** A selectable r-md card. Selected: 2px cobalt edge, cobalt-soft fill, check. Arrow keys move. */
+/** A selectable r-md card. Selected: 2px primary edge, accent fill, check. Arrow keys move. */
 export function RadioCard({ title, description, icon: Icon, className, ...props }: RadioCardProps) {
   const id = useId();
   return (
@@ -34,13 +34,16 @@ export function RadioCard({ title, description, icon: Icon, className, ...props 
       aria-labelledby={`${id}-title`}
       aria-describedby={description ? `${id}-description` : undefined}
       className={cn(
-        "group relative flex cursor-pointer flex-col items-start gap-2 rounded-md border border-rule bg-sheet p-4 pr-12 text-left interactive hover:border-rule-strong disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-cobalt data-[state=checked]:bg-cobalt-soft data-[state=checked]:ring-1 data-[state=checked]:ring-cobalt data-[state=checked]:ring-inset",
+        "group relative flex cursor-pointer flex-col items-start gap-2 rounded-md border border-rule bg-sheet p-4 pr-12 text-left interactive hover:border-rule-strong disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-accent data-[state=checked]:ring-1 data-[state=checked]:ring-primary data-[state=checked]:ring-inset",
         className,
       )}
       {...props}
     >
       {Icon && (
-        <Icon aria-hidden className="size-5 text-graphite group-data-[state=checked]:text-cobalt" />
+        <Icon
+          aria-hidden
+          className="size-5 text-graphite group-data-[state=checked]:text-primary"
+        />
       )}
       <span id={`${id}-title`} className="text-body font-medium text-ink">
         {title}
@@ -52,7 +55,7 @@ export function RadioCard({ title, description, icon: Icon, className, ...props 
       )}
       <span
         aria-hidden
-        className="absolute top-4 right-4 flex size-5 items-center justify-center rounded-full border border-graphite group-data-[state=checked]:border-cobalt group-data-[state=checked]:bg-cobalt"
+        className="absolute top-4 right-4 flex size-5 items-center justify-center rounded-full border border-graphite group-data-[state=checked]:border-primary group-data-[state=checked]:bg-primary"
       >
         <Check
           strokeWidth={3}

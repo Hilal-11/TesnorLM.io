@@ -16,7 +16,7 @@ type ToastOptions = {
 export const toastSurface =
   "flex w-[356px] max-w-[calc(100vw-2rem)] items-center gap-3 rounded-md border border-rule bg-popover p-4 text-ink shadow-2";
 export const toastAction =
-  "interactive ml-auto h-8 shrink-0 cursor-pointer rounded-sm px-3 text-small font-medium text-cobalt hover:bg-cobalt-soft active:scale-98";
+  "interactive ml-auto h-8 shrink-0 cursor-pointer rounded-sm px-3 text-small font-medium text-primary hover:bg-accent active:scale-98";
 
 let announceAssertive: ((message: string) => void) | null = null;
 
@@ -78,7 +78,7 @@ export function Toaster() {
         icons={{
           success: <CircleCheck aria-hidden className="size-4 text-success-strong" />,
           error: <CircleAlert aria-hidden className="size-4 text-danger-strong" />,
-          info: <Info aria-hidden className="size-4 text-cobalt" />,
+          info: <Info aria-hidden className="size-4 text-primary" />,
         }}
         toastOptions={{
           unstyled: true,

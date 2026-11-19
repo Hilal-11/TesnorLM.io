@@ -16,9 +16,9 @@ export const DropdownMenuRadioGroup = MenuPrimitive.RadioGroup;
 export const menuSurface =
   "z-50 min-w-48 overflow-hidden rounded-md border border-rule bg-sheet-2 p-1 text-ink shadow-2 data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in";
 
-/** Shared item row: 32px, r-sm, cobalt-soft when highlighted. */
+/** Shared item row: 32px, r-sm, accent when highlighted. */
 export const menuItem =
-  "relative flex h-8 w-full cursor-default items-center gap-2 rounded-sm px-2 text-body text-ink outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-cobalt-soft [&_svg]:size-4 [&_svg]:shrink-0";
+  "relative flex h-8 w-full cursor-default items-center gap-2 rounded-sm px-2 text-body text-ink outline-none select-none data-disabled:pointer-events-none data-disabled:opacity-50 data-highlighted:bg-accent [&_svg]:size-4 [&_svg]:shrink-0";
 
 export function DropdownMenuContent({
   className,
@@ -93,7 +93,7 @@ export function DropdownMenuCheckboxItem({
     <MenuPrimitive.CheckboxItem className={cn(menuItem, "pl-8", className)} {...props}>
       <span className="absolute left-2 flex size-4 items-center justify-center">
         <MenuPrimitive.ItemIndicator>
-          <Check aria-hidden className="text-cobalt" />
+          <Check aria-hidden className="text-primary" />
         </MenuPrimitive.ItemIndicator>
       </span>
       <ItemBody shortcut={shortcut}>{children}</ItemBody>
@@ -110,7 +110,7 @@ export function DropdownMenuRadioItem({
     <MenuPrimitive.RadioItem className={cn(menuItem, "pl-8", className)} {...props}>
       <span className="absolute left-2 flex size-4 items-center justify-center">
         <MenuPrimitive.ItemIndicator>
-          <span aria-hidden className="block size-2 rounded-full bg-cobalt" />
+          <span aria-hidden className="block size-2 rounded-full bg-primary" />
         </MenuPrimitive.ItemIndicator>
       </span>
       <span className="min-w-0 flex-1 truncate">{children}</span>
@@ -147,7 +147,7 @@ export function DropdownMenuSubTrigger({
 }: React.ComponentProps<typeof MenuPrimitive.SubTrigger> & { icon?: LucideIcon }) {
   return (
     <MenuPrimitive.SubTrigger
-      className={cn(menuItem, "data-[state=open]:bg-cobalt-soft", className)}
+      className={cn(menuItem, "data-[state=open]:bg-accent", className)}
       {...props}
     >
       <ItemBody icon={icon}>{children}</ItemBody>

@@ -10,12 +10,12 @@ import { cn } from "@/lib/utils";
  * Works both on a wrapper (`within-focus`, `has-…`) and on the control itself.
  */
 export const fieldBox = cva(
-  "interactive flex w-full min-w-0 items-center rounded-sm border border-rule bg-sheet text-ink hover:border-rule-strong focus-visible:border-cobalt within-focus:border-cobalt within-focus:outline-2 within-focus:outline-offset-2 within-focus:outline-ring aria-invalid:border-danger has-[[aria-invalid=true]]:border-danger disabled:cursor-not-allowed disabled:bg-muted disabled:text-graphite has-disabled:cursor-not-allowed has-disabled:bg-muted has-disabled:text-graphite",
+  "interactive flex w-full min-w-0 items-center rounded-sm border border-rule bg-sheet text-ink shadow-1 hover:border-rule-strong focus-visible:border-ink focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ink/12 within-focus:border-ink within-focus:ring-3 within-focus:ring-ink/12 aria-invalid:border-danger has-[[aria-invalid=true]]:border-danger disabled:cursor-not-allowed disabled:bg-muted disabled:text-graphite has-disabled:cursor-not-allowed has-disabled:bg-muted has-disabled:text-graphite",
   {
     variants: {
       size: {
-        md: "h-9 text-body",
-        lg: "h-11 text-body",
+        md: "h-8 text-body",
+        lg: "h-9 text-body",
       },
     },
     defaultVariants: { size: "md" },

@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronsUpDown, Plus, Settings } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,23 +43,25 @@ export function WorkspaceSwitcher({
           type="button"
           aria-label={compact ? `Workspace: ${current.name}` : undefined}
           className={cn(
-            "flex w-full cursor-pointer items-center gap-3 rounded-md border border-rule bg-sheet p-2 text-left interactive hover:bg-cobalt-soft/50 active:scale-98",
-            compact && "size-11 justify-center p-0",
+            "flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-rule bg-sheet p-1.5 text-left shadow-1 interactive hover:bg-muted active:scale-98",
+            compact && "size-10 justify-center p-0",
             className,
           )}
         >
           <span
             aria-hidden
-            className="flex size-8 shrink-0 items-center justify-center rounded-sm bg-ink text-small font-semibold text-paper"
+            className="flex size-7 shrink-0 items-center justify-center rounded-sm bg-muted text-small font-semibold text-ink"
           >
             {current.name.slice(0, 1).toUpperCase()}
           </span>
           {!compact && (
             <>
-              <span className="min-w-0 flex-1 truncate text-body font-medium text-ink">
-                {current.name}
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-body font-medium text-ink">{current.name}</span>
+                {current.plan && (
+                  <span className="truncate text-caption text-graphite">{current.plan} plan</span>
+                )}
               </span>
-              {current.plan && <Badge variant="cobalt">{current.plan}</Badge>}
               <ChevronsUpDown aria-hidden className="size-4 shrink-0 text-graphite" />
             </>
           )}

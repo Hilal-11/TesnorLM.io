@@ -47,7 +47,7 @@ export function SettingsGroup({
 type SettingsRowProps = {
   label: string;
   description?: ReactNode;
-  /** e.g. <Badge variant="cobalt">Recommended</Badge> */
+  /** e.g. <Badge variant="primary">Recommended</Badge> */
   badge?: ReactNode;
   checked?: boolean;
   defaultChecked?: boolean;

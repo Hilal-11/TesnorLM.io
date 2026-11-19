@@ -12,7 +12,10 @@ import { AuthCard, FormError } from "./auth-card";
 import { PasswordField } from "./password-field";
 
 const backToSignIn = (
-  <Link href="/login" className="link-underline font-medium text-cobalt">
+  <Link
+    href="/login"
+    className="font-medium text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-ink"
+  >
     Back to sign in
   </Link>
 );

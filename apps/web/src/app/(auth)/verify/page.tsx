@@ -7,6 +7,9 @@ import { AuthCard } from "../_components/auth-card";
 import { AuthCardSkeleton } from "../_components/auth-card-skeleton";
 import { VerifyForm } from "../_components/verify-form";
 
+// Reads the session at request time, so it can't be an instant (prerendered) navigation.
+export const instant = false;
+
 export const metadata: Metadata = { title: "Check your email" };
 
 async function Verify() {
@@ -17,7 +20,10 @@ async function Verify() {
         title="Your code has expired"
         subtitle="Enter your email again and we'll send a new code."
         footer={
-          <Link href="/login" className="link-underline font-medium text-cobalt">
+          <Link
+            href="/login"
+            className="font-medium text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-ink"
+          >
             Back to sign in
           </Link>
         }

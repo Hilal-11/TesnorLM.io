@@ -106,7 +106,7 @@ export function DialogHeader({
     <div className={cn("flex flex-col gap-1 px-6 pt-6 pr-14 pb-4", className)}>
       <DialogPrimitive.Title className="text-h3 text-ink">{title}</DialogPrimitive.Title>
       {description && (
-        <DialogPrimitive.Description className="text-small text-graphite [&_a]:text-cobalt [&_a]:underline">
+        <DialogPrimitive.Description className="text-small text-graphite [&_a]:text-primary [&_a]:underline">
           {description}
         </DialogPrimitive.Description>
       )}

@@ -4,7 +4,7 @@ import { Switch as SwitchPrimitive } from "radix-ui";
 import { useId, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** 36×20 toggle; on = cobalt; the thumb slides with --spring (skill 8.1). */
+/** 36×20 toggle; on = primary; the thumb slides with --spring (skill 8.1). */
 export function Switch({
   className,
   ...props
@@ -13,7 +13,7 @@ export function Switch({
     <SwitchPrimitive.Root
       data-slot="switch"
       className={cn(
-        "inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full bg-graphite/80 p-0.5 interactive hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-cobalt data-[state=checked]:hover:bg-[color-mix(in_oklab,var(--cobalt),var(--shade)_6%)]",
+        "inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full bg-graphite/80 p-0.5 interactive hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:hover:bg-primary/85",
         className,
       )}
       {...props}

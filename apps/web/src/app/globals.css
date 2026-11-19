@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 /*
- * TensorLM design tokens — source of truth: .claude/skills/tensorlm-design/SKILL.md
+ * TensorLM design tokens — monochrome (pure white / pure black). Source: .claude/skills/tensorlm-design/SKILL.md
  *
  * Raw tokens live on theme scopes (:root/.light and .dark) so any element can switch theme by
  * class. Values derived from other tokens (shadcn names, highlights) sit in a rule that applies
@@ -54,142 +54,133 @@
   }
 }
 
-/* ───────────── Raw tokens: light (skill 2.1, 2.3, 2.4, 4.3) ───────────── */
+/* ───────────── Raw tokens: light — pure white, ink black ───────────── */
 :root,
 .light {
   color-scheme: light;
 
-  --paper: #f6f7f4;
-  --sheet: #ffffff;
-  --sheet-2: #ffffff;
-  --ink: #14212b;
-  --graphite: #5b6873;
-  --rule: #dce1de;
-  --cobalt: #2449d8;
-  --cobalt-soft: #e7ecfc;
-  --marker: #ffe066;
-  --muted: #edefec;
+  --paper: #ffffff; /* app background */
+  --subtle: #fafafa; /* sidebar, table headers, card footers */
+  --sheet: #ffffff; /* cards, inputs */
+  --sheet-2: #ffffff; /* popovers, menus */
+  --muted: #f4f4f5; /* hover fills, chips, quiet surfaces */
+  --ink: #09090b; /* text, primary actions */
+  --graphite: #6e6e78; /* secondary text */
+  --rule: #e8e8eb; /* borders, dividers */
+  --primary: #09090b; /* the one action colour: black */
+  --accent: #f4f4f5; /* selected and active fills */
+  --marker: #ffe066; /* source evidence only */
 
-  --success: #16855b;
-  --warning: #a86a00;
-  --danger: #c42b3a;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #dc2626;
 
   --primary-foreground: #ffffff;
   --danger-foreground: #ffffff;
 
-  /* Hover darkens by mixing toward --shade (skill 8.1). */
-  --shade: var(--ink);
-  /* Modal backdrop: ink at 40%. Settings groups sit in a muted well. */
-  --scrim: rgb(20 33 43 / 0.4);
-  --well: var(--muted);
+  --scrim: rgb(9 9 11 / 0.32);
+  --well: var(--subtle);
 
-  /* Source highlights sit behind ink at 45–60% (skill 2.1). */
   --marker-strength: 55%;
-  --grid-line: #dce1de;
+  --grid-line: #ededf0;
 
-  /* Diagram and chart palette, in order of use (skill 2.4). */
-  --chart-1: #2449d8;
-  --chart-2: #0e9f8e;
-  --chart-3: #d99a1e;
-  --chart-4: #d1497a;
-  --chart-5: #5b6873;
+  /* Diagram and chart palette, in order of use. Charts keep colour; the UI stays monochrome. */
+  --chart-1: #2563eb;
+  --chart-2: #0d9488;
+  --chart-3: #d97706;
+  --chart-4: #db2777;
+  --chart-5: #71717a;
 
-  /* Shadows are tinted with ink, never grey (skill 4.3). */
-  --shadow-1: 0 1px 2px rgb(20 33 43 / 0.06);
-  --shadow-2: 0 2px 4px rgb(20 33 43 / 0.06), 0 8px 24px rgb(20 33 43 / 0.08);
-  --shadow-3: 0 4px 8px rgb(20 33 43 / 0.08), 0 24px 48px rgb(20 33 43 / 0.14);
+  --shadow-1: 0 1px 2px rgb(9 9 11 / 0.05);
+  --shadow-2: 0 1px 2px rgb(9 9 11 / 0.04), 0 6px 16px rgb(9 9 11 / 0.06);
+  --shadow-3: 0 2px 6px rgb(9 9 11 / 0.06), 0 20px 48px rgb(9 9 11 / 0.14);
 }
 
-/* ───────────── Raw tokens: dark — a night study desk (skill 2.2) ───────────── */
+/* ───────────── Raw tokens: dark — pure black, white ink ───────────── */
 .dark {
   color-scheme: dark;
 
-  --paper: #0f1820;
-  --sheet: #17232d;
-  --sheet-2: #1f2d39;
-  --ink: #e6ecef;
-  --graphite: #93a1ac;
-  --rule: #2a3946;
-  --cobalt: #7b9bff;
-  --cobalt-soft: #1c2a55;
+  --paper: #000000;
+  --subtle: #0a0a0a;
+  --sheet: #0a0a0a;
+  --sheet-2: #111113;
+  --muted: #18181b;
+  --ink: #fafafa;
+  --graphite: #a1a1aa;
+  --rule: #232326;
+  --primary: #fafafa;
+  --accent: #1c1c1f;
   --marker: #e9c84a;
-  --muted: #1a2631;
 
-  --success: #4cc38a;
-  --warning: #f0b44c;
-  --danger: #ff7a85;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
 
-  --primary-foreground: #0f1820;
-  --danger-foreground: #0f1820;
+  --primary-foreground: #09090b;
+  --danger-foreground: #09090b;
 
-  --shade: var(--paper);
-  /* Modal backdrop: paper at 60%. Settings groups sit on sheet. */
-  --scrim: rgb(15 24 32 / 0.6);
-  --well: var(--sheet);
+  --scrim: rgb(0 0 0 / 0.6);
+  --well: var(--subtle);
 
-  /* Dark highlights sit at 22–30%; text stays ink. */
   --marker-strength: 26%;
-  --grid-line: #22303b;
+  --grid-line: #1a1a1d;
 
-  --chart-1: #7b9bff;
-  --chart-2: #3ccbb8;
-  --chart-3: #f0b44c;
-  --chart-4: #f07aa3;
-  --chart-5: #93a1ac;
+  --chart-1: #60a5fa;
+  --chart-2: #2dd4bf;
+  --chart-3: #fbbf24;
+  --chart-4: #f472b6;
+  --chart-5: #a1a1aa;
 
-  /* Dark mode drops shadows almost entirely: depth comes from sheet → sheet-2 plus a rule border.
-     Only dialogs keep a faint deep shadow so they separate from the page beneath. */
+  /* Dark: depth from borders and the sheet → sheet-2 step; only dialogs cast a shadow. */
   --shadow-1: none;
-  --shadow-2: none;
-  --shadow-3: 0 24px 48px rgb(4 9 14 / 0.5);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-3: 0 24px 64px rgb(0 0 0 / 0.7);
 }
 
 /* ───────────── Derived tokens, re-declared in every theme scope ───────────── */
 :root,
 .light,
 .dark {
-  --info: var(--cobalt);
+  --info: var(--primary);
   --highlight: color-mix(in oklab, var(--marker) var(--marker-strength), transparent);
-  --rule-strong: color-mix(in oklab, var(--rule), var(--ink) 15%);
+  --rule-strong: color-mix(in oklab, var(--rule), var(--ink) 14%);
   /* Status words on tinted backgrounds: pushed toward ink so small text stays above 4.5:1. */
-  --success-strong: color-mix(in oklab, var(--success) 75%, var(--ink));
-  --warning-strong: color-mix(in oklab, var(--warning) 75%, var(--ink));
-  --danger-strong: color-mix(in oklab, var(--danger) 80%, var(--ink));
+  --success-strong: color-mix(in oklab, var(--success) 80%, var(--ink));
+  --warning-strong: color-mix(in oklab, var(--warning) 80%, var(--ink));
+  --danger-strong: color-mix(in oklab, var(--danger) 85%, var(--ink));
 
-  /* shadcn mapping (skill 2.6) — keeps generated components working on TensorLM tokens. */
+  /* shadcn mapping — keeps generated components working on TensorLM tokens. */
   --background: var(--paper);
   --foreground: var(--ink);
   --card: var(--sheet);
   --card-foreground: var(--ink);
   --popover: var(--sheet-2);
   --popover-foreground: var(--ink);
-  --primary: var(--cobalt);
-  --secondary: var(--cobalt-soft);
-  --secondary-foreground: var(--cobalt);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--ink);
   --muted-foreground: var(--graphite);
-  --accent: var(--cobalt-soft);
   --accent-foreground: var(--ink);
   --destructive: var(--danger);
   --destructive-foreground: var(--danger-foreground);
   --border: var(--rule);
   --input: var(--rule);
-  --ring: var(--cobalt);
-  --radius: 0.5rem;
-  --sidebar: var(--paper);
+  --ring: var(--primary);
+  --radius: 0.375rem;
+  --sidebar: var(--subtle);
   --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--cobalt);
+  --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--cobalt-soft);
+  --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--ink);
   --sidebar-border: var(--rule);
-  --sidebar-ring: var(--cobalt);
+  --sidebar-ring: var(--primary);
 }
 
 /* ───────────── Theme-independent tokens ───────────── */
 :root {
-  /* Fonts: next/font sets --font-hanken / --font-literata / --font-jetbrains on <html>. */
-  --font-ui: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-read: var(--font-literata), Georgia, "Times New Roman", serif;
+  /* Fonts: next/font sets --font-inter / --font-jetbrains on <html>. One face for UI and reading. */
+  --font-ui: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-read: var(--font-ui);
   --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", Consolas, monospace;
 
   /* Motion (skill 7.1). Use as duration-(--dur-fast) and ease-out / ease-spring. */
@@ -224,8 +215,7 @@
   --color-rule-strong: var(--rule-strong);
   --color-scrim: var(--scrim);
   --color-well: var(--well);
-  --color-cobalt: var(--cobalt);
-  --color-cobalt-soft: var(--cobalt-soft);
+  --color-subtle: var(--subtle);
   --color-marker: var(--marker);
   --color-highlight: var(--highlight);
   --color-success: var(--success);
@@ -276,11 +266,11 @@
   --font-serif: var(--font-read);
   --font-mono: var(--font-mono);
 
-  /* Radius scale by hierarchy (skill 4.2): rounded-xs/sm/md/lg; rounded-full is built in. */
+  /* Radius scale by hierarchy: xs tags/kbd, sm buttons/inputs, md cards, lg dialogs/panels. */
   --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
 
   --shadow-1: var(--shadow-1);
   --shadow-2: var(--shadow-2);
@@ -381,71 +371,78 @@
   }
 }
 
-/* ───────────── Type roles (skill 3.1) — the only text sizes ───────────── */
+/* ───────────── Type roles — dense dashboard scale (Inter). The only text sizes. ───────────── */
 @utility text-display {
   font-family: var(--font-ui);
-  font-size: 2.25rem; /* 36 / 42 on mobile */
-  line-height: 2.625rem;
-  letter-spacing: -0.02em;
-  font-weight: 600;
+  font-size: 2.5rem; /* 40 / 44 on mobile */
+  line-height: 2.75rem;
+  letter-spacing: -0.035em;
+  font-weight: 700;
   @media (width >= 48rem) {
-    font-size: 3rem; /* 48 / 54 */
-    line-height: 3.375rem;
+    font-size: 3.75rem; /* 60 / 64 */
+    line-height: 4rem;
   }
 }
 
 @utility text-h1 {
   font-family: var(--font-ui);
-  font-size: 1.625rem; /* 26 / 34 on mobile */
-  line-height: 2.125rem;
-  letter-spacing: -0.015em;
+  font-size: 1.375rem; /* 22 / 28 on mobile */
+  line-height: 1.75rem;
+  letter-spacing: -0.025em;
   font-weight: 600;
   @media (width >= 48rem) {
-    font-size: 2rem; /* 32 / 40 */
-    line-height: 2.5rem;
+    font-size: 1.625rem; /* 26 / 32 */
+    line-height: 2rem;
   }
 }
 
 @utility text-h2 {
   font-family: var(--font-ui);
-  font-size: 1.5rem; /* 24 / 32 */
-  line-height: 2rem;
-  letter-spacing: -0.01em;
+  font-size: 1.125rem; /* 18 / 26 */
+  line-height: 1.625rem;
+  letter-spacing: -0.015em;
   font-weight: 600;
 }
 
 @utility text-h3 {
   font-family: var(--font-ui);
-  font-size: 1.1875rem; /* 19 / 28 */
-  line-height: 1.75rem;
+  font-size: 0.9375rem; /* 15 / 22 */
+  line-height: 1.375rem;
+  letter-spacing: -0.01em;
   font-weight: 600;
 }
 
 @utility text-body-read {
   font-family: var(--font-read);
-  font-size: 1.0625rem; /* 17 / 29 — never shrinks on mobile */
-  line-height: 1.8125rem;
+  font-size: 1rem; /* 16 / 26 — answers and long text */
+  line-height: 1.625rem;
 }
 
 @utility text-body {
   font-family: var(--font-ui);
-  font-size: 0.9375rem; /* 15 / 24 */
-  line-height: 1.5rem;
+  font-size: 0.875rem; /* 14 / 20 — interface default */
+  line-height: 1.25rem;
 }
 
 @utility text-small {
   font-family: var(--font-ui);
-  font-size: 0.8125rem; /* 13 / 20 */
-  line-height: 1.25rem;
+  font-size: 0.8125rem; /* 13 / 18 — descriptions, metadata */
+  line-height: 1.125rem;
+}
+
+@utility text-caption {
+  font-family: var(--font-ui);
+  font-size: 0.75rem; /* 12 / 16 — badges, labels, timestamps */
+  line-height: 1rem;
 }
 
 @utility text-code {
   font-family: var(--font-mono);
-  font-size: 0.875rem; /* 14 / 22 */
-  line-height: 1.375rem;
+  font-size: 0.8125rem; /* 13 / 20 */
+  line-height: 1.25rem;
 }
 
-/* Reading measure for answers: 60–72 characters (skill 3.2). */
+/* Reading measure for answers: 60–72 characters. */
 @utility measure {
   max-width: 68ch;
 }
@@ -570,7 +567,7 @@
   body {
     @apply bg-background text-body text-foreground;
   }
-  /* Focus ring (skill 8.1): 2px cobalt, 2px offset, keyboard only. */
+  /* Focus ring: 2px primary (black / white), 2px offset, keyboard only. */
   :focus-visible,
   [data-force="focus"] {
     outline: 2px solid var(--ring);

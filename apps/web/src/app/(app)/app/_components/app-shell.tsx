@@ -4,6 +4,7 @@ import { CircleHelp, Menu, Moon, Plus, Search, Sun } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
+import { Logo, LogoMark } from "@/components/logo";
 import { BreadcrumbSwitcher } from "@/components/ui/breadcrumb-switcher";
 import { Button } from "@/components/ui/button";
 import {
@@ -118,28 +119,58 @@ export function AppShell({
 
   const sidebarBody = (isCollapsed: boolean, onNavigate?: () => void) => (
     <>
-      <div className={cn("flex gap-2", isCollapsed ? "flex-col items-center" : "items-center")}>
+      <div className={cn("flex flex-col gap-3", isCollapsed && "items-center")}>
         <WorkspaceSwitcher
           workspaces={[{ id: "personal", name: workspaceName, plan: user.plan }]}
           currentId="personal"
           onSelect={() => {}}
           compact={isCollapsed}
-          className={isCollapsed ? undefined : "min-w-0 flex-1"}
+          className={isCollapsed ? undefined : "w-full"}
         />
+        {isCollapsed ? (
+          <>
+            <IconButton
+              icon={Search}
+              aria-label="Search"
+              shortcut={["mod", "K"]}
+              onClick={() => setPaletteOpen(true)}
+            />
+            <IconButton
+              icon={Plus}
+              aria-label="New notebook"
+              variant="primary"
+              onClick={() => setNewNotebookOpen(true)}
+            />
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                onNavigate?.();
+                setPaletteOpen(true);
+              }}
+              className="flex h-8 w-full cursor-pointer items-center gap-2 rounded-sm border border-rule bg-sheet px-2.5 text-body text-graphite shadow-1 interactive hover:border-rule-strong hover:text-ink"
+            >
+              <Search aria-hidden className="size-4" />
+              <span className="flex-1 text-left">Search</span>
+              <Kbd keys={["mod", "K"]} />
+            </button>
+            <Button
+              leadingIcon={Plus}
+              className="w-full"
+              onClick={() => {
+                onNavigate?.();
+                setNewNotebookOpen(true);
+              }}
+            >
+              New notebook
+            </Button>
+          </>
+        )}
       </div>
-      {isCollapsed ? (
-        <IconButton
-          icon={Plus}
-          aria-label="New notebook"
-          variant="primary"
-          onClick={() => setNewNotebookOpen(true)}
-        />
-      ) : (
-        <Button leadingIcon={Plus} className="w-full" onClick={() => setNewNotebookOpen(true)}>
-          New notebook
-        </Button>
-      )}
-      <SidebarSection>
+
+      <SidebarSection label="Workspace">
         {PRIMARY_NAV.map((item) => (
           <SidebarNavItem
             key={item.href}
@@ -151,12 +182,14 @@ export function AppShell({
           />
         ))}
       </SidebarSection>
+
       {!isCollapsed && (
         <div className="flex flex-col gap-1">
-          <SidebarSectionLabel>Notebooks</SidebarSectionLabel>
-          <p className="px-3 text-small text-graphite">Your notebooks appear here.</p>
+          <SidebarSectionLabel>Recent notebooks</SidebarSectionLabel>
+          <p className="px-2.5 text-small text-graphite">Your notebooks appear here.</p>
         </div>
       )}
+
       <div className="mt-auto flex w-full flex-col gap-2">
         <SidebarSection>
           {SECONDARY_NAV.map((item) => (
@@ -170,7 +203,9 @@ export function AppShell({
             />
           ))}
         </SidebarSection>
-        {userCard(isCollapsed)}
+        <div className={cn("border-t border-rule pt-2", isCollapsed && "flex justify-center")}>
+          {userCard(isCollapsed)}
+        </div>
       </div>
     </>
   );
@@ -179,53 +214,64 @@ export function AppShell({
     <div className="flex min-h-dvh bg-paper">
       <a
         href="#main"
-        className="sr-only z-50 rounded-sm bg-sheet px-4 py-2 text-body text-ink shadow-2 focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+        className="sr-only z-50 rounded-sm bg-ink px-4 py-2 text-body text-paper shadow-2 focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
       >
         Skip to content
       </a>
 
-      {/* Desktop sidebar (≥1024). The width snaps; no width animation (skill 7.3). */}
-      <aside className="sticky top-0 hidden h-dvh shrink-0 border-r border-rule lg:flex">
-        <Sidebar collapsed={collapsed} className={cn("h-full", !collapsed && "w-[264px]")}>
+      {/* Desktop sidebar (≥1024). The width snaps; no width animation. */}
+      <aside className="sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-rule bg-subtle lg:flex">
+        <div
+          className={cn(
+            "flex h-14 shrink-0 items-center px-3",
+            collapsed ? "justify-center" : "justify-between",
+          )}
+        >
+          {collapsed ? <LogoMark /> : <Logo />}
+          {!collapsed && (
+            <SidebarCollapseToggle
+              collapsed={collapsed}
+              onCollapsedChange={(c) => setStoredCollapsed(c)}
+            />
+          )}
+        </div>
+        <Sidebar
+          collapsed={collapsed}
+          className={cn(
+            "min-h-0 flex-1 overflow-y-auto bg-transparent pt-1",
+            !collapsed && "w-[248px]",
+          )}
+        >
+          {collapsed && (
+            <SidebarCollapseToggle
+              collapsed={collapsed}
+              onCollapsedChange={(c) => setStoredCollapsed(c)}
+            />
+          )}
           {sidebarBody(collapsed)}
         </Sidebar>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-rule bg-paper px-2 md:px-4">
+        <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-rule bg-paper/90 px-3 backdrop-blur md:px-6">
           <IconButton
             icon={Menu}
             aria-label="Open navigation"
             className="lg:hidden"
             onClick={() => setDrawerOpen(true)}
           />
-          <span className="hidden lg:inline-flex">
-            <SidebarCollapseToggle
-              collapsed={collapsed}
-              onCollapsedChange={(c) => setStoredCollapsed(c)}
-            />
-          </span>
-
           <p className="min-w-0 flex-1 truncate text-h3 md:hidden">{title}</p>
-          <div className="hidden min-w-0 flex-1 items-center gap-2 md:flex">
+          <div className="hidden min-w-0 flex-1 items-center gap-1 md:flex">
             <BreadcrumbSwitcher segments={[{ label: workspaceName }, { label: title }]} />
+            <span aria-hidden className="mx-1 h-4 w-px bg-rule" />
             <LevelSwitch level={user.level} />
           </div>
 
-          <button
-            type="button"
-            onClick={() => setPaletteOpen(true)}
-            className="hidden h-9 w-56 cursor-pointer items-center gap-2 rounded-sm border border-rule bg-sheet px-3 text-body text-graphite interactive hover:border-rule-strong md:flex"
-          >
-            <Search aria-hidden className="size-4" />
-            <span className="flex-1 text-left">Search</span>
-            <Kbd keys={["mod", "K"]} />
-          </button>
           <IconButton
             icon={Search}
             aria-label="Search"
             shortcut={["mod", "K"]}
-            className="md:hidden"
+            className="lg:hidden"
             onClick={() => setPaletteOpen(true)}
           />
           <IconButton
@@ -242,19 +288,19 @@ export function AppShell({
           <div className="lg:hidden">{userCard(true, "bottom")}</div>
         </header>
 
-        <main
-          id="main"
-          tabIndex={-1}
-          className="flex-1 px-4 pt-8 pb-28 outline-none md:px-8 md:pb-12"
-        >
-          {children}
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-8 md:pb-16">
+            {children}
+          </div>
         </main>
       </div>
 
       {/* Under 1024 the sidebar is a drawer. */}
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent side="left" title="Navigation">
-          <Sidebar className="w-full p-0">{sidebarBody(false, () => setDrawerOpen(false))}</Sidebar>
+          <Sidebar className="w-full bg-transparent p-0">
+            {sidebarBody(false, () => setDrawerOpen(false))}
+          </Sidebar>
         </SheetContent>
       </Sheet>
 

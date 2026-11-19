@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export const Tabs = TabsPrimitive.Root;
 
 /**
- * Page tabs with a 2px cobalt underline that slides to the active tab using transform only
+ * Page tabs with a 2px primary underline that slides to the active tab using transform only
  * (--dur-base, --ease-out). Overflowing lists scroll sideways with faded edges.
  */
 export function TabsList({
@@ -57,7 +57,7 @@ export function TabsList({
       <span
         ref={indicatorRef}
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-px origin-left bg-cobalt opacity-0 transition-transform duration-(--dur-base) ease-out"
+        className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-px origin-left bg-primary opacity-0 transition-transform duration-(--dur-base) ease-out"
       />
     </TabsPrimitive.List>
   );
@@ -88,14 +88,14 @@ export function TabsContent({
 
 /** "● Indexing" style status inside a tab: dot + word, never the dot alone. */
 export function TabStatus({
-  tone = "cobalt",
+  tone = "primary",
   children,
 }: {
-  tone?: "cobalt" | "success" | "warning" | "danger";
+  tone?: "primary" | "success" | "warning" | "danger";
   children: React.ReactNode;
 }) {
   const dot = {
-    cobalt: "bg-cobalt",
+    primary: "bg-primary",
     success: "bg-success",
     warning: "bg-warning",
     danger: "bg-danger",

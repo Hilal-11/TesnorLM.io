@@ -27,7 +27,7 @@ function LearningSettings() {
         <SettingsRow
           label="Show citations inline"
           description="Numbered chips after each claim, linked to the passage they came from."
-          badge={<Badge variant="cobalt">Recommended</Badge>}
+          badge={<Badge variant="primary">Recommended</Badge>}
           defaultChecked
           onCheckedChange={autoSave}
         />

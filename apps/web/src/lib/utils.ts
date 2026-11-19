@@ -9,6 +9,7 @@ export const TYPE_ROLES = [
   "body-read",
   "body",
   "small",
+  "caption",
   "code",
 ] as const;
 

@@ -198,7 +198,7 @@ function StaticPreviews() {
         <p className="px-2 pt-2 pb-1 text-small font-medium text-graphite">Explain at</p>
         <div className={cn(menuItem, "pl-8")}>
           <span className="absolute left-2 flex size-4 items-center justify-center">
-            <span className="block size-2 rounded-full bg-cobalt" />
+            <span className="block size-2 rounded-full bg-primary" />
           </span>
           Intermediate level
         </div>
@@ -272,7 +272,7 @@ export function OverlaysSection() {
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-6 cursor-pointer items-center rounded-xs bg-cobalt-soft px-2 text-small font-medium text-cobalt interactive hover:bg-[color-mix(in_oklab,var(--cobalt-soft),var(--cobalt)_12%)]"
+                className="inline-flex h-6 cursor-pointer items-center rounded-xs bg-accent px-2 text-small font-medium text-primary interactive hover:bg-[color-mix(in_oklab,var(--accent),var(--primary)_12%)]"
               >
                 [1]
               </button>

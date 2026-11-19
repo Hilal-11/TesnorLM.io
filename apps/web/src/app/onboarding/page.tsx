@@ -6,13 +6,16 @@ import { requireUser } from "@/lib/auth";
 import { firstName, getProfile } from "@/lib/profile";
 import { OnboardingWizard } from "./onboarding-wizard";
 
+// Reads the session at request time, so it can't be an instant (prerendered) navigation.
+export const instant = false;
+
 export const metadata: Metadata = { title: "Welcome" };
 
 export default function OnboardingPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto flex w-full max-w-[560px] flex-col gap-6 px-6 py-24">
+        <div className="mx-auto flex w-full max-w-[640px] flex-col items-center gap-6 px-4 py-24">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-8 w-80 max-w-full" />
           <Skeleton className="h-48 w-full rounded-md" />

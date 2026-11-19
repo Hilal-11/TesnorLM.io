@@ -101,7 +101,7 @@ export function OtpInput({
             }
           }}
           className={cn(
-            "h-12 w-full max-w-12 min-w-0 flex-1 rounded-sm border border-rule bg-sheet text-center text-h3 font-mono text-ink interactive outline-none hover:border-rule-strong focus-visible:border-cobalt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:bg-muted disabled:text-graphite",
+            "h-12 w-full max-w-12 min-w-0 flex-1 rounded-sm border border-rule bg-sheet text-center text-h3 font-mono text-ink interactive outline-none hover:border-rule-strong focus-visible:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:bg-muted disabled:text-graphite",
             invalid && "border-danger",
           )}
         />

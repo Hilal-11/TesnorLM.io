@@ -174,13 +174,13 @@ export function DataTable<T extends RowData>({
     <div data-slot="data-table" className="flex flex-col gap-3">
       {selectable && selectedIds.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex h-8 items-center gap-1 rounded-sm bg-cobalt-soft pr-1 pl-3 text-small font-medium text-cobalt tabular-nums">
+          <span className="inline-flex h-8 items-center gap-1 rounded-sm bg-accent pr-1 pl-3 text-small font-medium text-primary tabular-nums">
             {selectedIds.length} selected
             <button
               type="button"
               aria-label="Clear selection"
               onClick={clearSelection}
-              className="inline-flex size-6 cursor-pointer items-center justify-center rounded-xs interactive hover:bg-cobalt/12 active:scale-94"
+              className="inline-flex size-6 cursor-pointer items-center justify-center rounded-xs interactive hover:bg-primary/12 active:scale-94"
             >
               <X aria-hidden className="size-4" />
             </button>
@@ -220,7 +220,7 @@ export function DataTable<T extends RowData>({
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
                           className={cn(
-                            "-mx-2 inline-flex h-8 cursor-pointer items-center gap-1 rounded-sm px-2 interactive hover:bg-cobalt-soft/50 hover:text-ink",
+                            "-mx-2 inline-flex h-8 cursor-pointer items-center gap-1 rounded-sm px-2 interactive hover:bg-accent/50 hover:text-ink",
                             sorted && "text-ink",
                           )}
                         >
@@ -255,7 +255,7 @@ export function DataTable<T extends RowData>({
                 <tr
                   key={row.id}
                   data-selected={rowSelection[row.id] ? true : undefined}
-                  className="h-12 border-b border-rule last:border-b-0 hover:bg-cobalt-soft/40 data-selected:bg-cobalt-soft"
+                  className="h-12 border-b border-rule last:border-b-0 hover:bg-accent/40 data-selected:bg-accent"
                 >
                   {selectable && (
                     <td className="w-12 pl-4">{rowCheckbox(index, row.id, rowLabel(index))}</td>
@@ -286,7 +286,7 @@ export function DataTable<T extends RowData>({
               <li
                 key={row.id}
                 data-selected={rowSelection[row.id] ? true : undefined}
-                className="flex gap-3 p-4 data-selected:bg-cobalt-soft"
+                className="flex gap-3 p-4 data-selected:bg-accent"
               >
                 {selectable && (
                   <div className="pt-1">{rowCheckbox(index, row.id, rowLabel(index))}</div>

@@ -283,7 +283,7 @@ export function InputsSection() {
           <SwitchField
             label="Show citations inline"
             description="Numbered chips after each claim."
-            badge={<Badge variant="cobalt">Recommended</Badge>}
+            badge={<Badge variant="primary">Recommended</Badge>}
             defaultChecked
             showState
           />

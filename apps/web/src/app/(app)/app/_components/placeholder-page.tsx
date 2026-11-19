@@ -21,7 +21,7 @@ export function PlaceholderPage({
   return (
     <div className="flex max-w-5xl flex-col gap-8">
       <PageHeader title={title} description={description} />
-      <div className="rounded-md border border-rule bg-sheet">
+      <div className="rounded-md border border-rule bg-sheet shadow-1">
         <EmptyState
           titleAs="h2"
           icon={icon}

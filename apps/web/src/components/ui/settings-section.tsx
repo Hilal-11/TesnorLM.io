@@ -3,12 +3,15 @@ import { cn } from "@/lib/utils";
 
 /** Settings page section: h2 title, one-line description, optional action on the right. */
 export function SettingsSection({
+  id: sectionId,
   title,
   description,
   action,
   className,
   children,
 }: {
+  /** Anchor for in-page navigation. */
+  id?: string;
   title: string;
   description?: ReactNode;
   action?: ReactNode;
@@ -17,7 +20,11 @@ export function SettingsSection({
 }) {
   const id = useId();
   return (
-    <section aria-labelledby={id} className={cn("flex flex-col gap-6", className)}>
+    <section
+      id={sectionId}
+      aria-labelledby={id}
+      className={cn("flex scroll-mt-20 flex-col gap-4", className)}
+    >
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <h2 id={id} className="text-h2 text-ink">

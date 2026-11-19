@@ -10,13 +10,10 @@ import { cn } from "@/lib/utils";
  * `hover:` also matches data-force="hover" so the showcase can show the state statically.
  */
 export const buttonColors = {
-  primary:
-    "bg-cobalt text-primary-foreground hover:bg-[color-mix(in_oklab,var(--cobalt),var(--shade)_6%)]",
-  dark: "bg-ink text-paper hover:bg-[color-mix(in_oklab,var(--ink),var(--graphite)_16%)]",
-  secondary: "border border-rule bg-sheet text-ink hover:bg-cobalt-soft/50",
-  ghost: "text-ink hover:bg-cobalt-soft",
-  danger:
-    "bg-danger text-danger-foreground hover:bg-[color-mix(in_oklab,var(--danger),var(--shade)_6%)]",
+  primary: "bg-primary text-primary-foreground hover:bg-primary/85",
+  secondary: "border border-rule bg-sheet text-ink shadow-1 hover:bg-muted",
+  ghost: "text-ink hover:bg-muted",
+  danger: "bg-danger text-danger-foreground hover:bg-danger/90",
 } as const;
 
 export const buttonVariants = cva(
@@ -25,12 +22,12 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         ...buttonColors,
-        link: "rounded-xs text-cobalt link-underline active:scale-100",
+        link: "rounded-xs font-medium text-ink underline decoration-rule-strong underline-offset-4 hover:decoration-ink active:scale-100",
       },
       size: {
-        sm: "h-8 px-3 text-small [&_svg]:size-4",
-        md: "h-9 px-4 text-body [&_svg]:size-4",
-        lg: "h-11 px-5 text-body [&_svg]:size-4.5",
+        sm: "h-7 px-2.5 text-small [&_svg]:size-3.5",
+        md: "h-8 px-3 text-body [&_svg]:size-4",
+        lg: "h-9 px-4 text-body [&_svg]:size-4",
       },
     },
     compoundVariants: [{ variant: "link", size: ["sm", "md", "lg"], className: "h-auto px-0" }],

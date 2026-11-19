@@ -73,8 +73,8 @@ export function DisplaySection() {
       <Demo title="Badge">
         <Row>
           <Badge>New</Badge>
-          <Badge variant="cobalt">Pro</Badge>
-          <Badge variant="cobalt">Recommended</Badge>
+          <Badge variant="primary">Pro</Badge>
+          <Badge variant="primary">Recommended</Badge>
           <Badge variant="success">Indexed</Badge>
           <Badge variant="warning">Beta</Badge>
           <Badge variant="danger">Over limit</Badge>

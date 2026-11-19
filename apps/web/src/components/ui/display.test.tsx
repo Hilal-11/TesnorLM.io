@@ -167,7 +167,7 @@ describe("Tag, Kbd, LevelFlag", () => {
   it("has no axe violations", async () => {
     const { container } = renderUI(
       <div>
-        <Badge variant="cobalt">Pro</Badge>
+        <Badge variant="primary">Pro</Badge>
         <StatusPill status="ready" detail="15 pages" />
         <Tag onRemove={() => {}}>Attention</Tag>
         <LevelFlag level="beginner" />

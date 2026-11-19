@@ -41,7 +41,7 @@ type ComboboxProps = Common &
   );
 
 const comboItem =
-  "relative flex h-8 cursor-pointer items-center gap-2 rounded-sm px-2 text-body text-ink outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-cobalt-soft";
+  "relative flex h-8 cursor-pointer items-center gap-2 rounded-sm px-2 text-body text-ink outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-accent";
 
 /** Searchable select (cmdk in a popover). Optional multi-select with removable tags. */
 export function Combobox(props: ComboboxProps) {
@@ -152,7 +152,7 @@ export function Combobox(props: ComboboxProps) {
               >
                 <span className="min-w-0 flex-1 truncate">{option.label}</span>
                 {selected.includes(option.value) && (
-                  <Check aria-hidden className="size-4 shrink-0 text-cobalt" />
+                  <Check aria-hidden className="size-4 shrink-0 text-primary" />
                 )}
               </Command.Item>
             ))}

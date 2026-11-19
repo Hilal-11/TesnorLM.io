@@ -31,7 +31,12 @@ const baseUrl = process.env.SHOTS_BASE_URL ?? "http://localhost:3000";
 const channel =
   process.env.SHOTS_CHANNEL ??
   (process.platform === "win32" ? "msedge" : process.platform === "darwin" ? "chrome" : undefined);
-const slug = route.replace(/^\/+|\/+$/g, "").replace(/\//g, "-") || "home";
+// File-safe name: "/dev/onboarding?step=2" → "dev-onboarding-step-2" (Windows rejects "?").
+const slug =
+  route
+    .replace(/^\/+|\/+$/g, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "") || "home";
 
 try {
   await fetch(new URL(route, baseUrl));

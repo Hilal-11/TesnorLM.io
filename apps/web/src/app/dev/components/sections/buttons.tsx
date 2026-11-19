@@ -12,7 +12,6 @@ const COLUMNS = ["Default", "Hover", "Pressed", "Focus", "Disabled", "Loading"];
 
 const VARIANTS = [
   { variant: "primary", label: "Add source" },
-  { variant: "dark", label: "Export notes" },
   { variant: "secondary", label: "Add source" },
   { variant: "ghost", label: "Add source" },
   { variant: "danger", label: "Delete source" },
@@ -26,7 +25,7 @@ export function ButtonsSection() {
     <ShowcaseSection
       id="buttons"
       title="Buttons"
-      usage="Primary for the one main action in a view. Dark sparingly, for a strong second action on busy surfaces. Secondary and ghost for everything else, danger only for destructive actions, link inside text. Labels are a verb and an object."
+      usage="Primary (black) for the one main action in a view. Secondary and ghost for everything else, danger only for destructive actions, link inside text. Labels are a verb and an object."
     >
       <Demo title="Button" note="Size md. Loading keeps the label and width.">
         <StateMatrix

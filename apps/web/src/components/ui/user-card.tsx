@@ -51,7 +51,7 @@ export function UserCard({
         <button
           type="button"
           className={cn(
-            "flex w-full cursor-pointer items-center gap-3 rounded-sm p-2 text-left interactive hover:bg-cobalt-soft/50 active:scale-98",
+            "flex w-full cursor-pointer items-center gap-3 rounded-sm p-2 text-left interactive hover:bg-accent/50 active:scale-98",
             compact && "size-11 justify-center p-0",
             className,
           )}

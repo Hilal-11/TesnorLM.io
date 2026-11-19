@@ -29,7 +29,7 @@ export function ProgressBar({ value, max = 100, size = 4, label, className }: Pr
     >
       <ProgressPrimitive.Indicator
         className={cn(
-          "h-full rounded-full bg-cobalt",
+          "h-full rounded-full bg-primary",
           indeterminate
             ? "w-2/5 animate-indeterminate motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-40"
             : "w-full transition-transform duration-(--dur-slow) ease-out",
@@ -40,7 +40,7 @@ export function ProgressBar({ value, max = 100, size = 4, label, className }: Pr
   );
 }
 
-/** Steps: done = cobalt, current = cobalt ring, to do = rule. Labelled "Step 2 of 5". */
+/** Steps: done = primary, current = primary ring, to do = rule. Labelled "Step 2 of 5". */
 export function ProgressDots({
   steps,
   current,
@@ -64,8 +64,8 @@ export function ProgressDots({
             data-state={step < current ? "done" : step === current ? "current" : "todo"}
             className={cn(
               "size-2 rounded-full",
-              step < current && "bg-cobalt",
-              step === current && "ring-2 ring-cobalt",
+              step < current && "bg-primary",
+              step === current && "ring-2 ring-primary",
               step > current && "bg-rule-strong",
             )}
           />
@@ -131,7 +131,7 @@ export function ProgressRing({
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - pct / 100)}
-          className="stroke-cobalt transition-[stroke-dashoffset] duration-(--dur-slow) ease-out"
+          className="stroke-primary transition-[stroke-dashoffset] duration-(--dur-slow) ease-out"
         />
       </svg>
       <span aria-hidden className={cn("absolute font-medium text-ink tabular-nums", text)}>

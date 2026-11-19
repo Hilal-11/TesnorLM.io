@@ -22,7 +22,7 @@ export function Tag({ className, children, onRemove, ...props }: TagProps) {
           type="button"
           aria-label={`Remove ${label}`}
           onClick={onRemove}
-          className="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-xs text-graphite interactive hover:bg-cobalt-soft hover:text-ink active:scale-94"
+          className="inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-xs text-graphite interactive hover:bg-accent hover:text-ink active:scale-94"
         >
           <X aria-hidden className="size-3.5" />
         </button>
@@ -50,7 +50,7 @@ export function SelectableTag({
       onClick={() => onSelectedChange(!selected)}
       className={cn(
         tagBase,
-        "cursor-pointer interactive hover:bg-cobalt-soft/60 active:scale-98 aria-pressed:bg-cobalt-soft aria-pressed:text-cobalt",
+        "cursor-pointer interactive hover:bg-accent/60 active:scale-98 aria-pressed:bg-accent aria-pressed:text-primary",
         className,
       )}
       {...props}

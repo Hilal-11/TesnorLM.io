@@ -45,7 +45,10 @@ export function OAuthButtons({ next }: { next?: string }) {
             {label}
           </Button>
           {lastMethod === id && (
-            <Badge variant="cobalt" className="pointer-events-none absolute -top-2.5 right-3">
+            <Badge
+              variant="outline"
+              className="pointer-events-none absolute -top-2.5 right-3 rounded-full shadow-1"
+            >
               Last used
             </Badge>
           )}

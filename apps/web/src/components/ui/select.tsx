@@ -73,7 +73,7 @@ export function SelectItem({
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
       <span className="absolute right-2 flex size-4 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <Check aria-hidden className="text-cobalt" />
+          <Check aria-hidden className="text-primary" />
         </SelectPrimitive.ItemIndicator>
       </span>
     </SelectPrimitive.Item>

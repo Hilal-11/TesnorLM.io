@@ -28,12 +28,15 @@ export function LoginForm() {
 
   return (
     <AuthCard
-      title="Sign in"
-      subtitle="Pick up where you left off."
+      title="Sign in to TensorLM"
+      subtitle="Welcome back! Sign in to continue learning."
       footer={
         <>
           New to TensorLM?{" "}
-          <Link href="/signup" className="link-underline font-medium text-cobalt">
+          <Link
+            href="/signup"
+            className="font-medium text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-ink"
+          >
             Create an account
           </Link>
         </>
@@ -122,7 +125,10 @@ export function LoginForm() {
                 Email me a code instead
               </Button>
             </form>
-            <Link href="/forgot-password" className="link-underline text-small text-cobalt">
+            <Link
+              href="/forgot-password"
+              className="text-small font-medium text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-ink"
+            >
               Forgot password?
             </Link>
           </div>

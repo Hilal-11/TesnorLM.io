@@ -35,7 +35,7 @@ export default function ComponentsPage() {
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
-                className="flex h-9 items-center rounded-sm px-3 text-body text-ink interactive hover:bg-cobalt-soft/50"
+                className="flex h-9 items-center rounded-sm px-3 text-body text-ink interactive hover:bg-accent/50"
               >
                 {s.label}
               </a>

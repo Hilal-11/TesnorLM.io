@@ -30,7 +30,7 @@ function EnsureProvider({ children }: { children: ReactNode }) {
 }
 
 export const tooltipSurface =
-  "flex max-w-xs items-center gap-2 rounded-sm border border-rule bg-sheet-2 px-2 py-1 text-small text-ink shadow-2";
+  "flex max-w-xs items-center gap-2 rounded-sm bg-ink px-2 py-1 text-caption font-medium text-paper shadow-2";
 
 export function TooltipContent({
   className,
@@ -78,9 +78,14 @@ export function Tooltip({
     <EnsureProvider>
       <TooltipPrimitive.Root open={open} onOpenChange={onOpenChange}>
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
-        <TooltipContent side={side} className={cn(tone === "danger" && "text-danger-strong")}>
+        <TooltipContent
+          side={side}
+          className={cn(tone === "danger" && "bg-danger text-danger-foreground")}
+        >
           <span>{label}</span>
-          {shortcut && <Kbd keys={shortcut} />}
+          {shortcut && (
+            <Kbd keys={shortcut} className="border-paper/25 bg-transparent text-paper/75" />
+          )}
         </TooltipContent>
       </TooltipPrimitive.Root>
     </EnsureProvider>

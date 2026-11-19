@@ -361,6 +361,13 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      rls_status: {
+        Args: never
+        Returns: {
+          rls_enabled: boolean
+          table_name: string
+        }[]
+      }
     }
     Enums: {
       learning_level: "beginner" | "intermediate" | "expert"

@@ -14,10 +14,10 @@ import { cn } from "@/lib/utils";
 
 export type BreadcrumbSegment = {
   label: string;
-  /** e.g. <Badge variant="cobalt">Pro</Badge> */
+  /** e.g. <Badge variant="primary">Pro</Badge> */
   badge?: ReactNode;
   /** Status dot + word, e.g. { word: "Student level", tone: "success" }. */
-  status?: { word: string; tone?: "cobalt" | "success" | "warning" };
+  status?: { word: string; tone?: "primary" | "success" | "warning" };
   /** Switch to a sibling (workspace / notebook / level). */
   options?: { value: string; label: string }[];
   menuLabel?: string;
@@ -25,7 +25,7 @@ export type BreadcrumbSegment = {
   onSelect?: (value: string) => void;
 };
 
-const DOT = { cobalt: "bg-cobalt", success: "bg-success", warning: "bg-warning" };
+const DOT = { primary: "bg-primary", success: "bg-success", warning: "bg-warning" };
 
 function SegmentContent({ segment }: { segment: BreadcrumbSegment }) {
   return (
@@ -36,7 +36,7 @@ function SegmentContent({ segment }: { segment: BreadcrumbSegment }) {
         <span className="flex shrink-0 items-center gap-1 text-small font-normal text-graphite">
           <span
             aria-hidden
-            className={cn("size-2 rounded-full", DOT[segment.status.tone ?? "cobalt"])}
+            className={cn("size-2 rounded-full", DOT[segment.status.tone ?? "primary"])}
           />
           {segment.status.word}
         </span>
@@ -82,7 +82,7 @@ export function BreadcrumbSwitcher({
                       aria-current={current ? "page" : undefined}
                       className={cn(
                         segmentClass,
-                        "cursor-pointer hover:bg-cobalt-soft/50 active:scale-98",
+                        "cursor-pointer hover:bg-accent/50 active:scale-98",
                       )}
                     >
                       <SegmentContent segment={segment} />

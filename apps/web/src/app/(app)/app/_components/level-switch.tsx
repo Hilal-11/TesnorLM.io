@@ -32,7 +32,7 @@ export function LevelSwitch({ level }: { level: Level }) {
         <button
           type="button"
           aria-label={`Explanation level: ${label}`}
-          className="flex h-8 shrink-0 cursor-pointer items-center gap-2 rounded-sm px-2 text-small font-medium text-graphite interactive hover:bg-cobalt-soft/50 hover:text-ink active:scale-98"
+          className="flex h-8 shrink-0 cursor-pointer items-center gap-2 rounded-sm px-2 text-small font-medium text-graphite interactive hover:bg-accent/50 hover:text-ink active:scale-98"
         >
           <span aria-hidden className="size-2 rounded-full bg-success" />
           {label}

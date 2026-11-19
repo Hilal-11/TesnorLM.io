@@ -12,9 +12,9 @@ export const STATUS: Record<
   { word: string; icon: LucideIcon; tone: string; spin?: boolean }
 > = {
   queued: { word: "Queued", icon: Clock, tone: "text-graphite" },
-  uploading: { word: "Uploading", icon: Loader2, tone: "text-cobalt", spin: true },
-  reading: { word: "Reading", icon: Loader2, tone: "text-cobalt", spin: true },
-  indexing: { word: "Indexing", icon: Loader2, tone: "text-cobalt", spin: true },
+  uploading: { word: "Uploading", icon: Loader2, tone: "text-primary", spin: true },
+  reading: { word: "Reading", icon: Loader2, tone: "text-primary", spin: true },
+  indexing: { word: "Indexing", icon: Loader2, tone: "text-primary", spin: true },
   ready: { word: "Ready", icon: CircleCheck, tone: "text-success-strong" },
   failed: { word: "Failed", icon: CircleAlert, tone: "text-danger-strong" },
 };

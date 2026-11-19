@@ -20,11 +20,14 @@ export function SignupForm() {
   return (
     <AuthCard
       title="Create your account"
-      subtitle="Upload a paper and ask anything about it."
+      subtitle="Upload a paper and understand it, with diagrams and citations."
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="link-underline font-medium text-cobalt">
+          <Link
+            href="/login"
+            className="font-medium text-ink underline decoration-rule-strong underline-offset-2 hover:decoration-ink"
+          >
             Sign in
           </Link>
         </>

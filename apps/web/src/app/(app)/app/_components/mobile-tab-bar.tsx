@@ -31,7 +31,7 @@ export function MobileTabBar({ pathname, onAsk }: { pathname: string; onAsk: () 
               <button
                 type="button"
                 onClick={onAsk}
-                className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-cobalt text-primary-foreground shadow-2 interactive hover:bg-[color-mix(in_oklab,var(--cobalt),var(--shade)_6%)] active:scale-94"
+                className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2 interactive hover:bg-primary/85 active:scale-94"
               >
                 <MessageCircleQuestion aria-hidden className="size-5.5" />
                 <span className="sr-only">Ask about your sources</span>
@@ -47,7 +47,7 @@ export function MobileTabBar({ pathname, onAsk }: { pathname: string; onAsk: () 
                   "aria-[current=page]:font-medium aria-[current=page]:text-ink",
                 )}
               >
-                <tab.icon aria-hidden className="size-5.5 group-aria-[current=page]:text-cobalt" />
+                <tab.icon aria-hidden className="size-5.5 group-aria-[current=page]:text-primary" />
                 {tab.label}
               </Link>
             </li>

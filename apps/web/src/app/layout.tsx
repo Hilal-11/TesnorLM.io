@@ -1,24 +1,16 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk, JetBrains_Mono, Literata } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
-// All three are variable fonts: one file per style covers every weight we use (400/500/600).
-// Only the interface face is preloaded; Literata (answers) and JetBrains Mono load on first use.
-const hanken = Hanken_Grotesk({
+// Variable fonts: one file covers every weight. Inter (interface and reading) is preloaded;
+// JetBrains Mono (code, keys, shapes) loads on first use.
+const inter = Inter({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-hanken",
+  variable: "--font-inter",
   display: "swap",
-});
-
-const literata = Literata({
-  subsets: ["latin", "latin-ext"],
-  style: ["normal", "italic"],
-  variable: "--font-literata",
-  display: "swap",
-  preload: false,
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -38,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${hanken.variable} ${literata.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider>

@@ -1,8 +1,9 @@
 import { CircleAlert } from "lucide-react";
 import type { ReactNode } from "react";
+import { LogoMark } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
-/** Sheet card, r-lg, 400px, with the wordmark, a title and one graphite line under it. */
+/** Centred sign-in card: logo mark, title, one graphite line, then the form; footer band below. */
 export function AuthCard({
   title,
   subtitle,
@@ -16,19 +17,19 @@ export function AuthCard({
   children: ReactNode;
 }) {
   return (
-    <div className="w-full max-w-[400px] overflow-hidden rounded-lg border border-transparent bg-sheet shadow-2 dark:border-rule">
-      <div className="flex flex-col gap-6 p-6 sm:p-8">
-        <div className="flex flex-col gap-4">
-          <p className="text-body font-semibold tracking-tight text-ink">TensorLM</p>
+    <div className="w-full max-w-[400px] overflow-hidden rounded-lg border border-rule bg-sheet shadow-3">
+      <div className="flex flex-col gap-6 px-6 pt-8 pb-6 sm:px-10 sm:pt-10">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <LogoMark className="size-9 rounded-[9px]" />
           <div className="flex flex-col gap-1">
             <h1 className="text-h2 text-ink">{title}</h1>
-            {subtitle && <p className="text-body text-graphite">{subtitle}</p>}
+            {subtitle && <p className="text-small text-graphite">{subtitle}</p>}
           </div>
         </div>
         {children}
       </div>
       {footer && (
-        <div className="border-t border-rule bg-paper px-6 py-4 text-center text-body text-graphite sm:px-8">
+        <div className="border-t border-rule bg-subtle px-6 py-4 text-center text-small text-graphite sm:px-10">
           {footer}
         </div>
       )}
