@@ -43,3 +43,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Modal + TypedConfirmDialog, Sheet (side, or bottom with snap points), DropdownMenu finished, Popover citation preview, sonner Toaster.
 - Overlays portal into the showcase column (PortalContainerProvider), so overlays opened in the dark column are dark.
 - Verified: 6 tests (focus trap and return, typed confirm, snaps, menu typeahead and submenu, Undo); axe on the open dialog.
+
+## 2026-11-19 — P1.5 — Navigation
+
+- Tabs, BreadcrumbSwitcher, Sidebar (item/section/group/collapse toggle), WorkspaceSwitcher, UserCard.
+- Collapse approach: the width snaps 272/72px with no width animation (skill 7.3); groups expand with grid-template-rows 0fr to 1fr and go inert when closed. Radix Collapsible.Content unmounts when closed, so only its Root and Trigger are used.
+- Verified: 6 tests (underline follows, aria-current, persisted group state); axe clean.
