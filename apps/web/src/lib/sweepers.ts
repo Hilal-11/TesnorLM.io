@@ -10,7 +10,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { removePrefix } from "@/lib/cleanup";
-import { STORAGE } from "@/lib/ingestion/contract";
+import { STAGES, STORAGE, isTerminal } from "@/lib/ingestion/contract";
 
 type Admin = SupabaseClient<Database>;
 
@@ -18,7 +18,8 @@ export const STALE_UPLOAD_MS = 2 * 60 * 60 * 1000;
 export const STUCK_RUN_MS = 2 * 60 * 60 * 1000;
 export const ORPHAN_AGE_MS = 24 * 60 * 60 * 1000;
 
-const NON_TERMINAL = ["queued", "validating", "parsing", "ocr", "reading_figures", "indexing"] as const;
+/** Stages a queue run is in (not uploading, not finished), from the contract. */
+export const RUN_STAGES = STAGES.filter((s) => !isTerminal(s) && s !== "uploading");
 
 async function failRun(admin: Admin, id: string, runId: string, code: string) {
   const { error } = await admin.rpc("set_document_stage", {
@@ -53,7 +54,7 @@ export async function sweepStuckRuns(admin: Admin, now = Date.now()) {
   const { data, error } = await admin
     .from("documents")
     .select("id, ingest_run_id, updated_at")
-    .in("stage", [...NON_TERMINAL])
+    .in("stage", RUN_STAGES)
     .is("deleted_at", null)
     .lt("updated_at", cutoff)
     .limit(500);

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUserForApi } from "@/lib/auth";
+import { restartInterruptedRuns } from "@/lib/documents/server";
 import { defineAction } from "@/lib/errors";
 import { sendEvent } from "@/lib/events";
 import * as repo from "@/lib/notebooks/repo";
@@ -13,6 +14,7 @@ import {
   notebookUpdateSchema,
   type Notebook,
 } from "@/lib/notebooks/shared";
+import { createAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 /** The sidebar's recent notebooks render on the server, so changes refresh the app layout. */
@@ -77,11 +79,15 @@ export const deleteNotebooks = defineAction(notebookIdsSchema, async ({ ids }) =
   };
 });
 
+/** Undo: the notebooks come back, and runs their delete cancelled start again. */
 export const restoreNotebooks = defineAction(notebookIdsSchema, async ({ ids }) => {
   await requireUserForApi();
   const db = await createClient();
   const restored: Notebook[] = [];
-  for (const id of ids) restored.push(await repo.restoreNotebook(db, id));
+  for (const id of ids) {
+    restored.push(await repo.restoreNotebook(db, id)); // RLS: only the person's own notebooks
+    await restartInterruptedRuns(createAdmin(), id);
+  }
   refresh();
   return { ok: true, data: restored };
 });

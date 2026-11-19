@@ -35,7 +35,11 @@ const row = async (id: string) =>
 beforeAll(async () => {
   A = await person("sweep");
   notebook = must(
-    await A.client.from("notebooks").insert({ user_id: A.user.id, title: "Sweep" }).select("id").single(),
+    await A.client
+      .from("notebooks")
+      .insert({ user_id: A.user.id, title: "Sweep" })
+      .select("id")
+      .single(),
   ).id;
 });
 
