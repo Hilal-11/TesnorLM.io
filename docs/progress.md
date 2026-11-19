@@ -49,3 +49,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Tabs, BreadcrumbSwitcher, Sidebar (item/section/group/collapse toggle), WorkspaceSwitcher, UserCard.
 - Collapse approach: the width snaps 272/72px with no width animation (skill 7.3); groups expand with grid-template-rows 0fr to 1fr and go inert when closed. Radix Collapsible.Content unmounts when closed, so only its Root and Trigger are used.
 - Verified: 6 tests (underline follows, aria-current, persisted group state); axe clean.
+
+## 2026-11-19 — P1.6 — Data table and pagination
+
+- DataTable (TanStack v9 tableFeatures API), Pagination, RelativeTime.
+- Verified: 9 tests (sort cycle, select-all, Shift range, bulk Undo toast, states, pagination math); axe clean; no overflow at 320 or 390.
