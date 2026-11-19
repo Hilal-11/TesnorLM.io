@@ -7,8 +7,16 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import {
-  Bar, BarChart, CartesianGrid, Legend, Line, LineChart,
-  ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 /** Renders LLM output: markdown + KaTeX math + ```mermaid diagrams + ```chart JSON charts. */
@@ -51,7 +59,9 @@ function Mermaid({ code }: { code: string }) {
         if (!cancelled) setFailed(true); // phase 2: ask the model to fix the diagram
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [code, id]);
 
   if (failed) return <pre>{code}</pre>;
@@ -83,9 +93,11 @@ function Chart({ spec }: { spec: string }) {
           <Tooltip />
           <Legend />
           {parsed.series.map((s) =>
-            parsed.type === "bar"
-              ? <Bar key={s} dataKey={s} />
-              : <Line key={s} dataKey={s} type="monotone" dot={false} />,
+            parsed.type === "bar" ? (
+              <Bar key={s} dataKey={s} />
+            ) : (
+              <Line key={s} dataKey={s} type="monotone" dot={false} />
+            ),
           )}
         </Wrapper>
       </ResponsiveContainer>

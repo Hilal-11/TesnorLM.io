@@ -21,7 +21,9 @@ export async function POST(req: Request) {
   const { notebookId, question, level = "student" } = await req.json();
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   // Adaptive routing: whole documents for small notebooks, retrieval for big ones

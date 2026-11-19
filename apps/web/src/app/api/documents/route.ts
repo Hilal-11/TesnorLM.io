@@ -9,7 +9,9 @@ export async function POST(req: Request) {
   const { documentId, notebookId, title, filePath, mimeType } = await req.json();
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
   const { error } = await supabase.from("documents").insert({

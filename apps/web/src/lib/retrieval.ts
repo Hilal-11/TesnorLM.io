@@ -1,7 +1,13 @@
 import OpenAI from "openai";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-const openai = new OpenAI();
+let openaiClient: OpenAI | undefined;
+
+/** Created on first use so importing this module needs no API key (tests, build). */
+function getOpenAI() {
+  openaiClient ??= new OpenAI();
+  return openaiClient;
+}
 
 export type Chunk = {
   id: string;
@@ -14,7 +20,7 @@ export type Chunk = {
 export const FULL_CONTEXT_TOKEN_LIMIT = 60_000;
 
 export async function embedQuery(text: string) {
-  const res = await openai.embeddings.create({
+  const res = await getOpenAI().embeddings.create({
     model: process.env.EMBEDDING_MODEL ?? "text-embedding-3-small",
     input: text,
   });

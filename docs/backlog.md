@@ -4,9 +4,9 @@
 
 Milestone: repo runs locally, checks run in CI, design tokens exist in code.
 
-- [ ] P1 — Web scripts: typecheck, test (Vitest), format (Prettier)
+- [x] P1 — Web scripts: typecheck, test (Vitest), format (Prettier)
 - [ ] P2 — Worker: pytest + `app/chunking.py` + chunking tests
-- [ ] P3 — GitHub Actions CI (web + worker jobs)
+- [ ] P3 — GitHub Actions CI (web + worker jobs) — use Node 22, not 20 (Vitest 5 needs Node ≥ 22.12)
 - [ ] P4 — Supabase TypeScript types + `db:types` script
 - [ ] P5 — `src/lib/models.ts`: single source of model choice
 - [ ] P6 — All LLM prompts in `src/prompts/`
