@@ -2,10 +2,11 @@
  * Browser pre-checks (spec section 3, step 1): instant feedback, never trusted. The API and the
  * worker check again. Errors use the contract's codes, so the copy matches the worker's.
  */
-import { LIMITS } from "@/lib/ingestion/contract";
+import { LIMITS, type ErrorCode } from "@/lib/ingestion/contract";
 import { MB, isPdfName, sizeMb } from "@/lib/documents/shared";
 
-export type PrecheckError = { code: string; vars?: Record<string, unknown> };
+/** Contract error codes only (the compiler checks them against contracts/ingestion.json). */
+export type PrecheckError = { code: ErrorCode; vars?: Record<string, unknown> };
 
 export type ScanResult = {
   sha256: string;

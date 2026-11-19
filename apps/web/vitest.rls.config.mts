@@ -7,7 +7,11 @@ import { defineConfig } from "vitest/config";
 const root = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    // Server modules (lib/documents/server.ts) are called directly as two different people.
+    alias: { "server-only": fileURLToPath(new URL("./src/test/server-only.ts", import.meta.url)) },
+  },
   test: {
     name: "rls",
     environment: "node",

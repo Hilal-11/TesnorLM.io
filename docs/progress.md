@@ -184,3 +184,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `POST /api/documents/[id]/reprocess` (new run via `start_ingest_run`, `document/reprocess` cancels the old run, then `document/uploaded`; old chunks stay searchable until finalize; 3 per document per hour), `DELETE /api/documents/[id]` (soft delete + `document/deleted`), `POST .../restore` (Undo; restarts a run the delete cut short), `GET .../download` (303 to a 60 s signed URL with the original filename). Notebook Undo restarts interrupted runs. Delete source → "Source deleted" toast with Undo (8 s), no confirm.
 - Verified: e2e delete → hidden → Undo → back; Read again → new run → Ready; delete again → `cleanup-document` hard-deleted the row and all 7 stored files after the 30 s window (queue log). Sweeper DB tests on the local stack.
+
+## 2026-11-20 — Cost note: one 20-page paper (Phase 3 S8)
+
+- Embeddings (`text-embedding-3-small`, $0.02 / 1M tokens): ~500 words/page → ~13k tokens of text, plus the contextual prefix (title + heading path, ~20 tokens × ~35 chunks) ≈ 14k tokens → **≈ $0.0003**.
+- Figure captions (`claude-haiku-5-5`, $0.10 in / $0.50 out per 1M, effort low): per figure ≈ 2,100 image tokens (1600 × 1000 WebP) + ~300 prompt/context in, ~350 out incl. thinking → ≈ $0.0004; 8 figures **≈ $0.0034**. Cache by image hash makes re-processing the same paper free.
+- Total **≈ $0.004 per 20-page paper** (well under a cent). Estimates, not measurements: the e2e and load tests ran with `WORKER_FAKE_AI=1`; the worker logs real `caption usage` and `embedding_tokens` per document, so check them on the first real uploads.
