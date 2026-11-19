@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     max_document_tokens: int = Field(default=600_000, gt=0)
     caption_concurrency: int = Field(default=4, gt=0)
 
+    # Local end-to-end tests only: deterministic fake embeddings and no captions (no API cost).
+    # Refused unless INNGEST_DEV is on, so it can never reach production.
+    worker_fake_ai: bool = False
+
     inngest_dev: bool = False
     inngest_signing_key: str | None = None
     inngest_event_key: str | None = None
@@ -60,9 +64,12 @@ class SettingsError(RuntimeError):
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     try:
-        return Settings()  # type: ignore[call-arg]
+        settings = Settings()  # type: ignore[call-arg]
     except ValidationError as exc:
         names = sorted({str(err["loc"][0]).upper() for err in exc.errors()})
         raise SettingsError(
             f"Invalid worker environment: {', '.join(names)}. See .env.example."
         ) from None
+    if settings.worker_fake_ai and not settings.inngest_dev:
+        raise SettingsError("WORKER_FAKE_AI is for local tests only (needs INNGEST_DEV=1).")
+    return settings

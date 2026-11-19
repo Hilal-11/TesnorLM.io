@@ -145,12 +145,12 @@ describe("errors", () => {
 describe("readEnv", () => {
   it("names missing and invalid variables without printing values", () => {
     expect(() =>
-      readEnv("worker", { WORKER_URL: "http://localhost:8000", WORKER_SECRET: "abcd" }),
-    ).toThrow(/WORKER_SECRET \(must be at least 16 characters\)/);
+      readEnv("inngest", { INNGEST_EVENT_KEY: "evt", INNGEST_SIGNING_KEY: "abcd" }),
+    ).toThrow(/INNGEST_SIGNING_KEY \(must be at least 16 characters\)/);
     try {
-      readEnv("worker", { WORKER_SECRET: "abcd" });
+      readEnv("inngest", { INNGEST_SIGNING_KEY: "abcd" });
     } catch (err) {
-      expect(String(err)).toContain("WORKER_URL (missing)");
+      expect(String(err)).toContain("INNGEST_EVENT_KEY (missing)");
       expect(String(err)).not.toContain("abcd");
     }
   });

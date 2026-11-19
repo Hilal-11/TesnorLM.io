@@ -4,31 +4,37 @@ Upload any paper. Understand it deeply. AI explanations with diagrams, examples,
 
 ```
 tensorlm/
-├── apps/web/                 # Next.js app (created by setup script)
-├── templates/web/            # TensorLM starter files copied into apps/web
-├── services/worker/          # Python FastAPI worker: parsing (Docling) + embeddings
-├── supabase/migrations/      # Postgres schema, pgvector, hybrid search, RLS, storage
-├── scripts/setup.sh          # one-time setup
+├── apps/web/                 # Next.js app: UI, API routes, queue functions (cleanup, sweepers)
+├── services/worker/          # Python worker: the ingest-document queue function (Docling, OCR, figures, embeddings)
+├── contracts/ingestion.json  # stage names, learner words, error copy, limits — shared by web and worker
+├── supabase/migrations/      # Postgres schema, pgvector, RLS, hybrid search, stage machine, storage
+├── docs/                     # specs (docs/specs/ingestion.md), backlog, progress log, reports
 └── .env.example
 ```
 
 ## How it works
 
 ```
-Browser ──upload──▶ Supabase Storage
+Browser ── pre-check (type, size, SHA-256 in a Web Worker)
    │
-   └─POST /api/documents ─▶ Next.js ─▶ Worker /ingest
-                                         ├─ Docling: PDF → Markdown (tables, LaTeX)
-                                         ├─ heading-aware chunking (+ section context)
-                                         ├─ OpenAI embeddings
-                                         └─ Postgres: chunks (pgvector + full-text)
-
-Browser ──question──▶ /api/chat
-                         ├─ small notebook? → send full documents (no RAG needed)
-                         ├─ else → hybrid_search() (vector + BM25, RRF fusion)
-                         └─ Claude streams answer: markdown + $math$ + ```mermaid + ```chart
-                              └─ LessonRenderer renders it
+   ├─ POST /api/notebooks/:id/documents ─▶ Next.js: auth, ownership, quota, duplicate check, row "uploading"
+   ├─ TUS resumable upload ──────────────▶ Supabase Storage  documents/<user>/<doc>/source.pdf
+   └─ POST /api/documents/:id/uploaded ──▶ Next.js: object exists → "queued" → event document/uploaded
+                                                                                   │
+                                     Inngest ◀─────────────────────────────────────┘
+                                        │  (2 runs at a time, 2 per person, 3 retries per step,
+                                        │   cancelled by re-process / delete)
+                                        ▼
+                         Worker /api/inngest  ingest-document
+                           validate → parse (Docling, OCR only for scanned pages) → figures
+                           → captions (fast vision model) → index (chunks + embeddings) → finalize
+                                        │  set_document_stage() / finalize_ingest()
+                                        ▼
+                         Postgres: documents.stage + progress ──Realtime──▶ source cards update live
+                                   chunks (pages, bboxes, headings) · figures · hybrid_search()
 ```
+
+The full design is in [`docs/specs/ingestion.md`](docs/specs/ingestion.md).
 
 ---
 
@@ -36,101 +42,119 @@ Browser ──question──▶ /api/chat
 
 | Tool | Version | Check |
 |---|---|---|
-| Node.js | 20 LTS or newer | `node -v` |
-| Python | 3.11 or 3.12 | `python3 --version` |
+| Node.js | 22.12 or newer | `node -v` |
+| Python | 3.12 | `python --version` |
+| Docker Desktop | for the local Supabase stack and the worker image | `docker -v` |
 | Git | any | `git --version` |
-| Docker Desktop | optional (only to run worker in a container / local Supabase) | `docker -v` |
-| VS Code + extensions | ESLint, Prettier, Tailwind CSS IntelliSense, Python, Pylance | |
 
-## 2. Create these accounts and keys
+## 2. Accounts and keys
 
-| Service | Why | Where to get key |
+| Service | Why | Variables |
 |---|---|---|
-| **Supabase** | Postgres + pgvector + auth + storage | supabase.com → New project → Settings → API |
-| **Anthropic** | main LLM for answers/lessons | console.anthropic.com |
-| **OpenAI** | embeddings | platform.openai.com |
-| **GitHub** | repo | `Hilal-11/tensorlm` |
-| **Vercel** | deploy web app | vercel.com (import repo) |
-| **Railway / Fly.io / Render** | deploy Python worker | railway.app |
+| **Supabase** | Postgres + pgvector + auth + storage + Realtime | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` |
+| **OpenAI** | embeddings (`text-embedding-3-small`, 1536 dims) | `OPENAI_API_KEY`, `EMBEDDING_MODEL` |
+| **Anthropic** | answers (`LLM_MODEL`) and figure captions (`FAST_MODEL`) | `ANTHROPIC_API_KEY` |
+| **Inngest** | the job queue (app `tensorlm`) | production: `INNGEST_EVENT_KEY`, `INNGEST_SIGNING_KEY`; locally `INNGEST_DEV=1` |
+| **Vercel** | web app | all web variables + Inngest keys |
+| **Railway** | worker (≥ 4 GB RAM) | worker variables (see `.env.example`) |
 
-Later (phase 2): Cohere (rerank), E2B (code sandbox), Langfuse (tracing), Upstash Redis (cache/rate limit), Razorpay.
-
-> 💡 Set a monthly spend limit on Anthropic and OpenAI dashboards before you start.
+Set a monthly spend limit on the OpenAI and Anthropic dashboards. Every variable is listed with a
+comment in [`.env.example`](.env.example); copy it to `.env` at the repo root (the web app's
+`apps/web/.env.local` is generated from it by `npm run dev` / `npm run build`).
 
 ## 3. Setup
 
 ```bash
 git clone https://github.com/Hilal-11/tensorlm.git
 cd tensorlm
-bash scripts/setup.sh          # creates apps/web, installs everything, sets up Python venv
+cp .env.example .env                 # then fill it in
+
+cd apps/web && npm install && cd ../..
+
+cd services/worker
+python -m venv .venv
+.venv/Scripts/python -m pip install -r requirements.txt -r requirements-dev.txt   # Windows
+# .venv/bin/python -m pip install -r requirements.txt -r requirements-dev.txt     # macOS/Linux
 ```
 
-Fill in `.env` (copied from `.env.example`). `apps/web/.env.local` is a symlink to it.
-
 ## 4. Database
+
+Apply every migration in `supabase/migrations/` to your project, then regenerate types:
 
 ```bash
 cd apps/web
 npx supabase login
-npx supabase link --project-ref <your-project-ref>     # ref is in your Supabase URL
-npx supabase db push --workdir ../..                  # runs supabase/migrations/0001_init.sql
+npx supabase link --project-ref <your-project-ref> --workdir ../..
+npx supabase db push --workdir ../..
+npm run db:types
 ```
 
-Or paste `supabase/migrations/0001_init.sql` into the Supabase SQL editor and run it.
-
-In Supabase dashboard → Authentication → Providers: enable **Email** and **Google**.
-
-## 5. Run locally (two terminals)
+## 5. Run locally (three processes)
 
 ```bash
-# Terminal A — worker  (first run downloads Docling models, takes a few minutes)
+# Terminal 1 — Inngest Dev Server (queue + dashboard at http://localhost:8288)
+npx inngest-cli@1.53.0 dev --no-discovery \
+  -u http://localhost:3000/api/inngest -u http://localhost:8000/api/inngest
+
+# Terminal 2 — worker (the first parse loads Docling's models, about a minute)
 cd services/worker
-.venv/bin/uvicorn app.main:app --reload --port 8000
-# check: http://localhost:8000/health
+.venv/Scripts/python -m uvicorn app.main:app --port 8000        # macOS/Linux: .venv/bin/python
+# check: http://localhost:8000/health and http://localhost:8000/ready
 
-# Terminal B — web
+# Terminal 3 — web
 cd apps/web
-npm run dev
-# http://localhost:3000
+npm run dev                                                      # http://localhost:3000
 ```
 
-Add `@tailwindcss/typography` to your Tailwind CSS file so lesson text looks good:
+`INNGEST_DEV=1` in `.env` makes both apps talk to the Dev Server without keys. Open
+http://localhost:8288 to see runs, steps, retries and cancellations.
 
-```css
-/* apps/web/src/app/globals.css */
-@import "tailwindcss";
-@plugin "@tailwindcss/typography";
+**Fully local (no cloud project):** `npx supabase start` (Docker), then `npm run dev:local` in
+`apps/web` (port 3100, local stack keys injected, nothing written to `.env`) and start the worker
+with the same keys: `node scripts/with-local-supabase.mjs --app <path-to-python> -m uvicorn
+app.main:app --port 8000 --app-dir ../../services/worker`. Point the Dev Server at
+`http://localhost:3100/api/inngest` instead of port 3000.
+
+## 6. Checks
+
+Web (`cd apps/web`):
+
+```bash
+npm run lint && npm run typecheck && npm test && npm run build
+npm run e2e                 # Playwright (signed-out flows)
+npm run test:rls            # database + RLS suite against the TEST project (.env.test)
+npm run test:rls:local      # the same against the local stack
+npm run e2e:local           # signed-in flows against `npm run dev:local`
 ```
 
-## 6. What's already built vs. what you build next
+Worker (`cd services/worker`):
 
-**Included in this starter**
-- [x] Schema: notebooks, documents, chunks, figures, chats, messages, lessons + RLS
-- [x] Hybrid search SQL function (vector + keyword, RRF)
-- [x] Private storage bucket with per-user folders
-- [x] Worker: download → Docling parse → structure-aware chunking → embeddings → store
-- [x] `/api/documents` — register upload + trigger ingestion
-- [x] `/api/chat` — adaptive routing (full-context vs retrieval) + streaming Claude answer
-- [x] `LessonRenderer` — markdown + KaTeX + Mermaid + Recharts
+```bash
+.venv/Scripts/python -m pytest -q                         # all tests (Docling ones load models once)
+.venv/Scripts/python -m pytest -q -m "not docling"        # fast unit tests only
+.venv/Scripts/python -m pytest -q --cov=app               # coverage
+```
 
-**Build next (MVP)**
-- [ ] Auth pages (login / signup) + middleware session refresh
-- [ ] Notebook list + upload UI (upload to `documents/<user_id>/<doc_id>/<file>`, then POST `/api/documents`)
-- [ ] Document status polling (or Supabase Realtime on `documents.status`)
-- [ ] Chat UI that reads the text stream and renders with `LessonRenderer`
-- [ ] Citation chips → open PDF viewer at the source section
-- [ ] Eval set: 30–50 real questions on 5 papers, run after every change
+The worker's integration test against Postgres runs with the local stack's keys:
+`cd apps/web && node scripts/with-local-supabase.mjs --test <path-to-python> -m pytest -q -c
+../../services/worker/pytest.ini ../../services/worker/tests/test_supabase_store.py`.
 
-**Phase 2**
-- [ ] Reranking (Cohere) in `retrieve()`
-- [ ] Figure extraction + vision captions → `figures` table
-- [ ] Structured lesson generator (JSON blocks) saved to `lessons`
-- [ ] Worked examples executed in E2B sandbox
-- [ ] Quizzes / flashcards
-- [ ] Langfuse tracing, Upstash rate limits, Razorpay plans
-- [ ] Move ingestion to Inngest / Trigger.dev queue
+## 7. Deploy
 
-## Auth setup (Phase 2)
+**Web (Vercel):** import the repo, root directory `apps/web`, add every web variable from
+`.env.example` plus `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY` (no `INNGEST_DEV`).
+
+**Worker (Railway, ≥ 4 GB RAM):** new service from the repo with the Dockerfile at
+`services/worker/Dockerfile` and the **repo root** as build context (the image needs
+`contracts/ingestion.json`). Add the worker variables (no `INNGEST_DEV`, no `WORKER_FAKE_AI`).
+Health check path `/ready`. The image is multi-stage, pins every dependency, bakes in the Docling
+and OCR models (`HF_HUB_OFFLINE=1`) and runs as a non-root user.
+
+**Inngest:** create the app, then sync both endpoints:
+`https://<your-domain>/api/inngest` (web) and `https://<worker-domain>/api/inngest` (worker).
+Requests without a valid signature are rejected in production.
+
+## Auth setup
 
 Do these once in the dashboards; secrets go in `.env` only (never in chat or git).
 Supabase callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`.
@@ -140,38 +164,22 @@ Supabase callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`.
    preview pattern.
 2. **Email provider**: enabled, "Confirm email" on, minimum password length 8; leaked-password protection
    on if your plan has it.
-3. **Email templates**: paste the four files from `docs/email-templates/` (confirm signup, magic link,
-   reset password, change email). They send a 6-digit code plus a backup link through `/auth/confirm`.
+3. **Email templates**: paste the four files from `docs/email-templates/`.
 4. **SMTP (Resend)**: host `smtp.resend.com`, port 465, user `resend`, password = Resend API key, sender
-   `hello@tensorlm.io` / `TensorLM`. The built-in sender only allows a few emails an hour.
-5. **Google**: Google Cloud → OAuth client (Web). Origins `http://localhost:3000`, `https://tensorlm.io`;
-   redirect URI = the Supabase callback URL. Paste the ID/secret into Supabase → Providers → Google.
-6. **GitHub**: Settings → Developer settings → OAuth Apps → callback = the Supabase callback URL. Paste the
-   ID/secret into Supabase → Providers → GitHub.
-7. **Manual linking**: turn on "Allow manual linking" (Settings → Linked accounts uses it).
-8. **Turnstile (optional)**: Cloudflare Turnstile site key in `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; secret in
-   Supabase → Attack Protection.
-9. **.env**: add `NEXT_PUBLIC_SITE_URL=http://localhost:3000`, then copy `.env` to `apps/web/.env.local`
-   (on Windows `setup.sh`'s symlink becomes a copy, so repeat after every edit).
-10. **RLS test project**: a second Supabase project with all migrations applied
-    (`npx supabase db push --db-url <test-db-url>`), and its keys in a repo-root `.env.test`:
-    `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`, `TEST_SUPABASE_SERVICE_ROLE_KEY`. Then `npm run test:rls`.
-
-Checks: `npm run lint && npm run typecheck && npm test && npm run build`, `npm run e2e` (Playwright),
-`npm run test:rls` (test project only), `npm run db:types` after every migration.
-
-## 7. Deploy
-
-- **Web:** push to GitHub → import in Vercel → set root directory `apps/web` → add env vars.
-- **Worker:** Railway → New service from repo → root `services/worker` → it detects the Dockerfile → add env vars → copy the public URL into `WORKER_URL` on Vercel.
-- Worker needs ~2 GB RAM for Docling. Start with the smallest plan that has that.
+   `hello@tensorlm.io` / `TensorLM`.
+5. **Google** and **GitHub** OAuth apps with the Supabase callback URL; paste the IDs/secrets into
+   Supabase → Providers. Turn on "Allow manual linking".
+6. **Turnstile (optional)**: site key in `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; secret in Supabase → Attack
+   Protection.
+7. **Test project**: a second Supabase project with all migrations applied and its keys in a repo-root
+   `.env.test`: `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`, `TEST_SUPABASE_SERVICE_ROLE_KEY`.
 
 ## Common problems
 
 | Problem | Fix |
 |---|---|
-| Worker first request is very slow | Docling downloads its models once; later runs are fast |
-| `libGL.so.1` error | `sudo apt install libgl1 libglib2.0-0` (Linux) — already in Dockerfile |
-| `hybrid_search` returns nothing | document status must be `ready`; check `chunks` table has rows |
-| 401 from `/api/chat` | user isn't logged in — build auth pages first |
+| Sources stay "Queued" | The Inngest Dev Server isn't running, or isn't pointed at the worker's `/api/inngest` |
+| Worker `/ready` is 503 | Models are still loading (first start), or Supabase isn't reachable |
+| First parse is slow locally | Docling loads its models once per process; later files are fast |
+| `Invalid worker environment: …` | The named variables are missing; see `.env.example` |
 | Embedding dimension error | `EMBEDDING_MODEL` must output 1536 dims to match `vector(1536)` |

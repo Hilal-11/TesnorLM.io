@@ -16,9 +16,10 @@ const schemas = {
     LLM_MODEL: z.string().min(1).default("claude-sonnet-5-5"),
     EMBEDDING_MODEL: z.string().min(1).default("text-embedding-3-small"),
   }),
-  worker: z.object({
-    WORKER_URL: z.url(),
-    WORKER_SECRET: z.string().min(16, "must be at least 16 characters"),
+  // Production queue keys (locally INNGEST_DEV=1 talks to the Dev Server without keys).
+  inngest: z.object({
+    INNGEST_EVENT_KEY: z.string().min(1),
+    INNGEST_SIGNING_KEY: z.string().min(16, "must be at least 16 characters"),
   }),
 } as const;
 

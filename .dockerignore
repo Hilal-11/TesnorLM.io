@@ -1,0 +1,7 @@
+# The worker image is built from the repo root; send only what it needs.
+**
+!contracts/ingestion.json
+!services/worker/requirements.txt
+!services/worker/app/**
+**/__pycache__
+**/*.pyc
