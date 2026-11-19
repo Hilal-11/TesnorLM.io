@@ -73,7 +73,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 - [x] P3.4 — Board view with drag and drop
 - [ ] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs
 - [x] P3.6 — Worker: page count + file validation; stage column updates
-- [ ] P3.7 — OCR fallback for scanned pages
+- [x] P3.7 — OCR fallback for scanned pages
 - [ ] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
 - [ ] P3.9 — Figures: extract and store; caption and embed
 - [ ] P3.10 — Upload flow (resumable) + upload modal

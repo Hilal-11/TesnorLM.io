@@ -226,14 +226,19 @@ On final failure (retries exhausted, or a final error): `set_document_stage(...,
 mapped code and vars. Unexpected exceptions map to `internal` and are logged with `document_id`,
 `run_id`, step and exception type.
 
-**Parse progress.** P3.6 decides between Docling page-level progress and converting in page ranges
-(for example 20 pages per batch), choosing honest progress without hurting quality, and records the
-choice here.
+**Parse progress (decided in P3.6).** Docling's `progress_callback` reports every finished page
+(`completed_pages` of `total_pages`), so the whole PDF is converted in one pass and the detail line
+counts real pages. Page-range batches were rejected: they break tables and reading order at batch
+boundaries.
 
 **OCR.** Pages with fewer than about 20 characters of extractable text and an image layer count as
-scanned. No scanned pages: OCR off. Otherwise OCR runs (engine chosen in P3.7, models baked into
-the image) and the stage shows `ocr` with the scanned-page count. No text after OCR:
-`no_text_found`.
+scanned. No scanned pages: OCR off. Otherwise OCR runs and the stage shows `ocr` with the
+scanned-page count. No text after OCR: `no_text_found`.
+
+**OCR engine (decided in P3.7): RapidOCR on ONNX Runtime.** Its detection, classification and
+recognition models are small ONNX files (baked into the image with `docling-tools models download`,
+`HF_HUB_OFFLINE=1` at run time), it needs no system packages (unlike Tesseract) and is far lighter
+than EasyOCR's torch models. At most two Docling converters exist per process (OCR on and off).
 
 ## 10. Chunks, positions and figures
 
@@ -366,6 +371,6 @@ repo root).
 | Decision | Owner | Status |
 | --- | --- | --- |
 | Source quota is per notebook (20 on the free plan), not per account | product (you) | chosen here; confirm |
-| Parse progress: Docling page progress vs page-range batches | P3.6 | open |
-| OCR engine (EasyOCR, Tesseract or RapidOCR) | P3.7 | open |
-| Worker image build context includes `contracts/` | P3.14 | open |
+| Parse progress: Docling page progress vs page-range batches | P3.6 | Docling page progress (section 9) |
+| OCR engine (EasyOCR, Tesseract or RapidOCR) | P3.7 | RapidOCR on ONNX Runtime (section 9) |
+| Worker image build context includes `contracts/` | P3.14 | yes: built from the repo root, `.dockerignore` sends only the contract and the worker |
