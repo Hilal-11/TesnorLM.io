@@ -60,3 +60,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - SettingsSection/Group/Row/SubOptions + useAutoSave (Saved toast; error toast with Try again).
 - Whole page: real-browser axe (WCAG 2.1 A/AA, light and dark) 0 violations; no horizontal overflow at 320/390; 129 tests; build passes.
 - Open: P1.8 (Playwright e2e specs + CI a11y job) needs Phase 0 P3 (CI).
+
+## 2026-11-19 — P2.1 — profiles table, signup trigger, RLS (+ level names)
+
+- Migration 0002 applied to the project with `supabase db push --remote`; types regenerated (`npm run db:types`).
+- Pulled Phase 0 P4/P7/P10 (web side) forward: typed clients, env.ts, errors.ts, logger with email masking.
+- Open: the trigger check against a TEST project needs `.env.test`.

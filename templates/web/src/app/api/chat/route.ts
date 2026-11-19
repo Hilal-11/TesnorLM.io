@@ -18,7 +18,7 @@ Formatting rules:
 - Structure: intuition first, then mechanism, then math, then a short worked example.`;
 
 export async function POST(req: Request) {
-  const { notebookId, question, level = "student" } = await req.json();
+  const { notebookId, question, level = "intermediate" } = await req.json();
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
