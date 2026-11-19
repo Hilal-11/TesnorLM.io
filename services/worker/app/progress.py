@@ -15,18 +15,18 @@ import time
 from collections.abc import Callable
 from typing import Any
 
-from app.contract import STAGES, detail_line
+from app.contract import STAGE, STAGES, detail_line
 from app.errors import StaleRun
 from app.store import Store
 
 # (start, end) of each stage's share of the 0–100 bar (spec section 5).
 BANDS: dict[str, tuple[int, int]] = {
-    "queued": (0, 0),
-    "validating": (0, 5),
-    "parsing": (5, 45),
-    "ocr": (5, 45),
-    "reading_figures": (45, 65),
-    "indexing": (65, 99),
+    STAGE.queued: (0, 0),
+    STAGE.validating: (0, 5),
+    STAGE.parsing: (5, 45),
+    STAGE.ocr: (5, 45),
+    STAGE.reading_figures: (45, 65),
+    STAGE.indexing: (65, 99),
 }
 
 ORDER = {stage: i for i, stage in enumerate(STAGES)}
@@ -121,5 +121,5 @@ class StageReporter:
     def fail(self, code: str, values: dict[str, Any] | None = None) -> bool:
         self._pending = None
         return self._store.set_stage(
-            self._document_id, self._run_id, "failed", None, None, code, values or None
+            self._document_id, self._run_id, STAGE.failed, None, None, code, values or None
         )

@@ -83,3 +83,13 @@ def test_scanned_pages_are_found(pdfs):
     assert check(pdfs["scanned"]).scanned_pages == [1]
     assert check(pdfs["blank_scan"]).scanned_pages == [1]
     assert check(pdfs["logo_repeat"]).scanned_pages == []
+
+
+def test_concurrent_validation_is_safe(pdfs):
+    """PDFium isn't thread-safe; the queue runs two ingests at once (load test regression)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    names = ["paper_basic", "scanned", "logo_repeat", "paper_basic", "scanned", "logo_repeat"] * 2
+    with ThreadPoolExecutor(6) as pool:
+        results = list(pool.map(lambda n: check(pdfs[n]).pages, names))
+    assert results == [{"paper_basic": 3, "scanned": 1, "logo_repeat": 4}[n] for n in names]

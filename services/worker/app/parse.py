@@ -10,7 +10,8 @@ recognition models ship inside the `rapidocr` wheel (no download at run time), i
 system packages (unlike Tesseract), and it is much lighter than EasyOCR's torch models.
 OCR is switched on only when validation found scanned pages; born-digital PDFs never pay for it.
 
-At most two converters exist per process (with and without OCR), created once and reused.
+At most two converters exist per process (with and without OCR), created once and reused, and
+only one conversion runs at a time (parallel Docling conversions crash the process).
 """
 
 from __future__ import annotations
@@ -22,12 +23,16 @@ from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
+from app.contract import ERROR
 from app.errors import IngestError
+from app.native import NATIVE_PDF_LOCK
 
 PICTURE_SCALE = 2.0  # 144 dpi picture crops: sharp enough for captions, ≤ 1600 px after resize
 
 _converters: dict[bool, Any] = {}
 _lock = threading.Lock()
+# One conversion at a time per process, never alongside validation (see app/native.py).
+_convert_lock = NATIVE_PDF_LOCK
 
 
 def parser_version() -> str:
@@ -97,13 +102,14 @@ def convert(
         if on_page is not None and getattr(event, "kind", None) == "page_completed":
             on_page(int(event.completed_pages), int(event.total_pages), int(event.page_no))
 
-    started = clock()
-    result = converter.convert(path, raises_on_error=True, progress_callback=progress)
-    elapsed = clock() - started
+    with _convert_lock:
+        started = clock()  # the timeout counts conversion time, not time spent waiting
+        result = converter.convert(path, raises_on_error=True, progress_callback=progress)
+        elapsed = clock() - started
     if result.status == ConversionStatus.PARTIAL_SUCCESS and elapsed >= timeout_s * 0.95:
-        raise IngestError("parse_timeout")
+        raise IngestError(ERROR.parse_timeout)
     if elapsed > timeout_s:
-        raise IngestError("parse_timeout")
+        raise IngestError(ERROR.parse_timeout)
     if result.status not in (ConversionStatus.SUCCESS, ConversionStatus.PARTIAL_SUCCESS):
         raise RuntimeError(f"docling status {result.status}")
     return result.document

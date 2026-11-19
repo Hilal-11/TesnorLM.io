@@ -8,6 +8,7 @@ import time
 from collections.abc import Callable
 from typing import Any
 
+from app.contract import ERROR
 from app.errors import IngestError
 
 BATCH = 96
@@ -74,5 +75,5 @@ def check_token_budget(token_counts: list[int], cap: int) -> int:
     total = sum(token_counts)
     if total > cap:
         # Pages are capped first, so this only trips on pathological files: treat as final.
-        raise IngestError("internal")
+        raise IngestError(ERROR.internal)
     return total

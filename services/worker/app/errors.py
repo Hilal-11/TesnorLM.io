@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.contract import CONTRACT
+from app.contract import CONTRACT, ERROR
 
 
 class IngestError(Exception):
@@ -15,7 +15,7 @@ class IngestError(Exception):
 
     def __init__(self, code: str, values: dict[str, Any] | None = None) -> None:
         if code not in CONTRACT.errors:
-            code = "internal"
+            code = ERROR.internal
         super().__init__(code)
         self.code = code
         self.values = values or {}

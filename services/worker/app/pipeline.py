@@ -19,7 +19,7 @@ from typing import Any
 
 from app import chunking, figures, parse
 from app.captions import Captioner, caption_all
-from app.contract import STORAGE, storage_path
+from app.contract import ERROR, STAGE, STORAGE, storage_path
 from app.embed import Embedder, check_token_budget
 from app.errors import IngestError, StaleRun
 from app.log import get_log
@@ -75,7 +75,7 @@ def parsed_path(doc: dict[str, Any], run: Run) -> str:
 def download_source(deps: Deps, doc: dict[str, Any], folder: Path) -> Path:
     size = deps.store.object_size(STORAGE.bucket, doc["storage_path"])
     if size is None:
-        raise IngestError("upload_interrupted")
+        raise IngestError(ERROR.upload_interrupted)
     check_size(size, deps.settings.max_upload_bytes)
     data = deps.store.download(STORAGE.bucket, doc["storage_path"])
     check_size(len(data), deps.settings.max_upload_bytes)
@@ -99,7 +99,7 @@ def guarded(step: str, deps: Deps, run: Run, fn: Callable[[], StepResult]) -> St
         return {"stop": "stale"}
     except IngestError as exc:
         failed = deps.store.set_stage(
-            run.document_id, run.run_id, "failed", None, None, exc.code, exc.values or None
+            run.document_id, run.run_id, STAGE.failed, None, None, exc.code, exc.values or None
         )
         log.info("ingest failed", error_code=exc.code, recorded=failed, **fields)
         return {"stop": "failed", "code": exc.code}
@@ -115,7 +115,7 @@ def guarded(step: str, deps: Deps, run: Run, fn: Callable[[], StepResult]) -> St
 def step_validate(deps: Deps, run: Run) -> StepResult:
     doc = current(deps.store, run)
     stages = reporter(deps, run, doc)
-    stages.enter("validating")
+    stages.enter(STAGE.validating)
     with tempfile.TemporaryDirectory(prefix="tensorlm-") as tmp:
         path = download_source(deps, doc, Path(tmp))
         info = validate_pdf(
@@ -146,9 +146,9 @@ def step_parse(deps: Deps, run: Run, pages: int, scanned: list[int]) -> StepResu
 
     stages = reporter(deps, run, doc)
     ocr = bool(scanned)
-    stages.enter("parsing")
+    stages.enter(STAGE.parsing)
     if ocr:
-        stages.enter("ocr")
+        stages.enter(STAGE.ocr)
     scanned_set = set(scanned)
     finished: set[int] = set()
     lock = threading.Lock()
@@ -167,7 +167,7 @@ def step_parse(deps: Deps, run: Run, pages: int, scanned: list[int]) -> StepResu
         path = download_source(deps, doc, Path(tmp))
         parsed = deps.convert(path, ocr=ocr, timeout_s=deps.settings.parse_timeout_s, on_page=on_page)
     if not parse.has_text(parsed):
-        raise IngestError("no_text_found")
+        raise IngestError(ERROR.no_text_found)
     deps.store.upload(STORAGE.artifacts_bucket, artifact, parse.to_json(parsed), "application/json")
     if not deps.store.update_document(run.document_id, run.run_id, {"ocr_used": ocr}):
         raise StaleRun()
@@ -184,7 +184,7 @@ def step_figures(deps: Deps, run: Run) -> StepResult:
     if not saved:
         return {"figures": 0, "skipped": skipped}
     stages = reporter(deps, run, doc)
-    stages.enter("reading_figures", 0, len(saved), done=0, total=len(saved))
+    stages.enter(STAGE.reading_figures, 0, len(saved), done=0, total=len(saved))
     rows = []
     for figure in saved:
         path = storage_path(
@@ -224,7 +224,7 @@ def step_captions(deps: Deps, run: Run) -> StepResult:
     if not rows or deps.captioner is None:
         return {"described": 0, "failed": 0}
     stages = reporter(deps, run, doc)
-    stages.enter("reading_figures")
+    stages.enter(STAGE.reading_figures)
     captioner = deps.captioner
 
     def save(figure: dict[str, Any], text: str) -> None:
@@ -265,12 +265,12 @@ def step_index(deps: Deps, run: Run) -> StepResult:
     title = doc.get("title") or "Untitled"
     rows = chunking.build_chunks(parsed, title, page_count, figure_rows)
     if not rows:
-        raise IngestError("no_text_found")
+        raise IngestError(ERROR.no_text_found)
     check_token_budget([r.token_count for r in rows], deps.settings.max_document_tokens)
 
     stages = reporter(deps, run, doc)
     total = len(rows)
-    stages.enter("indexing", 0, total, passages=total)
+    stages.enter(STAGE.indexing, 0, total, passages=total)
     done_already = deps.store.embedded_chunk_indexes(run.document_id, run.run_id)
     todo = [r for r in rows if r.chunk_index not in done_already]
 
@@ -362,12 +362,12 @@ def run_all(deps: Deps, run: Run, step: Callable[[str, Callable[[], StepResult]]
 
 def fail_internal(store: Store, run: Run, reason: str) -> bool:
     """After the last retry: the document fails as `internal` (logged with ids, not text)."""
-    ok = store.set_stage(run.document_id, run.run_id, "failed", None, None, "internal", None)
+    ok = store.set_stage(run.document_id, run.run_id, STAGE.failed, None, None, ERROR.internal, None)
     log.error(
         "ingest failed after retries",
         document_id=run.document_id,
         run_id=run.run_id,
-        error_code="internal",
+        error_code=ERROR.internal,
         reason=reason,
         recorded=ok,
     )

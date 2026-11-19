@@ -278,6 +278,29 @@ LIMITS = CONTRACT.limits  # defaults only: settings read MAX_UPLOAD_MB, MAX_PAGE
 STORAGE = CONTRACT.storage
 
 
+class _Names:
+    """Names the contract defines, as attributes: `STAGE.parsing`, `ERROR.corrupt_pdf`.
+
+    Worker code uses these instead of string literals, so a renamed or removed stage or error
+    code fails loudly (tests/test_contract_names.py also checks every use statically)."""
+
+    def __init__(self, kind: str, names: object) -> None:
+        self._kind = kind
+        self._names = frozenset(names)  # type: ignore[arg-type]
+
+    def __getattr__(self, name: str) -> str:
+        if name.startswith("_") or name not in self._names:
+            raise AttributeError(f'{self._kind} "{name}" is not in contracts/ingestion.json')
+        return name
+
+    def __contains__(self, name: object) -> bool:
+        return name in self._names
+
+
+STAGE = _Names("stage", CONTRACT.stages)
+ERROR = _Names("error code", CONTRACT.errors)
+
+
 @dataclass(frozen=True)
 class ErrorAction:
     id: str

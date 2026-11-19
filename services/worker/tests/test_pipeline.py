@@ -279,3 +279,14 @@ def test_unexpected_errors_propagate_for_the_queue_to_retry(pdf_bytes):
     with pytest.raises(MemoryError):
         run_all(deps, Run(doc["id"], doc["ingest_run_id"]), plain_step)
     assert store.documents[doc["id"]]["stage"] == "parsing"  # not failed: the queue retries
+
+
+def test_parallel_conversions_are_serialized(pdfs):
+    """Two ingests parse at once under load; unguarded, Docling crashes the process."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def convert(name):
+        return len(parse.convert(pdfs[name], ocr=False, timeout_s=600).pages)
+
+    with ThreadPoolExecutor(3) as pool:
+        assert list(pool.map(convert, ["paper_basic", "logo_repeat", "paper_basic"])) == [3, 4, 3]
