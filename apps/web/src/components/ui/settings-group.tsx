@@ -131,6 +131,30 @@ export function SettingsRow({
   );
 }
 
+/** A row without a switch: label, description and a control on the right (button, select, badge). */
+export function SettingsItem({
+  label,
+  description,
+  icon,
+  children,
+}: {
+  label: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <div data-slot="settings-item" className="flex flex-wrap items-center gap-4 p-4">
+      {icon && <span className="flex size-8 shrink-0 items-center justify-center">{icon}</span>}
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className="text-body font-medium text-ink">{label}</span>
+        {description && <span className="text-small text-graphite">{description}</span>}
+      </div>
+      {children && <div className="flex shrink-0 items-center gap-2">{children}</div>}
+    </div>
+  );
+}
+
 /** Nested options under a row: expand with grid-template-rows 0fr → 1fr; inert while hidden. */
 export function SettingsSubOptions({ open, children }: { open: boolean; children: ReactNode }) {
   return (

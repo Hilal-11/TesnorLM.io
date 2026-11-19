@@ -76,11 +76,13 @@ export function WorkspaceSwitcher({
           ))}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem icon={Plus} onSelect={onCreate}>
+        <DropdownMenuItem icon={Plus} onSelect={onCreate} disabled={!onCreate}>
           Create workspace
+          {!onCreate && <span className="ml-auto text-small text-graphite">Coming soon</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem icon={Settings} onSelect={onSettings}>
+        <DropdownMenuItem icon={Settings} onSelect={onSettings} disabled={!onSettings}>
           Settings
+          {!onSettings && <span className="ml-auto text-small text-graphite">Coming soon</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

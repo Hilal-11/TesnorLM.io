@@ -298,6 +298,8 @@
   --animate-pop-out: pop-out calc(var(--dur-base) * 0.7) var(--ease-in);
   --animate-slide-in-right: slide-in-right var(--dur-slow) var(--ease-out);
   --animate-slide-out-right: slide-out-right calc(var(--dur-slow) * 0.7) var(--ease-in);
+  --animate-slide-in-left: slide-in-left var(--dur-slow) var(--ease-out);
+  --animate-slide-out-left: slide-out-left calc(var(--dur-slow) * 0.7) var(--ease-in);
   --animate-slide-in-up: slide-in-up var(--dur-slow) var(--ease-out);
   --animate-slide-out-down: slide-out-down calc(var(--dur-slow) * 0.7) var(--ease-in);
   --animate-indeterminate: indeterminate 1.6s var(--ease-inout) infinite;
@@ -333,6 +335,16 @@
 @keyframes slide-out-right {
   to {
     transform: translateX(100%);
+  }
+}
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slide-out-left {
+  to {
+    transform: translateX(-100%);
   }
 }
 @keyframes slide-in-up {

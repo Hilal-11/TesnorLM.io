@@ -21,7 +21,7 @@ type SheetContentProps = {
   title: ReactNode;
   description?: ReactNode;
   /** "auto": a side sheet from 768px, a bottom sheet below. */
-  side?: "auto" | "right" | "bottom";
+  side?: "auto" | "right" | "left" | "bottom";
   defaultSnap?: (typeof SNAP_POINTS)[number];
   className?: string;
   children: ReactNode;
@@ -40,13 +40,16 @@ export function SheetContent({
   return (
     <DialogPrimitive.Portal container={usePortalContainer()}>
       <DialogOverlay />
-      {resolved === "right" ? (
+      {resolved === "right" || resolved === "left" ? (
         <DialogPrimitive.Content
           data-slot="sheet"
-          data-side="right"
+          data-side={resolved}
           {...(description ? {} : { "aria-describedby": undefined })}
           className={cn(
-            "fixed inset-y-0 right-0 z-50 flex w-[clamp(420px,40vw,560px)] max-w-full flex-col rounded-l-lg border-l border-rule bg-popover text-ink shadow-3 data-[state=closed]:animate-slide-out-right data-[state=open]:animate-slide-in-right",
+            "fixed inset-y-0 z-50 flex max-w-full flex-col bg-popover text-ink shadow-3",
+            resolved === "right"
+              ? "right-0 w-[clamp(420px,40vw,560px)] rounded-l-lg border-l border-rule data-[state=closed]:animate-slide-out-right data-[state=open]:animate-slide-in-right"
+              : "left-0 w-[min(320px,85vw)] rounded-r-lg border-r border-rule data-[state=closed]:animate-slide-out-left data-[state=open]:animate-slide-in-left",
             className,
           )}
         >

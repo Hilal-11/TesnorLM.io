@@ -26,6 +26,8 @@ type UserCardProps = {
   onShortcuts?: () => void;
   onSignOut: () => void;
   compact?: boolean;
+  /** Where the menu opens: up from a sidebar footer, down from a top bar. */
+  menuSide?: "top" | "bottom";
   className?: string;
 };
 
@@ -40,6 +42,7 @@ export function UserCard({
   onShortcuts,
   onSignOut,
   compact = false,
+  menuSide = "top",
   className,
 }: UserCardProps) {
   return (
@@ -66,7 +69,11 @@ export function UserCard({
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start" className="min-w-56">
+      <DropdownMenuContent
+        side={menuSide}
+        align={menuSide === "top" ? "start" : "end"}
+        className="min-w-56"
+      >
         <DropdownMenuItem icon={User} onSelect={onProfile}>
           Profile
         </DropdownMenuItem>

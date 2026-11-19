@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 type EmptyStateProps = {
@@ -9,7 +10,13 @@ type EmptyStateProps = {
   /** One sentence that invites the action (skill 9). */
   description: ReactNode;
   /** Exactly one primary action. */
-  action?: { label: string; icon?: LucideIcon; onClick?: () => void };
+  action?: {
+    label: string;
+    icon?: LucideIcon;
+    onClick?: () => void;
+    /** Not available yet: the button stays focusable, shows this in a tooltip, and does nothing. */
+    disabledReason?: string;
+  };
   /** Example questions shown as chips. */
   examples?: string[];
   onExample?: (example: string) => void;
@@ -45,11 +52,20 @@ export function EmptyState({
         <Title className="text-h3 text-ink">{title}</Title>
         <p className="max-w-[46ch] text-body text-balance text-graphite">{description}</p>
       </div>
-      {action && (
-        <Button leadingIcon={action.icon} onClick={action.onClick}>
-          {action.label}
-        </Button>
-      )}
+      {action &&
+        (action.disabledReason ? (
+          <Tooltip label={action.disabledReason}>
+            <Button aria-disabled>
+              {action.icon && <action.icon aria-hidden />}
+              {action.label}
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button onClick={action.onClick}>
+            {action.icon && <action.icon aria-hidden />}
+            {action.label}
+          </Button>
+        ))}
       {examples && examples.length > 0 && (
         <ul aria-label="Example questions" className="flex flex-wrap justify-center gap-2">
           {examples.map((example) => (

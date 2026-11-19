@@ -77,3 +77,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - Proxy + server guards (defence in depth); onboarding check lives in the (app) layout, not the proxy.
 - Verified: routeDecision unit tests; e2e for redirects with next, 401 JSON, no off-site redirects.
+
+## 2026-11-19 — P2.4 — Desktop app shell
+
+- Shell per spec; sidebar width snaps (no width animation); level switch saves to the profile.
+- Verified: unit tests (aria-current, Ctrl+B persistence, Ctrl+K navigation, linked accounts), e2e + axe light/dark, screenshots 1440-768.
+- Removed one accessory: the plan badge appeared in both the switcher and the breadcrumb; kept it in the switcher.

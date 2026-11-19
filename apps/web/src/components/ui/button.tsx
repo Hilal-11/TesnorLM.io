@@ -1,3 +1,5 @@
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2, type LucideIcon } from "lucide-react";
 import { Slot as SlotPrimitive } from "radix-ui";
@@ -91,7 +93,9 @@ export function Button({
         {asChild ? (
           children
         ) : (
-          <span className={cn("inline-flex items-center", loading && !Leading && "opacity-0")}>
+          <span
+            className={cn("inline-flex items-center gap-2", loading && !Leading && "opacity-0")}
+          >
             {children}
           </span>
         )}

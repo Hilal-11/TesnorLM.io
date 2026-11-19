@@ -2,6 +2,7 @@
 
 import { ChevronRight, PanelLeftClose, PanelLeftOpen, type LucideIcon } from "lucide-react";
 import { Collapsible as CollapsiblePrimitive } from "radix-ui";
+import Link from "next/link";
 import { createContext, use, useId, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { IconButton } from "@/components/ui/icon-button";
@@ -97,7 +98,7 @@ export function SidebarNavItem({
 }: SidebarNavItemProps) {
   const { collapsed } = use(SidebarContext);
   const link = (
-    <a
+    <Link
       href={href}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
@@ -120,7 +121,7 @@ export function SidebarNavItem({
           {count !== undefined && <Badge className="tabular-nums">{count}</Badge>}
         </>
       )}
-    </a>
+    </Link>
   );
   return (
     <li>
