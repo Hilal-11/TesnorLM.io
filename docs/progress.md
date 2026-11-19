@@ -106,3 +106,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Security: no off-site redirects (`//evil.com`, `https://evil.com`, `/\evil.com`); client bundle has no server env names or secret values (only supabase-js's `sb_secret_` prefix check); verify cookie httpOnly, `secure` in production; auth copy never reveals account existence; rate-limit message mapped.
 - Checks: lint, typecheck, 180 unit/component tests, build, 33 e2e passed (signed-in flow skipped until the test project exists).
 - Open (needs you): OAuth manual check, signed-in e2e and test:rls on the test project.
+
+## 2026-11-19 — P3.0 — Ingestion spec and shared contract
+
+- `docs/specs/ingestion.md` (flow, stage machine, errors, limits, storage, events, idempotency, cancellation, retries, acceptance) and `contracts/ingestion.json`; loaders in `src/lib/ingestion/contract.ts` (generated copy, since Turbopack can't import outside apps/web) and `app/contract.py` (pydantic).
+- Verified: vitest (validity, drift, broken-contract cases, helpers) writes `contracts/fixtures/ingestion-cases.json`; pytest asserts Python gives identical answers (mutating the contract makes it fail). Worker pytest is now set up (`pytest.ini`, `requirements-dev.txt`).
+- Open: confirm the source quota is per notebook; the worker image must include `contracts/` (P3.14).

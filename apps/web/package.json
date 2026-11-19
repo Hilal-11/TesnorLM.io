@@ -18,8 +18,9 @@
     "db:types": "supabase gen types typescript --remote --schema public --workdir ../.. > src/lib/database.types.ts",
     "test:rls": "node scripts/vitest.mjs run --config vitest.rls.config.mts",
     "e2e": "playwright test",
-    "predev": "node scripts/sync-env.mjs",
-    "prebuild": "node scripts/sync-env.mjs"
+    "contract:sync": "node scripts/sync-contract.mjs",
+    "predev": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs",
+    "prebuild": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.106",

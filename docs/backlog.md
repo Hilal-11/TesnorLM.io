@@ -59,6 +59,36 @@ Waiting on you (dashboards and secrets):
 - [ ] CI job for `test:rls` (needs Phase 0 P3 CI first)
 - [ ] Phase 3: wire onboarding step 4 ("sample paper" / "upload my own") to real uploads (TODO in onboarding-wizard)
 
+## Phase 3 — Notebooks & ingestion
+
+Milestone: a person creates a notebook, uploads up to 10 PDFs at once on a patchy connection,
+watches each move through honest live stages, and sees it Ready with page-aware chunks, figures and
+captions in the database. Failures explain the reason and the fix. Five uploads at once all finish.
+Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
+
+- [x] P3.0 — Ingestion spec + shared contract (TS and Python loaders, parity fixture)
+- [ ] P3.1 — Database: notebooks columns, document stages, chunks/figures by run, `finalize_ingest()`, `set_document_stage()`, Realtime, bucket limits, `ingest-artifacts` bucket
+- [ ] P3.2 — Notebooks data layer and actions (CRUD, ordering, soft delete)
+- [ ] P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
+- [ ] P3.4 — Board view with drag and drop
+- [ ] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs
+- [ ] P3.6 — Worker: page count + file validation; stage column updates
+- [ ] P3.7 — OCR fallback for scanned pages
+- [ ] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
+- [ ] P3.9 — Figures: extract and store; caption and embed
+- [ ] P3.10 — Upload flow (resumable) + upload modal
+- [ ] P3.11 — Live pipeline progress (notebook sources view)
+- [ ] P3.12 — Re-process and delete with cleanup
+- [ ] P3.13 — Worker test suite with fixtures
+- [ ] P3.14 — Production hardening, load test and deploy
+
+Waiting on you (Phase 3):
+
+- [ ] Confirm: the free source limit (20) is per notebook, not per account (spec section 17)
+- [ ] Inngest app `tensorlm` + Production event and signing keys; Railway plan with ≥ 4 GB RAM
+- [ ] Sample paper with a redistributable licence at `apps/web/public/samples/sample-paper.pdf` + `docs/samples.md`
+- [ ] Phase 3 variables in `.env` (names in `.env.example`); test project gets every migration
+
 ## Found in setup review — not yet scheduled
 
 - [ ] Worker crashes in Docker: `main.py` uses `Path(__file__).parents[3]`, which doesn't exist at `/app/app/main.py`

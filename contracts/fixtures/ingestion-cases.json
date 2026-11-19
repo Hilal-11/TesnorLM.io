@@ -1,0 +1,2582 @@
+{
+  "version": 1,
+  "uiWord": [
+    {
+      "stage": "uploading",
+      "out": "Uploading"
+    },
+    {
+      "stage": "queued",
+      "out": "Queued"
+    },
+    {
+      "stage": "validating",
+      "out": "Reading"
+    },
+    {
+      "stage": "parsing",
+      "out": "Reading"
+    },
+    {
+      "stage": "ocr",
+      "out": "Reading"
+    },
+    {
+      "stage": "reading_figures",
+      "out": "Reading"
+    },
+    {
+      "stage": "indexing",
+      "out": "Indexing"
+    },
+    {
+      "stage": "ready",
+      "out": "Ready"
+    },
+    {
+      "stage": "failed",
+      "out": "Failed"
+    },
+    {
+      "stage": "nope",
+      "throws": true
+    }
+  ],
+  "canTransition": [
+    {
+      "from": "uploading",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "queued",
+      "out": true
+    },
+    {
+      "from": "uploading",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "uploading",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "validating",
+      "out": true
+    },
+    {
+      "from": "queued",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "queued",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "parsing",
+      "out": true
+    },
+    {
+      "from": "validating",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "validating",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "ocr",
+      "out": true
+    },
+    {
+      "from": "parsing",
+      "to": "reading_figures",
+      "out": true
+    },
+    {
+      "from": "parsing",
+      "to": "indexing",
+      "out": true
+    },
+    {
+      "from": "parsing",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "parsing",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "parsing",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "reading_figures",
+      "out": true
+    },
+    {
+      "from": "ocr",
+      "to": "indexing",
+      "out": true
+    },
+    {
+      "from": "ocr",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "ocr",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "indexing",
+      "out": true
+    },
+    {
+      "from": "reading_figures",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "reading_figures",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "ready",
+      "out": true
+    },
+    {
+      "from": "indexing",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "indexing",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "failed",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "failed",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "parsing",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "failed",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "nope",
+      "out": false
+    }
+  ],
+  "isTerminal": [
+    {
+      "stage": "uploading",
+      "out": false
+    },
+    {
+      "stage": "queued",
+      "out": false
+    },
+    {
+      "stage": "validating",
+      "out": false
+    },
+    {
+      "stage": "parsing",
+      "out": false
+    },
+    {
+      "stage": "ocr",
+      "out": false
+    },
+    {
+      "stage": "reading_figures",
+      "out": false
+    },
+    {
+      "stage": "indexing",
+      "out": false
+    },
+    {
+      "stage": "ready",
+      "out": true
+    },
+    {
+      "stage": "failed",
+      "out": true
+    },
+    {
+      "stage": "nope",
+      "throws": true
+    }
+  ],
+  "detailLine": [
+    {
+      "stage": "uploading",
+      "vars": {},
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62
+      },
+      "out": "Uploading · 62%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62,
+        "unrelated": "ignored"
+      },
+      "out": "Uploading · 62%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 1
+      },
+      "out": "Uploading · 1%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": "{page}"
+      },
+      "out": "Uploading · {page}%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 0
+      },
+      "out": "Uploading · 0%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62.5
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": true
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": null
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": {
+          "n": 1
+        }
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": [
+          1
+        ]
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 9007199254740992
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": -9007199254740992
+      },
+      "out": "Uploading"
+    },
+    {
+      "stage": "queued",
+      "vars": {},
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "queued",
+      "vars": {},
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "queued",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "validating",
+      "vars": {},
+      "out": "Checking the file"
+    },
+    {
+      "stage": "validating",
+      "vars": {},
+      "out": "Checking the file"
+    },
+    {
+      "stage": "validating",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": "Checking the file"
+    },
+    {
+      "stage": "parsing",
+      "vars": {},
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "out": "Reading page 4 of 12"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "out": "Reading page 4 of 12"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "out": "Reading page 1 of 12"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "out": "Reading page {page} of 12"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "out": "Reading page 0 of 12"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "out": "Reading page 4 of 1"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "out": "Reading page 4 of {page}"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "out": "Reading page 4 of 0"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "parsing",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "out": "Reading the pages"
+    },
+    {
+      "stage": "ocr",
+      "vars": {},
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "out": "Running OCR on page 4 of 12"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "out": "Running OCR on page 4 of 12"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "out": "Running OCR on page 1 of 12"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "out": "Running OCR on page {page} of 12"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "out": "Running OCR on page 0 of 12"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "out": "Running OCR on page 4 of 1"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "out": "Running OCR on page 4 of {page}"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "out": "Running OCR on page 4 of 0"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "out": "Running OCR"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {},
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 9
+      },
+      "out": "Reading figures · 3 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 9,
+        "unrelated": "ignored"
+      },
+      "out": "Reading figures · 3 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 1,
+        "total": 9
+      },
+      "out": "Reading figures · 1 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": "{page}",
+        "total": 9
+      },
+      "out": "Reading figures · {page} of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 0,
+        "total": 9
+      },
+      "out": "Reading figures · 0 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 1
+      },
+      "out": "Reading figures · 3 of 1"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": "{page}"
+      },
+      "out": "Reading figures · 3 of {page}"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 0
+      },
+      "out": "Reading figures · 3 of 0"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 62.5,
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": true,
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": null,
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": {
+          "n": 1
+        },
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": [
+          1
+        ],
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 9007199254740992,
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": -9007199254740992,
+        "total": 9
+      },
+      "out": "Reading figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {},
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 128
+      },
+      "out": "Indexing 128 passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 128,
+        "unrelated": "ignored"
+      },
+      "out": "Indexing 128 passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 1
+      },
+      "out": "Indexing 1 passage"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": "{page}"
+      },
+      "out": "Indexing {page} passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 0
+      },
+      "out": "Indexing 0 passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 62.5
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": true
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": null
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": {
+          "n": 1
+        }
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": [
+          1
+        ]
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 9007199254740992
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": -9007199254740992
+      },
+      "out": "Indexing passages"
+    },
+    {
+      "stage": "ready",
+      "vars": {},
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 12
+      },
+      "out": "12 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "out": "12 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 1
+      },
+      "out": "1 page · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": "{page}"
+      },
+      "out": "{page} pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 0
+      },
+      "out": "0 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 62.5
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": true
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": null
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": {
+          "n": 1
+        }
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": [
+          1
+        ]
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 9007199254740992
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": -9007199254740992
+      },
+      "out": "Ready"
+    },
+    {
+      "stage": "failed",
+      "vars": {},
+      "throws": true
+    },
+    {
+      "stage": "failed",
+      "vars": {},
+      "throws": true
+    },
+    {
+      "stage": "failed",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {},
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {},
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "throws": true
+    }
+  ],
+  "errorCopy": [
+    {
+      "code": "not_pdf",
+      "vars": {},
+      "out": {
+        "code": "not_pdf",
+        "message": "This file isn't a PDF.",
+        "fix": "Choose a PDF file instead.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "not_pdf",
+      "vars": {},
+      "out": {
+        "code": "not_pdf",
+        "message": "This file isn't a PDF.",
+        "fix": "Choose a PDF file instead.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "not_pdf",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "not_pdf",
+        "message": "This file isn't a PDF.",
+        "fix": "Choose a PDF file instead.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {},
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "63.4",
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 63.4 MB. The limit is 50 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "63.4",
+        "limitMb": 50,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 63.4 MB. The limit is 50 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": 1,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 1 MB. The limit is 50 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "{page}",
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is {page} MB. The limit is 50 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": 0,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 0 MB. The limit is 50 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "63.4",
+        "limitMb": 1
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 63.4 MB. The limit is 1 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "63.4",
+        "limitMb": "{page}"
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 63.4 MB. The limit is {page} MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": "63.4",
+        "limitMb": 0
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is 63.4 MB. The limit is 0 MB.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": 62.5,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": true,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": null,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": {
+          "n": 1
+        },
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": [
+          1
+        ],
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": 9007199254740992,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "file_too_large",
+      "vars": {
+        "sizeMb": -9007199254740992,
+        "limitMb": 50
+      },
+      "out": {
+        "code": "file_too_large",
+        "message": "This file is over the size limit.",
+        "fix": "Split the PDF or upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {},
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 12,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 12 pages. The limit is 200 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 12,
+        "limit": 200,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 12 pages. The limit is 200 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 1,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 1 pages. The limit is 200 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": "{page}",
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has {page} pages. The limit is 200 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 0,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 0 pages. The limit is 200 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 12,
+        "limit": 1
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 12 pages. The limit is 1 page.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 12,
+        "limit": "{page}"
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 12 pages. The limit is {page} pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 12,
+        "limit": 0
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has 12 pages. The limit is 0 pages.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 62.5,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": true,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": null,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": {
+          "n": 1
+        },
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": [
+          1
+        ],
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": 9007199254740992,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "too_many_pages",
+      "vars": {
+        "pages": -9007199254740992,
+        "limit": 200
+      },
+      "out": {
+        "code": "too_many_pages",
+        "message": "This PDF has more pages than the limit.",
+        "fix": "Upload chapters separately.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "encrypted_pdf",
+      "vars": {},
+      "out": {
+        "code": "encrypted_pdf",
+        "message": "This PDF is password-protected.",
+        "fix": "Remove the password and upload it again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "encrypted_pdf",
+      "vars": {},
+      "out": {
+        "code": "encrypted_pdf",
+        "message": "This PDF is password-protected.",
+        "fix": "Remove the password and upload it again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "encrypted_pdf",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "encrypted_pdf",
+        "message": "This PDF is password-protected.",
+        "fix": "Remove the password and upload it again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "corrupt_pdf",
+      "vars": {},
+      "out": {
+        "code": "corrupt_pdf",
+        "message": "This PDF looks damaged and can't be opened.",
+        "fix": "Re-download or re-export the PDF, then try again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "corrupt_pdf",
+      "vars": {},
+      "out": {
+        "code": "corrupt_pdf",
+        "message": "This PDF looks damaged and can't be opened.",
+        "fix": "Re-download or re-export the PDF, then try again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "corrupt_pdf",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "corrupt_pdf",
+        "message": "This PDF looks damaged and can't be opened.",
+        "fix": "Re-download or re-export the PDF, then try again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_found",
+      "vars": {},
+      "out": {
+        "code": "no_text_found",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_found",
+      "vars": {},
+      "out": {
+        "code": "no_text_found",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_found",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "no_text_found",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "parse_timeout",
+      "vars": {},
+      "out": {
+        "code": "parse_timeout",
+        "message": "This PDF took too long to read.",
+        "fix": "Try again, or upload it in smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "parse_timeout",
+      "vars": {},
+      "out": {
+        "code": "parse_timeout",
+        "message": "This PDF took too long to read.",
+        "fix": "Try again, or upload it in smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "parse_timeout",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "parse_timeout",
+        "message": "This PDF took too long to read.",
+        "fix": "Try again, or upload it in smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {},
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 200
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its limit of 200 sources.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 200,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its limit of 200 sources.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 1
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its limit of 1 sources.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": "{page}"
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its limit of {page} sources.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 0
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its limit of 0 sources.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 62.5
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": true
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": null
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": {
+          "n": 1
+        }
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": [
+          1
+        ]
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": 9007199254740992
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "quota_exceeded",
+      "vars": {
+        "limit": -9007199254740992
+      },
+      "out": {
+        "code": "quota_exceeded",
+        "message": "This notebook has reached its source limit.",
+        "fix": "Remove a source, then add this one.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "duplicate_file",
+      "vars": {},
+      "out": {
+        "code": "duplicate_file",
+        "message": "This paper is already in this notebook.",
+        "fix": "Open the copy you added, or add it again anyway.",
+        "actions": [
+          {
+            "id": "open_existing",
+            "label": "Open it"
+          },
+          {
+            "id": "add_anyway",
+            "label": "Add anyway"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "duplicate_file",
+      "vars": {},
+      "out": {
+        "code": "duplicate_file",
+        "message": "This paper is already in this notebook.",
+        "fix": "Open the copy you added, or add it again anyway.",
+        "actions": [
+          {
+            "id": "open_existing",
+            "label": "Open it"
+          },
+          {
+            "id": "add_anyway",
+            "label": "Add anyway"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "duplicate_file",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "duplicate_file",
+        "message": "This paper is already in this notebook.",
+        "fix": "Open the copy you added, or add it again anyway.",
+        "actions": [
+          {
+            "id": "open_existing",
+            "label": "Open it"
+          },
+          {
+            "id": "add_anyway",
+            "label": "Add anyway"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "upload_interrupted",
+      "vars": {},
+      "out": {
+        "code": "upload_interrupted",
+        "message": "The upload stopped.",
+        "fix": "Check your connection, then resume the upload.",
+        "actions": [
+          {
+            "id": "resume_upload",
+            "label": "Resume upload"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "upload_interrupted",
+      "vars": {},
+      "out": {
+        "code": "upload_interrupted",
+        "message": "The upload stopped.",
+        "fix": "Check your connection, then resume the upload.",
+        "actions": [
+          {
+            "id": "resume_upload",
+            "label": "Resume upload"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "upload_interrupted",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "upload_interrupted",
+        "message": "The upload stopped.",
+        "fix": "Check your connection, then resume the upload.",
+        "actions": [
+          {
+            "id": "resume_upload",
+            "label": "Resume upload"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "internal",
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": "internal",
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": "internal",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": "nope",
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": "nope",
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": "nope",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": null,
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": null,
+      "vars": {},
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    },
+    {
+      "code": null,
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "internal",
+        "message": "We couldn't finish reading this file.",
+        "fix": "Try again in a moment.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": true
+      }
+    }
+  ],
+  "storagePath": [
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/source.pdf"
+    },
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": "3"
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/source.pdf"
+    },
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3.5
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/source.pdf"
+    },
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20"
+      },
+      "throws": true
+    },
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "../d-2",
+        "runId": "r-1",
+        "n": 3
+      },
+      "throws": true
+    },
+    {
+      "kind": "source",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1\n",
+        "n": 3
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/source.pdf"
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/figures/r-1/3.webp"
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": "3"
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/figures/r-1/3.webp"
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3.5
+      },
+      "throws": true
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20"
+      },
+      "throws": true
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "../d-2",
+        "runId": "r-1",
+        "n": 3
+      },
+      "throws": true
+    },
+    {
+      "kind": "figure",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1\n",
+        "n": 3
+      },
+      "throws": true
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/r-1/doc.json"
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": "3"
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/r-1/doc.json"
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1",
+        "n": 3.5
+      },
+      "out": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20/d-1/r-1/doc.json"
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20"
+      },
+      "throws": true
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "../d-2",
+        "runId": "r-1",
+        "n": 3
+      },
+      "throws": true
+    },
+    {
+      "kind": "parsed",
+      "vars": {
+        "userId": "6f1c2a9e-0b7d-4c1e-9a52-3d8e4f7b1c20",
+        "documentId": "d-1",
+        "runId": "r-1\n",
+        "n": 3
+      },
+      "throws": true
+    }
+  ]
+}
