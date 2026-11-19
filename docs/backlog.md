@@ -42,7 +42,7 @@ Milestone: sign up (email, Google or GitHub), verify, log in, finish onboarding 
 shell on desktop and mobile; every table private per user, proven by an automated test.
 
 - [x] P2.1 — profiles table, signup trigger, RLS (+ level names)
-- [ ] P2.2 — Auth pages (email, OTP, magic link, Google, GitHub, reset) + branded emails
+- [x] P2.2 — Auth pages (email, OTP, magic link, Google, GitHub, reset) + branded emails
 - [ ] P2.3 — Session refresh and route protection
 - [ ] P2.4 — Desktop app shell
 - [ ] P2.5 — Mobile shell (bottom tab bar)

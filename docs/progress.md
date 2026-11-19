@@ -66,3 +66,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Migration 0002 applied to the project with `supabase db push --remote`; types regenerated (`npm run db:types`).
 - Pulled Phase 0 P4/P7/P10 (web side) forward: typed clients, env.ts, errors.ts, logger with email masking.
 - Open: the trigger check against a TEST project needs `.env.test`.
+
+## 2026-11-19 — P2.2 — Auth pages (email, OTP, magic link, Google, GitHub, reset) + branded emails
+
+- Auth pages and flows per spec; verify email kept in an httpOnly cookie, not the URL; `safeNext()` on every redirect.
+- Verified: unit tests (OtpInput, auth errors), e2e (sign-in steps, axe on 6 pages x 2 themes, 320px fit), screenshots 1440/390/320.
+- Open: paste docs/email-templates into Supabase; manual Google/GitHub check on localhost.

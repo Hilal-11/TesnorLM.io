@@ -1,0 +1,31 @@
+<!-- Supabase → Authentication → Emails → Change email address. Subject: Confirm your new TensorLM email -->
+<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:#F6F7F4;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F7F4;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#FFFFFF;border:1px solid #DCE1DE;border-radius:16px;">
+            <tr>
+              <td style="padding:32px;font-family:'Hanken Grotesk',Segoe UI,Helvetica,Arial,sans-serif;color:#14212B;">
+                <p style="margin:0 0 24px;font-size:15px;font-weight:600;">TensorLM</p>
+                <h1 style="margin:0 0 8px;font-size:24px;line-height:32px;font-weight:600;">Confirm your new email</h1>
+                <p style="margin:0 0 24px;font-size:15px;line-height:24px;color:#5B6873;">
+                  You asked to change your TensorLM email from {{ .Email }} to {{ .NewEmail }}.
+                  Confirm the change with this link.
+                </p>
+                <p style="margin:0 0 24px;">
+                  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/app/settings"
+                     style="display:inline-block;padding:10px 16px;background:#2449D8;color:#FFFFFF;border-radius:8px;font-size:15px;font-weight:500;text-decoration:none;">Confirm new email</a>
+                </p>
+                <p style="margin:0;font-size:13px;line-height:20px;color:#5B6873;">
+                  Didn't ask for this? Ignore this email and your email stays the same.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
