@@ -79,7 +79,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 - [ ] P3.10 — Upload flow (resumable) + upload modal
 - [ ] P3.11 — Live pipeline progress (notebook sources view)
 - [ ] P3.12 — Re-process and delete with cleanup
-- [ ] P3.13 — Worker test suite with fixtures
+- [x] P3.13 — Worker test suite with fixtures
 - [ ] P3.14 — Production hardening, load test and deploy
 
 Waiting on you (Phase 3):
