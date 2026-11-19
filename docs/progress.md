@@ -37,3 +37,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - StatusPill, LevelFlag, Avatar(+Stack), Progress (bar/dots/ring), Skeleton + DelayedSkeleton + presets, EmptyState.
 - Added success/warning/danger-strong tokens for status words on tints (light success/warning alone are 4.3/4.1:1).
 - Verified: 19 tests incl. fake-timer tooltip delay and DelayedSkeleton; axe clean.
+
+## 2026-11-19 — P1.4 — Overlays
+
+- Modal + TypedConfirmDialog, Sheet (side, or bottom with snap points), DropdownMenu finished, Popover citation preview, sonner Toaster.
+- Overlays portal into the showcase column (PortalContainerProvider), so overlays opened in the dark column are dark.
+- Verified: 6 tests (focus trap and return, typed confirm, snaps, menu typeahead and submenu, Undo); axe on the open dialog.

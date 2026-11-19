@@ -24,7 +24,7 @@ only from TensorLM design tokens, keyboard-operable, with zero serious axe issue
 - [x] P1.1 — Buttons, icon button, split button, copy button
 - [x] P1.2 — Inputs
 - [x] P1.3 — Display components
-- [ ] P1.4 — Overlays
+- [x] P1.4 — Overlays
 - [ ] P1.5 — Navigation
 - [ ] P1.6 — Data table and pagination
 - [ ] P1.7 — Settings group and rows

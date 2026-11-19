@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, JetBrains_Mono, Literata } from "next/font/google";
+import { Toaster } from "@/components/ui/toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 // All three are variable fonts: one file per style covers every weight we use (400/500/600).
@@ -36,7 +38,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${hanken.variable} ${literata.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <TooltipProvider>
+          {children}
+          <Toaster />
+        </TooltipProvider>
+      </body>
     </html>
   );
 }
