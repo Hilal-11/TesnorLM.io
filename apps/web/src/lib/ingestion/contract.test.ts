@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { Constants } from "@/lib/database.types";
 import {
   EVENTS,
   STAGES,
@@ -26,6 +27,10 @@ describe("ingestion contract", () => {
 
   it("is valid", () => {
     expect(validateContract(source)).toEqual([]);
+  });
+
+  it("matches the database's document_stage enum (migration 0004)", () => {
+    expect([...Constants.public.Enums.document_stage]).toEqual([...STAGES]);
   });
 
   it("gives every stage a learner word from the design skill's vocabulary", () => {

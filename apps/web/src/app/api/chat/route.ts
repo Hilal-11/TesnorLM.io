@@ -36,11 +36,13 @@ export const POST = withErrorHandling("/api/chat", async (req: Request) => {
   const supabase = await createClient();
 
   // Adaptive routing: whole documents for small notebooks, retrieval for big ones (RLS-scoped).
+  // A document answers from its published run (ready_run_id), even while it's re-processed.
   const { data: docs } = await supabase
     .from("documents")
     .select("title, markdown, token_count")
     .eq("notebook_id", notebookId)
-    .eq("status", "ready");
+    .not("ready_run_id", "is", null)
+    .is("deleted_at", null);
 
   const totalTokens = (docs ?? []).reduce((s, d) => s + (d.token_count ?? 0), 0);
 

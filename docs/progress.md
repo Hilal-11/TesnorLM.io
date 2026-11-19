@@ -112,3 +112,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - `docs/specs/ingestion.md` (flow, stage machine, errors, limits, storage, events, idempotency, cancellation, retries, acceptance) and `contracts/ingestion.json`; loaders in `src/lib/ingestion/contract.ts` (generated copy, since Turbopack can't import outside apps/web) and `app/contract.py` (pydantic).
 - Verified: vitest (validity, drift, broken-contract cases, helpers) writes `contracts/fixtures/ingestion-cases.json`; pytest asserts Python gives identical answers (mutating the contract makes it fail). Worker pytest is now set up (`pytest.ini`, `requirements-dev.txt`).
 - Open: confirm the source quota is per notebook; the worker image must include `contracts/` (P3.14).
+
+## 2026-11-19 — P3.1 — Database: notebooks and ingestion schema
+
+- Migration 0004: notebook board columns (`position` in "C" collation), document stages + run ids (`ingest_run_id` processing, `ready_run_id` published), chunk/figure run keys and positions, `set_document_stage()`, `finalize_ingest()`, `start_ingest_run()` (service role only), `hybrid_search()` over published runs, Realtime, bucket limits, `ingest-artifacts` bucket. A trigger chooses `storage_path`; column grants stop people writing pipeline columns.
+- Verified on the local stack (`npx supabase start`, `npm run test:rls:local`): 73 tests incl. contract-vs-SQL transitions, stale/backward moves, atomic swap, search during re-process, Realtime to owner only, bucket limits. Old `/api/documents` route removed (P3.10 replaces it); chat reads published runs.
+- Open: apply 0003 + 0004 to your test and main projects; the old worker `main.py` no longer matches the schema until P3.5/P3.6.

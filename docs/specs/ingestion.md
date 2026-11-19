@@ -34,7 +34,7 @@ collaboration or sharing; languages other than English for OCR by default (confi
 ## 2. Words used here
 
 | Term | Meaning |
-|---|---|
+| --- | --- |
 | Document | One uploaded file (`documents` row). Shown to people as a **source**. |
 | Ingest run | One attempt to process a document, identified by `ingest_run_id` (uuid). A new upload or a re-process starts a new run. All worker output is keyed by `document_id` + `run_id`. |
 | Stage | Where a run is in the stage machine (section 4). Stored in `documents.stage`. |
@@ -43,7 +43,7 @@ collaboration or sharing; languages other than English for OCR by default (confi
 
 ## 3. Flow
 
-```
+```text
 Browser                         Web API (Next.js)                Supabase                 Inngest              Worker (FastAPI)
 ───────                         ─────────────────                ────────                 ───────              ────────────────
 pre-check (type, size, sha256)
@@ -88,7 +88,7 @@ Cancel during upload: `POST /api/documents/[id]/cancel` deletes the partial obje
 
 ## 4. Stage machine
 
-```
+```text
 uploading ─▶ queued ─▶ validating ─▶ parsing ─┬─▶ ocr ─┬─▶ reading_figures ─▶ indexing ─▶ ready
                                               │        └──────────────────────▲
                                               ├─▶ reading_figures             │
@@ -97,7 +97,7 @@ every stage except ready ──────────────────�
 ```
 
 | From | Allowed next stages |
-|---|---|
+| --- | --- |
 | uploading | queued, failed |
 | queued | validating, failed |
 | validating | parsing, failed |
@@ -127,7 +127,7 @@ People see one of six learner words (design skill 8.2) and a detail line with re
 lines come from the contract's `details` templates; when a count is missing the fallback is shown.
 
 | Stage | Word | Detail line (template) | Fallback | DB progress band |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | uploading | Uploading | Uploading · {percent}% | Uploading | 0 (bytes progress is local to the uploading browser) |
 | queued | Queued | Waiting to start | — | 0 |
 | validating | Reading | Checking the file | — | 0–5 |
@@ -152,7 +152,7 @@ the **fix** (what to do) and, where there is one, an **action** button. Never "S
 wrong". `autoRetry` says whether the queue retries the step by itself.
 
 | Code | Message | Fix | Action | Raised by | Auto-retry |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | not_pdf | This file isn't a PDF. | Choose a PDF file instead. | — | browser, API, worker (magic bytes) | no |
 | file_too_large | This file is {sizeMb} MB. The limit is {limitMb} MB. | Split the PDF or upload chapters separately. | — | browser, API, worker | no |
 | too_many_pages | This PDF has {pages} pages. The limit is {limit} pages. | Upload chapters separately. | — | browser (optional), worker | no |
@@ -178,7 +178,7 @@ Defaults live in the contract's `limits`; environment variables override them wh
 server and worker enforce them; the browser only gives early feedback.
 
 | Limit | Default | Env | Browser | API | Worker |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | File size | 50 MB | `MAX_UPLOAD_MB` | instant check | declared size, then the stored object's size | downloaded bytes |
 | Pages | 200 | `MAX_PAGES` | optional pdf.js check | — | authoritative |
 | Files per drop | 10 | — | yes | — | — |
@@ -192,9 +192,9 @@ The source quota counts a notebook's documents that are not deleted and not fail
 ## 8. Storage layout
 
 | Bucket | Who can access | Path (contract `storage.paths`) | Content |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `documents` (private, 50 MB, `application/pdf`, `image/png`, `image/webp`) | owner via RLS (first folder = `auth.uid()`), worker via service role | `{userId}/{documentId}/source.pdf` | the original upload |
-| | | `{userId}/{documentId}/figures/{runId}/{n}.webp` | extracted figures (WebP q85, ≤ 1600 px wide) |
+|  |  | `{userId}/{documentId}/figures/{runId}/{n}.webp` | extracted figures (WebP q85, ≤ 1600 px wide) |
 | `ingest-artifacts` (private, no user policies) | worker only (service role) | `{userId}/{documentId}/{runId}/doc.json` | the parsed DoclingDocument, so later steps and retries never re-parse |
 
 - `doc.json` lives in its own bucket because the `documents` bucket only accepts PDFs and images,
@@ -213,7 +213,7 @@ Every step starts with the **current-run guard**: load the document; if it's del
 `ingest_run_id` isn't this run's, stop quietly (no failure, no writes).
 
 | Step | Does | Output (keyed by document + run) | Idempotent because | Retry |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | validate | stream the source to a temp dir (size cap), check `%PDF-`, open with pypdfium2: encrypted, corrupt, 0 pages, too many pages; SHA-256; record parser and embedding versions | `page_count`, `file_size`, `sha256`, `parser_version`, `embedding_model` on the document | same values overwrite | download retried; validation errors are final |
 | parse | per-page text check to find scanned pages; Docling conversion (tables, picture images, OCR only when needed); markdown export (size-capped) | `doc.json` in `ingest-artifacts`, `ocr_used`, `markdown` | skips when `doc.json` for this run exists | `parse_timeout` is final; unexpected errors retried |
 | figures | pictures from `doc.json`: page, bbox, label, paper caption; skip tiny images and repeated logos; WebP to storage | `figures` rows by (document, run, ordinal); image files at deterministic paths | upsert by ordinal; storage upload with upsert | retried |
@@ -248,13 +248,15 @@ the image) and the stage shows `ocr` with the scanned-page count. No text after 
   Phase 4 highlights scale these by the viewer's zoom.
 - Figure caption chunks read `"{label} (page {p}): {paper caption}\n{description}"`, with
   `page_start = page_end = p` and `bboxes = [figure bbox]`.
-- `hybrid_search()` only returns chunks of a document's current run, for documents that are Ready
-  and not deleted, and returns the page fields, kind, bboxes and headings.
+- `hybrid_search()` only returns chunks of a document's **published run** (`ready_run_id`, set by
+  `finalize_ingest()`), for documents and notebooks that aren't deleted, and returns the page
+  fields, kind, bboxes, headings and figure id. Optional `p_document_ids` limits it to the sources
+  a person has ticked ("Asking 2 of 3 sources").
 
 ## 11. Re-process, delete and cancel
 
 | Action | What happens |
-|---|---|
+| --- | --- |
 | Re-process ("Try again" or the card menu) | `POST /api/documents/[id]/reprocess`: new `ingest_run_id`, `attempt + 1`, stage `queued`; sends `document/reprocess` then `document/uploaded`, both carrying the new run id. Old chunks stay searchable until finalize swaps them. Max 3 per document per hour. |
 | Delete a source | Soft delete (`deleted_at`): hidden and excluded from search at once; toast "Source deleted" with Undo (8 s). Sends `document/deleted`, which cancels a running ingest at once. A cleanup function sleeps 30 s, then, if the document is still deleted, removes its storage prefixes and its row (chunks and figures cascade). |
 | Undo | Clears `deleted_at`. If the document was mid-ingest when deleted, Undo starts a new run (like a re-process), because the old run was cancelled. |
@@ -277,7 +279,7 @@ Payload keys are snake_case. Event ids make sends idempotent (a double-clicked c
 run).
 
 | Event (contract key) | Name | Payload | Event id | Sent by | Consumed by |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `uploaded` | `document/uploaded` | `document_id`, `notebook_id`, `user_id`, `run_id` | `uploaded-{run_id}` | `/uploaded`, `/reprocess`, Undo of an interrupted run | worker `ingest-document` |
 | `reprocess` | `document/reprocess` | `document_id`, `notebook_id`, `user_id`, `run_id` (new) | `reprocess-{run_id}` | `/reprocess` | `cancelOn` of older runs |
 | `deleted` | `document/deleted` | `document_id`, `notebook_id`, `user_id` | — | delete action | `cancelOn`; web cleanup function |
@@ -289,7 +291,20 @@ run).
   `error_code`, `error_vars`, `original_filename`, `storage_path`, `file_size`, `sha256`,
   `page_count`, `ocr_used`, `figure_count`, `chunk_count`, `ingest_run_id`, `attempt`,
   `parser_version`, `embedding_model`, `stage_timings` (stage → start time and duration),
-  `started_at`, `finished_at`, `deleted_at`, `updated_at`. The old `status` column goes.
+  `started_at`, `finished_at`, `deleted_at`, `updated_at`. The old `status`, `error` and
+  `file_path` columns go.
+- **Two run ids.** `ingest_run_id` is the run being processed; `ready_run_id` is the run people
+  search and read. `finalize_ingest(document, run, markdown, token_count)` sets `ready_run_id`,
+  replaces the full text and deletes other runs' rows in one transaction, so a re-processed source
+  keeps answering from its previous run until the new one is Ready (and keeps doing so if the
+  re-process fails). `start_ingest_run(document)` begins a re-process: new run id, `attempt + 1`,
+  `queued`.
+- **What people may write.** A trigger sets `stage`, `ingest_run_id`, `storage_path`
+  (`{userId}/{documentId}/source.pdf`) and the first timing on insert, whatever the client sends.
+  Column grants let people insert only `id, notebook_id, user_id, title, original_filename,
+  mime_type, file_size, sha256`, and update only `title` and `deleted_at`. Notebooks: people
+  insert, edit and soft-delete; only the cleanup job hard-deletes. Everything else goes through
+  the API (service role, after an ownership check) or the worker.
 - Duplicate lookup: an index on `(notebook_id, sha256) where deleted_at is null`, **not unique**,
   because "Add anyway" must be able to add the same file again. The check ignores failed documents.
   The worker overwrites the browser's `sha256` with the one it computes.
@@ -349,7 +364,7 @@ repo root).
 ## 17. Open decisions
 
 | Decision | Owner | Status |
-|---|---|---|
+| --- | --- | --- |
 | Source quota is per notebook (20 on the free plan), not per account | product (you) | chosen here; confirm |
 | Parse progress: Docling page progress vs page-range batches | P3.6 | open |
 | OCR engine (EasyOCR, Tesseract or RapidOCR) | P3.7 | open |

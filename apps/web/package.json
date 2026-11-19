@@ -17,6 +17,8 @@
     "shots:components": "node scripts/screenshots.mjs /dev/components ../../docs/screenshots/phase1/components --sections",
     "db:types": "supabase gen types typescript --remote --schema public --workdir ../.. > src/lib/database.types.ts",
     "test:rls": "node scripts/vitest.mjs run --config vitest.rls.config.mts",
+    "test:rls:local": "node scripts/with-local-supabase.mjs --test node scripts/vitest.mjs run --config vitest.rls.config.mts",
+    "db:types:local": "supabase gen types typescript --local --schema public --workdir ../.. > src/lib/database.types.ts",
     "e2e": "playwright test",
     "contract:sync": "node scripts/sync-contract.mjs",
     "predev": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs",

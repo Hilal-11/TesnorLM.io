@@ -67,7 +67,7 @@ captions in the database. Failures explain the reason and the fix. Five uploads 
 Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 
 - [x] P3.0 — Ingestion spec + shared contract (TS and Python loaders, parity fixture)
-- [ ] P3.1 — Database: notebooks columns, document stages, chunks/figures by run, `finalize_ingest()`, `set_document_stage()`, Realtime, bucket limits, `ingest-artifacts` bucket
+- [x] P3.1 — Database: notebooks columns, document stages, chunks/figures by run, `finalize_ingest()`, `set_document_stage()`, Realtime, bucket limits, `ingest-artifacts` bucket
 - [ ] P3.2 — Notebooks data layer and actions (CRUD, ordering, soft delete)
 - [ ] P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
 - [ ] P3.4 — Board view with drag and drop
@@ -88,6 +88,7 @@ Waiting on you (Phase 3):
 - [ ] Inngest app `tensorlm` + Production event and signing keys; Railway plan with ≥ 4 GB RAM
 - [ ] Sample paper with a redistributable licence at `apps/web/public/samples/sample-paper.pdf` + `docs/samples.md`
 - [ ] Phase 3 variables in `.env` (names in `.env.example`); test project gets every migration
+- [ ] Apply migrations 0003 + 0004 to the test and main projects (`npx supabase db push` from the repo root, after `supabase link`), then `npm run db:types` — verified locally with `npm run test:rls:local`
 
 ## Found in setup review — not yet scheduled
 

@@ -7,24 +7,8 @@
  * When this fails, fix the POLICY in a new migration — never weaken the test.
  */
 import { randomUUID } from "node:crypto";
-import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-
-const URL_ = process.env.TEST_SUPABASE_URL;
-const ANON = process.env.TEST_SUPABASE_ANON_KEY;
-const SERVICE = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
-
-if (!URL_ || !ANON || !SERVICE) {
-  throw new Error(
-    "RLS tests need TEST_SUPABASE_URL, TEST_SUPABASE_ANON_KEY and TEST_SUPABASE_SERVICE_ROLE_KEY " +
-      "in the repo-root .env.test (a separate test project — see docs/backlog.md P2.7).",
-  );
-}
-if (URL_ === process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error(
-    "Refusing to run: TEST_SUPABASE_URL is the main project. Use a separate test project.",
-  );
-}
+import { admin, anon, embedding, must, person, type Person } from "./support";
 
 /** Every public table must appear here with a test case; the coverage test enforces it. */
 const COVERED = [
@@ -38,11 +22,6 @@ const COVERED = [
   "profiles",
 ];
 
-const opts = { auth: { persistSession: false, autoRefreshToken: false } };
-const admin = createClient(URL_, SERVICE, opts);
-const anon = createClient(URL_, ANON, opts);
-
-type Person = { user: User; client: SupabaseClient; email: string };
 const ids = {
   notebook: "",
   document: randomUUID(),
@@ -55,33 +34,12 @@ const ids = {
 let A: Person;
 let B: Person;
 let filePath = "";
-
-async function person(label: string): Promise<Person> {
-  const email = `rls-${label}-${randomUUID()}@example.com`;
-  const password = `Pw-${randomUUID()}`;
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: `RLS ${label.toUpperCase()}` },
-  });
-  if (error || !data.user) throw error ?? new Error("createUser failed");
-  const client = createClient(URL_!, ANON!, opts);
-  const signIn = await client.auth.signInWithPassword({ email, password });
-  if (signIn.error) throw signIn.error;
-  return { user: data.user, client, email };
-}
-
-const must = <T>(res: { data: T; error: unknown }): NonNullable<T> => {
-  if (res.error) throw res.error;
-  if (res.data === null || res.data === undefined) throw new Error("expected data, got none");
-  return res.data as NonNullable<T>;
-};
+let runId = "";
 
 beforeAll(async () => {
   A = await person("a");
   B = await person("b");
-  filePath = `${A.user.id}/${ids.document}/test.pdf`;
+  filePath = `${A.user.id}/${ids.document}/source.pdf`;
 
   ids.notebook = must(
     await A.client
@@ -91,32 +49,44 @@ beforeAll(async () => {
       .single(),
   ).id;
   must(
-    await A.client.from("documents").insert({
-      id: ids.document,
-      notebook_id: ids.notebook,
-      user_id: A.user.id,
-      title: "attention.pdf",
-      file_path: filePath,
-    }),
+    await A.client
+      .from("documents")
+      .insert({
+        id: ids.document,
+        notebook_id: ids.notebook,
+        user_id: A.user.id,
+        title: "attention.pdf",
+      })
+      .select("id"),
   );
+  runId = must(
+    await admin.from("documents").select("ingest_run_id").eq("id", ids.document).single(),
+  ).ingest_run_id;
   // Chunks and figures are written by the worker with the service role.
+  ids.figure = must(
+    await admin
+      .from("figures")
+      .insert({
+        document_id: ids.document,
+        user_id: A.user.id,
+        ingest_run_id: runId,
+        ordinal: 1,
+        image_path: `${A.user.id}/${ids.document}/figures/${runId}/1.webp`,
+      })
+      .select("id")
+      .single(),
+  ).id;
   ids.chunk = must(
     await admin
       .from("chunks")
       .insert({
         document_id: ids.document,
         notebook_id: ids.notebook,
+        ingest_run_id: runId,
         chunk_index: 0,
         content: "A's private passage about attention",
-        embedding: JSON.stringify(Array.from({ length: 1536 }, () => 0.01)),
+        embedding: embedding(),
       })
-      .select("id")
-      .single(),
-  ).id;
-  ids.figure = must(
-    await admin
-      .from("figures")
-      .insert({ document_id: ids.document, image_path: `${A.user.id}/${ids.document}/fig.png` })
       .select("id")
       .single(),
   ).id;
@@ -151,7 +121,9 @@ beforeAll(async () => {
       .from("documents")
       .upload(filePath, new Blob(["%PDF-1.4 rls test"], { type: "application/pdf" })),
   );
-  must(await A.client.from("profiles").update({ full_name: "Alice A" }).eq("id", A.user.id));
+  must(
+    await A.client.from("profiles").update({ full_name: "Alice A" }).eq("id", A.user.id).select(),
+  );
 });
 
 afterAll(async () => {
@@ -183,12 +155,7 @@ const CASES: Record<
     value: () => ids.document,
     patch: { title: "changed by B" },
     column: "title",
-    forged: () => ({
-      notebook_id: ids.notebook,
-      user_id: B.user.id,
-      title: "forged",
-      file_path: `${B.user.id}/x/y.pdf`,
-    }),
+    forged: () => ({ notebook_id: ids.notebook, user_id: B.user.id, title: "forged" }),
   },
   chunks: {
     key: "id",
@@ -198,6 +165,7 @@ const CASES: Record<
     forged: () => ({
       document_id: ids.document,
       notebook_id: ids.notebook,
+      ingest_run_id: runId,
       chunk_index: 9,
       content: "forged",
     }),
@@ -205,9 +173,15 @@ const CASES: Record<
   figures: {
     key: "id",
     value: () => ids.figure,
-    patch: { caption: "changed by B" },
-    column: "caption",
-    forged: () => ({ document_id: ids.document, image_path: "forged.png" }),
+    patch: { description: "changed by B" },
+    column: "description",
+    forged: () => ({
+      document_id: ids.document,
+      user_id: A.user.id,
+      ingest_run_id: runId,
+      ordinal: 9,
+      image_path: "forged.webp",
+    }),
   },
   chats: {
     key: "id",
