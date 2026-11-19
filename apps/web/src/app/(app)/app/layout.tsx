@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense, type ReactNode } from "react";
 import { requireOnboarded } from "@/lib/auth";
 import { recentNotebooks } from "@/lib/notebooks/repo";
@@ -22,6 +23,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 }
 
 async function SignedInShell({ children }: { children: ReactNode }) {
+  // Request time: the auth check reads the clock (token expiry), which can't be prerendered.
+  await connection();
   const { user, profile } = await requireOnboarded();
   const name = profile.full_name || user.email?.split("@")[0] || "You";
   const shellUser: ShellUser = {

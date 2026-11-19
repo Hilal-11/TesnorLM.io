@@ -23,6 +23,8 @@ type StatusPillProps = {
   status: DocumentStatus;
   /** e.g. "12 pages" or the failure reason. */
   detail?: string;
+  /** Replaces the word when the line already says it ("Reading page 18 of 42", "12 pages · Ready"). */
+  label?: string;
   /** Play the Ready emphasis on mount too (it always plays when status changes to ready). */
   celebrate?: boolean;
   className?: string;
@@ -32,7 +34,13 @@ type StatusPillProps = {
  * Document status as icon + word + colour, never colour alone. When a document becomes Ready it
  * gets a 1.5s success wash, then settles. Spinners stop under reduced motion.
  */
-export function StatusPill({ status, detail, celebrate = false, className }: StatusPillProps) {
+export function StatusPill({
+  status,
+  detail,
+  label,
+  celebrate = false,
+  className,
+}: StatusPillProps) {
   const { word, icon: Icon, tone, spin } = STATUS[status];
   const [previous, setPrevious] = useState(status);
   const [emphasis, setEmphasis] = useState(celebrate && status === "ready" ? 1 : 0);
@@ -59,7 +67,7 @@ export function StatusPill({ status, detail, celebrate = false, className }: Sta
         />
       )}
       <Icon aria-hidden className={cn("relative size-4 shrink-0", spin && "animate-spin")} />
-      <span className="relative">{word}</span>
+      <span className="relative min-w-0 truncate">{label ?? word}</span>
       {detail && <span className="relative font-normal text-graphite">· {detail}</span>}
     </span>
   );
