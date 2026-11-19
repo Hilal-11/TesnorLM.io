@@ -88,3 +88,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - Tab bar with 44px+ targets and safe-area padding; content padded so nothing hides under it.
 - Verified: e2e at 390x844 (active tab, Ask sheet, drawer closes with Esc, 44px targets, axe) and no overflow at 320px.
+
+## 2026-11-19 — P2.6 — Onboarding (once, skippable, resumable)
+
+- Onboarding per spec, left-aligned 560px column, one primary action per step, no celebration motion.
+- Verified: schema tests reject invalid input; e2e axe on every step light/dark; one primary action per step.
+- Open: resume/skip end-to-end needs the test project (e2e/authed.spec.ts); step 4 upload wiring is a Phase 3 TODO.
