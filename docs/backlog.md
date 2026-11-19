@@ -21,7 +21,7 @@ Milestone: `/dev/components` shows every core component in all states, in light 
 only from TensorLM design tokens, keyboard-operable, with zero serious axe issues.
 
 - [x] P1.0 — Token alignment: tokens, fonts and motion match the design skill
-- [ ] P1.1 — Buttons, icon button, split button, copy button
+- [x] P1.1 — Buttons, icon button, split button, copy button
 - [ ] P1.2 — Inputs
 - [ ] P1.3 — Display components
 - [ ] P1.4 — Overlays

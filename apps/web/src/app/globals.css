@@ -13,6 +13,47 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Interaction variants also match a demo attribute, so the /dev/components state matrix can show
+ * every state statically: data-force="hover" | "pressed" | "focus". Real hover and press never
+ * apply to disabled controls.
+ */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover:not(:disabled, [aria-disabled="true"], [data-loading]) {
+      @slot;
+    }
+  }
+  &[data-force="hover"] {
+    @slot;
+  }
+}
+@custom-variant active {
+  &:active:not(:disabled, [aria-disabled="true"], [data-loading]) {
+    @slot;
+  }
+  &[data-force="pressed"] {
+    @slot;
+  }
+}
+@custom-variant focus-visible {
+  &:focus-visible {
+    @slot;
+  }
+  &[data-force="focus"] {
+    @slot;
+  }
+}
+/* A wrapper (input box, card) that shows focus when the control inside it has keyboard focus. */
+@custom-variant within-focus {
+  &:has(:focus-visible) {
+    @slot;
+  }
+  &[data-force="focus"] {
+    @slot;
+  }
+}
+
 /* ───────────── Raw tokens: light (skill 2.1, 2.3, 2.4, 4.3) ───────────── */
 :root,
 .light {
@@ -35,6 +76,12 @@
 
   --primary-foreground: #ffffff;
   --danger-foreground: #ffffff;
+
+  /* Hover darkens by mixing toward --shade (skill 8.1). */
+  --shade: var(--ink);
+  /* Modal backdrop: ink at 40%. Settings groups sit in a muted well. */
+  --scrim: rgb(20 33 43 / 0.4);
+  --well: var(--muted);
 
   /* Source highlights sit behind ink at 45–60% (skill 2.1). */
   --marker-strength: 55%;
@@ -75,6 +122,11 @@
   --primary-foreground: #0f1820;
   --danger-foreground: #0f1820;
 
+  --shade: var(--paper);
+  /* Modal backdrop: paper at 60%. Settings groups sit on sheet. */
+  --scrim: rgb(15 24 32 / 0.6);
+  --well: var(--sheet);
+
   /* Dark highlights sit at 22–30%; text stays ink. */
   --marker-strength: 26%;
   --grid-line: #22303b;
@@ -98,6 +150,11 @@
 .dark {
   --info: var(--cobalt);
   --highlight: color-mix(in oklab, var(--marker) var(--marker-strength), transparent);
+  --rule-strong: color-mix(in oklab, var(--rule), var(--ink) 15%);
+  /* Status words on tinted backgrounds: pushed toward ink so small text stays above 4.5:1. */
+  --success-strong: color-mix(in oklab, var(--success) 75%, var(--ink));
+  --warning-strong: color-mix(in oklab, var(--warning) 75%, var(--ink));
+  --danger-strong: color-mix(in oklab, var(--danger) 80%, var(--ink));
 
   /* shadcn mapping (skill 2.6) — keeps generated components working on TensorLM tokens. */
   --background: var(--paper);
@@ -164,6 +221,9 @@
   --color-ink: var(--ink);
   --color-graphite: var(--graphite);
   --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-scrim: var(--scrim);
+  --color-well: var(--well);
   --color-cobalt: var(--cobalt);
   --color-cobalt-soft: var(--cobalt-soft);
   --color-marker: var(--marker);
@@ -172,6 +232,9 @@
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   --color-danger-foreground: var(--danger-foreground);
+  --color-success-strong: var(--success-strong);
+  --color-warning-strong: var(--warning-strong);
+  --color-danger-strong: var(--danger-strong);
   --color-info: var(--info);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -227,6 +290,83 @@
   --ease-in: var(--ease-in);
   --ease-inout: var(--ease-inout);
   --ease-spring: var(--spring);
+
+  /* Overlay motion: enter with ease-out, exit at ~70% of the duration with ease-in (skill 7.3). */
+  --animate-fade-in: fade-in var(--dur-base) var(--ease-out);
+  --animate-fade-out: fade-out calc(var(--dur-base) * 0.7) var(--ease-in);
+  --animate-pop-in: pop-in var(--dur-base) var(--ease-out);
+  --animate-pop-out: pop-out calc(var(--dur-base) * 0.7) var(--ease-in);
+  --animate-slide-in-right: slide-in-right var(--dur-slow) var(--ease-out);
+  --animate-slide-out-right: slide-out-right calc(var(--dur-slow) * 0.7) var(--ease-in);
+  --animate-slide-in-up: slide-in-up var(--dur-slow) var(--ease-out);
+  --animate-slide-out-down: slide-out-down calc(var(--dur-slow) * 0.7) var(--ease-in);
+  --animate-indeterminate: indeterminate 1.6s var(--ease-inout) infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes slide-out-down {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+/* StatusPill: a document just became Ready — success wash for 1.5s, then settle. */
+@keyframes ready-emphasis {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes sheen {
+  to {
+    transform: translateX(100%);
+  }
 }
 
 /* ───────────── Type roles (skill 3.1) — the only text sizes ───────────── */
@@ -345,6 +485,68 @@
   }
 }
 
+/* Colour and press transitions for controls: colours at --dur-fast, press scale at --dur-instant. */
+@utility interactive {
+  transition-property: color, background-color, border-color, outline-color, opacity, scale;
+  transition-duration:
+    var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast), var(--dur-fast),
+    var(--dur-instant);
+  transition-timing-function: var(--ease-out);
+}
+
+/* Link underline that draws left → right on hover (skill 8.1). */
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 200ms var(--ease-out);
+  &:hover,
+  &[data-force="hover"] {
+    background-size: 100% 1px;
+  }
+}
+
+/* Slow sheen for skeletons (skill 10.6): a highlight sweeps across with transform. */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--sheet) 60%, transparent),
+      transparent
+    );
+    animation: sheen 1.6s var(--ease-inout) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
+}
+
+/* Dotted dim backdrop for modals: scrim plus a 16px dot grid in rule colour. */
+@utility scrim-dots {
+  background-color: var(--scrim);
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--rule) 40%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+
+/* Fade the ends of a horizontally scrolling row (tabs overflow). */
+@utility fade-edges-x {
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+
 /* ───────────── Base ───────────── */
 @layer base {
   * {
@@ -357,7 +559,8 @@
     @apply bg-background text-body text-foreground;
   }
   /* Focus ring (skill 8.1): 2px cobalt, 2px offset, keyboard only. */
-  :focus-visible {
+  :focus-visible,
+  [data-force="focus"] {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }

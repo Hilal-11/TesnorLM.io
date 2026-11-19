@@ -5,13 +5,27 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   // Vite 8 resolves tsconfig "paths" natively, so "@/..." imports work in tests.
   resolve: { tsconfigPaths: true },
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
-    environment: "node",
-    include: ["src/**/*.test.ts"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
       reporter: ["text", "html"],
     },
+    projects: [
+      {
+        extends: true,
+        test: { name: "unit", environment: "node", include: ["src/**/*.test.ts"] },
+      },
+      {
+        extends: true,
+        test: {
+          name: "components",
+          environment: "jsdom",
+          include: ["src/**/*.test.tsx"],
+          setupFiles: ["./src/test/setup.ts"],
+        },
+      },
+    ],
   },
 });

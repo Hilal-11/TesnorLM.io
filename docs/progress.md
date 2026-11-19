@@ -20,3 +20,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
   next to `text-ink`). `/dev/tokens` shows everything in light and dark; 404 in production.
 - Verified: lint, typecheck, 52 tests (contrast parsed from globals.css), build, grep clean, screenshots
   at 1440/390 reviewed. Open: light success/warning are 4.3/4.1:1 as small text (see backlog).
+
+## 2026-11-19 — P1.1 — Buttons, icon button, split button, copy button
+
+- Button, IconButton, SplitButton, CopyButton per spec; Tooltip, Kbd and DropdownMenu pulled forward (buttons need them).
+- Custom hover/active/focus-visible variants also match data-force, so the showcase shows every state statically.
+- Verified: 17 tests incl. axe; screenshots at 4 widths in both themes. Test stack: jsdom + Testing Library + axe-core (vitest-axe is unmaintained).

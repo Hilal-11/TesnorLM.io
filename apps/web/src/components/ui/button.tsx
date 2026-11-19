@@ -1,57 +1,102 @@
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2, type LucideIcon } from "lucide-react";
+import { Slot as SlotPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
-const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+/**
+ * Colour per variant, shared with IconButton. Hover darkens 6% toward --shade (skill 8.1);
+ * `hover:` also matches data-force="hover" so the showcase can show the state statically.
+ */
+export const buttonColors = {
+  primary:
+    "bg-cobalt text-primary-foreground hover:bg-[color-mix(in_oklab,var(--cobalt),var(--shade)_6%)]",
+  dark: "bg-ink text-paper hover:bg-[color-mix(in_oklab,var(--ink),var(--graphite)_16%)]",
+  secondary: "border border-rule bg-sheet text-ink hover:bg-cobalt-soft/50",
+  ghost: "text-ink hover:bg-cobalt-soft",
+  danger:
+    "bg-danger text-danger-foreground hover:bg-[color-mix(in_oklab,var(--danger),var(--shade)_6%)]",
+} as const;
+
+export const buttonVariants = cva(
+  "interactive relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm font-medium whitespace-nowrap select-none active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-loading:cursor-progress [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline:
-          "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
-        destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
-        link: "text-primary underline-offset-4 hover:underline",
+        ...buttonColors,
+        link: "rounded-xs text-cobalt link-underline active:scale-100",
       },
       size: {
-        default:
-          "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        icon: "size-8",
-        "icon-xs":
-          "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm":
-          "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
-        "icon-lg": "size-9",
+        sm: "h-8 px-3 text-small [&_svg]:size-4",
+        md: "h-9 px-4 text-body [&_svg]:size-4",
+        lg: "h-11 px-5 text-body [&_svg]:size-4.5",
       },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
+    compoundVariants: [{ variant: "link", size: ["sm", "md", "lg"], className: "h-auto px-0" }],
+    defaultVariants: { variant: "primary", size: "md" },
   },
 );
 
-function Button({
+export type ButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    /** Render the child element (e.g. a Next.js <Link>) with button styling. */
+    asChild?: boolean;
+    leadingIcon?: LucideIcon;
+    trailingIcon?: LucideIcon;
+    /** Shows a spinner, keeps the label and width, sets aria-busy and ignores clicks. */
+    loading?: boolean;
+  };
+
+export function Button({
   className,
-  variant = "default",
-  size = "default",
+  variant,
+  size,
+  asChild = false,
+  leadingIcon: Leading,
+  trailingIcon: Trailing,
+  loading = false,
+  disabled,
+  onClick,
+  children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonProps) {
+  const Comp = asChild ? SlotPrimitive.Slot : "button";
+  const ariaDisabled = props["aria-disabled"] === true || props["aria-disabled"] === "true";
+  const blocked = loading || ariaDisabled || (asChild && disabled);
+  const spinner = <Loader2 aria-hidden className="animate-spin" />;
+
   return (
-    <ButtonPrimitive
+    <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      data-variant={variant ?? "primary"}
+      type={asChild ? undefined : (props.type ?? "button")}
       {...props}
-    />
+      disabled={asChild ? undefined : disabled}
+      aria-disabled={asChild && disabled ? true : props["aria-disabled"]}
+      aria-busy={loading || undefined}
+      data-loading={loading || undefined}
+      className={cn(buttonVariants({ variant, size }), className)}
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+        if (blocked) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+      }}
+    >
+      {Leading && (loading ? spinner : <Leading aria-hidden />)}
+      {loading && !Leading && !asChild && (
+        <span className="absolute inset-0 flex items-center justify-center">{spinner}</span>
+      )}
+      <SlotPrimitive.Slottable>
+        {asChild ? (
+          children
+        ) : (
+          <span className={cn("inline-flex items-center", loading && !Leading && "opacity-0")}>
+            {children}
+          </span>
+        )}
+      </SlotPrimitive.Slottable>
+      {Trailing && <Trailing aria-hidden />}
+    </Comp>
   );
 }
-
-export { Button, buttonVariants };
