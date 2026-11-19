@@ -5,6 +5,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { hardDeleteNotebook, listPrefix } from "@/lib/cleanup";
 import * as repo from "@/lib/notebooks/repo";
+import { boardColumns } from "@/lib/notebooks/shared";
 import { admin, must, person, type Person } from "./support";
 
 let A: Person;
@@ -52,7 +53,7 @@ describe("ordering", () => {
       beforeId: one.id,
       afterId: two.id,
     });
-    const learning = repo.boardColumns(await repo.listNotebooks(db(A), { status: "learning" }));
+    const learning = boardColumns(await repo.listNotebooks(db(A), { status: "learning" }));
     expect(learning.get("learning")?.map((n) => n.title)).toEqual(["one", "three", "two"]);
 
     // To another column with no neighbours: goes to the end of that column.

@@ -190,3 +190,11 @@ export function countByStatus(list: Pick<Notebook, "status">[]) {
   for (const n of list) counts[n.status] += 1;
   return counts;
 }
+
+/** Board columns: each status's notebooks in position order. */
+export function boardColumns<T extends Notebook>(list: T[]) {
+  const columns = new Map<Notebook["status"], T[]>();
+  for (const n of list) columns.set(n.status, [...(columns.get(n.status) ?? []), n]);
+  for (const items of columns.values()) items.sort(compareBoardOrder);
+  return columns;
+}

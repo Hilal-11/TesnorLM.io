@@ -124,3 +124,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - `src/lib/notebooks/` (shared schemas, fractional ordering, filter/sort; repo taking the caller's client), server actions (create, update with `updated_at` conflict check, move, touch, soft delete + `notebook/deleted` event, restore), `GET /api/notebooks`, hard-delete cleanup in `src/lib/cleanup.ts`.
 - Verified: unit tests (schemas, positions incl. 50 random moves, filter/sort); database suite as two people (ownership 404s, order, soft delete/restore, conflict returns the fresh row, opening isn't an edit, live source counts, hard delete empties both buckets). 81 database tests pass locally.
 - Open: the hard-delete queue function is wired in P3.5.
+
+## 2026-11-19 — P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
+
+- `/app/notebooks`: header + New notebook (Ctrl/⌘ N from the shell), Grid · List · Board switch (in the URL, remembered), search (150 ms debounce), status/subject filters, sort; responsive grid 1/2/3/4; list view on DataTable with bulk Move to… and Delete; create/edit dialog (subject combobox with "Use …", five named colour swatches, exam date); inline rename (Enter/Esc); delete with Undo, no confirm; first-notebook and no-results empty states; 300 ms skeleton; error with Try again. Sidebar shows recent notebooks + View all; Home links to New notebook.
+- Verified: lint, typecheck, 232 unit tests; `npm run e2e:local` (local stack) 7/7 incl. axe light/dark at 1440 and 390 in all three views and keyboard-only create.

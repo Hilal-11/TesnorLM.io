@@ -1,6 +1,8 @@
 import { Suspense, type ReactNode } from "react";
 import { requireOnboarded } from "@/lib/auth";
+import { recentNotebooks } from "@/lib/notebooks/repo";
 import { firstName } from "@/lib/profile";
+import { createClient } from "@/lib/supabase/server";
 import { AppShell, type ShellUser } from "./_components/app-shell";
 import { ShellSkeleton } from "./_components/shell-skeleton";
 
@@ -31,5 +33,10 @@ async function SignedInShell({ children }: { children: ReactNode }) {
     level: profile.level,
     plan: "Free",
   };
-  return <AppShell user={shellUser}>{children}</AppShell>;
+  const recent = await recentNotebooks(await createClient()).catch(() => []);
+  return (
+    <AppShell user={shellUser} recentNotebooks={recent}>
+      {children}
+    </AppShell>
+  );
 }

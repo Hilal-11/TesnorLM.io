@@ -1,7 +1,7 @@
 "use client";
 
 import { Command } from "cmdk";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import { fieldBox, useFieldControl } from "@/components/ui/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -22,6 +22,8 @@ type Common = {
   "aria-describedby"?: string;
   "aria-invalid"?: boolean;
   "data-force"?: string;
+  /** Single select only: offer what was typed as a value ("Use “Organic chemistry”"). */
+  creatable?: boolean;
 };
 
 type ComboboxProps = Common &
@@ -156,6 +158,21 @@ export function Combobox(props: ComboboxProps) {
                 )}
               </Command.Item>
             ))}
+            {props.creatable &&
+              !props.multiple &&
+              query.trim() !== "" &&
+              !options.some(
+                (o) => o.label.toLocaleLowerCase() === query.trim().toLocaleLowerCase(),
+              ) && (
+                <Command.Item
+                  value={`create ${query}`}
+                  onSelect={() => choose(query.trim())}
+                  className={comboItem}
+                >
+                  <Plus aria-hidden className="size-4 shrink-0 text-graphite" />
+                  <span className="min-w-0 flex-1 truncate">Use &ldquo;{query.trim()}&rdquo;</span>
+                </Command.Item>
+              )}
           </Command.List>
         </Command>
       </PopoverContent>

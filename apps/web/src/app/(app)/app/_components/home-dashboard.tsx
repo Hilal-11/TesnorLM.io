@@ -10,6 +10,7 @@ import {
   Sparkle,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -39,14 +40,24 @@ function useGreeting() {
 
 const SOON = "Uploading sources arrives in the next update.";
 
-const GET_STARTED: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: FilePlus2, title: "Upload a paper", body: "PDFs, notes, images or CSVs." },
+const GET_STARTED: { icon: LucideIcon; title: string; body: string; href?: string }[] = [
+  {
+    icon: FilePlus2,
+    title: "Upload a paper",
+    body: "PDFs, notes, images or CSVs.",
+    href: "/app/notebooks?new=1",
+  },
   {
     icon: BookOpen,
     title: "Try the sample paper",
     body: "Attention Is All You Need, explained step by step.",
   },
-  { icon: NotebookPen, title: "Create a notebook", body: "Group the sources for one topic." },
+  {
+    icon: NotebookPen,
+    title: "Create a notebook",
+    body: "Group the sources for one topic.",
+    href: "/app/notebooks?new=1",
+  },
 ];
 
 export function HomeDashboard({
@@ -115,22 +126,35 @@ export function HomeDashboard({
           Get started
         </h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          {GET_STARTED.map(({ icon: Icon, title, body }) => (
-            <button
-              key={title}
-              type="button"
-              onClick={() => toast.info(title, { description: SOON })}
-              className="group flex cursor-pointer flex-col items-start gap-3 rounded-md border border-rule bg-sheet p-4 text-left shadow-1 interactive hover:border-rule-strong hover:shadow-2 active:scale-98"
-            >
-              <span className="flex size-8 items-center justify-center rounded-sm bg-muted text-ink">
-                <Icon aria-hidden className="size-4" />
-              </span>
-              <span className="flex flex-col gap-0.5">
-                <span className="text-body font-medium text-ink">{title}</span>
-                <span className="text-small text-graphite">{body}</span>
-              </span>
-            </button>
-          ))}
+          {GET_STARTED.map(({ icon: Icon, title, body, href }) => {
+            const className =
+              "group flex cursor-pointer flex-col items-start gap-3 rounded-md border border-rule bg-sheet p-4 text-left shadow-1 interactive hover:border-rule-strong hover:shadow-2 active:scale-98";
+            const content = (
+              <>
+                <span className="flex size-8 items-center justify-center rounded-sm bg-muted text-ink">
+                  <Icon aria-hidden className="size-4" />
+                </span>
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-body font-medium text-ink">{title}</span>
+                  <span className="text-small text-graphite">{body}</span>
+                </span>
+              </>
+            );
+            return href ? (
+              <Link key={title} href={href} className={className}>
+                {content}
+              </Link>
+            ) : (
+              <button
+                key={title}
+                type="button"
+                onClick={() => toast.info(title, { description: SOON })}
+                className={className}
+              >
+                {content}
+              </button>
+            );
+          })}
         </div>
       </section>
 

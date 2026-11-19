@@ -7,7 +7,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/database.types";
 import { notFound } from "@/lib/errors";
 import {
-  compareBoardOrder,
   filterNotebooks,
   positionBetween,
   sortNotebooks,
@@ -191,12 +190,4 @@ export async function restoreNotebook(db: Db, id: string) {
   if (error) throw error;
   if (!data) throw notFound("That notebook can't be restored any more.");
   return data;
-}
-
-/** Board columns: each status's notebooks in position order. */
-export function boardColumns<T extends Notebook>(list: T[]) {
-  const columns = new Map<Notebook["status"], T[]>();
-  for (const n of list) columns.set(n.status, [...(columns.get(n.status) ?? []), n]);
-  for (const items of columns.values()) items.sort(compareBoardOrder);
-  return columns;
 }

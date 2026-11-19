@@ -3,18 +3,11 @@
 import { CircleHelp, Menu, Moon, Plus, Search, Sun } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { Logo, LogoMark } from "@/components/logo";
 import { BreadcrumbSwitcher } from "@/components/ui/breadcrumb-switcher";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogBody,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from "@/components/ui/dialog";
 import { IconButton } from "@/components/ui/icon-button";
 import { Kbd } from "@/components/ui/kbd";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -31,11 +24,15 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { cn } from "@/lib/utils";
 import { signOut } from "../../../(auth)/actions";
+import { NotebookDialog } from "../notebooks/_components/notebook-dialog";
+import { ColorDot } from "../notebooks/_components/notebook-visuals";
 import { CommandPalette } from "./command-palette";
 import { LevelSwitch } from "./level-switch";
 import { MobileTabBar } from "./mobile-tab-bar";
 import { PRIMARY_NAV, SECONDARY_NAV, isActive, pageTitle } from "./nav";
 import { ShortcutsDialog } from "./shortcuts-dialog";
+
+export type RecentNotebook = { id: string; title: string; color: string };
 
 export type ShellUser = {
   id: string;
@@ -54,10 +51,13 @@ function isTyping(target: EventTarget | null) {
 
 export function AppShell({
   user,
+  recentNotebooks = [],
   children,
   previewPath,
 }: {
   user: ShellUser;
+  /** The six most recently opened notebooks, for the sidebar. */
+  recentNotebooks?: RecentNotebook[];
   children: ReactNode;
   /** Dev previews only: render as if on this route. */
   previewPath?: string;
@@ -92,6 +92,10 @@ export function AppShell({
       } else if (key === "b" && !isTyping(e.target)) {
         e.preventDefault();
         setStoredCollapsed(!collapsed);
+      } else if (key === "n" && !isTyping(e.target)) {
+        // Some browsers reserve Ctrl/⌘ N for a new window; where they don't, it opens this.
+        e.preventDefault();
+        setNewNotebookOpen(true);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -184,10 +188,45 @@ export function AppShell({
       </SidebarSection>
 
       {!isCollapsed && (
-        <div className="flex flex-col gap-1">
-          <SidebarSectionLabel>Recent notebooks</SidebarSectionLabel>
-          <p className="px-2.5 text-small text-graphite">Your notebooks appear here.</p>
-        </div>
+        <nav
+          aria-labelledby={`recent-notebooks${onNavigate ? "-drawer" : ""}`}
+          className="flex flex-col gap-1"
+        >
+          <SidebarSectionLabel id={`recent-notebooks${onNavigate ? "-drawer" : ""}`}>
+            Recent notebooks
+          </SidebarSectionLabel>
+          {recentNotebooks.length === 0 ? (
+            <p className="px-2.5 text-small text-graphite">Your notebooks appear here.</p>
+          ) : (
+            <ul className="flex flex-col gap-0.5">
+              {recentNotebooks.map((n) => {
+                const href = `/app/notebooks/${n.id}`;
+                return (
+                  <li key={n.id}>
+                    <Link
+                      href={href}
+                      onClick={onNavigate}
+                      aria-current={pathname === href ? "page" : undefined}
+                      className="flex h-8 items-center gap-2.5 rounded-sm px-2.5 text-body text-graphite interactive hover:bg-muted hover:text-ink aria-[current=page]:bg-accent aria-[current=page]:font-medium aria-[current=page]:text-ink"
+                    >
+                      <ColorDot color={n.color} />
+                      <span className="min-w-0 flex-1 truncate">{n.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+              <li>
+                <Link
+                  href="/app/notebooks"
+                  onClick={onNavigate}
+                  className="flex h-8 items-center rounded-sm px-2.5 text-small font-medium text-graphite interactive hover:bg-muted hover:text-ink"
+                >
+                  View all
+                </Link>
+              </li>
+            </ul>
+          )}
+        </nav>
       )}
 
       <div className="mt-auto flex w-full flex-col gap-2">
@@ -317,25 +356,11 @@ export function AppShell({
       <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
       <ShortcutsDialog open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
-      <Dialog open={newNotebookOpen} onOpenChange={setNewNotebookOpen}>
-        <DialogContent size="sm">
-          <DialogHeader
-            title="Notebooks are almost here"
-            description="Creating notebooks and adding sources arrives in the next update."
-          />
-          <DialogBody>
-            <p className="text-body text-graphite">
-              You&apos;ll be able to upload papers, notes and datasets, then ask anything about
-              them.
-            </p>
-          </DialogBody>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button data-autofocus>Got it</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <NotebookDialog
+        open={newNotebookOpen}
+        onOpenChange={setNewNotebookOpen}
+        onSaved={(notebook) => router.push(`/app/notebooks/${notebook.id}`)}
+      />
     </div>
   );
 }

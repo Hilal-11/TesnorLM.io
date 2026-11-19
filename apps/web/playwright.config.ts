@@ -19,10 +19,14 @@ export default defineConfig({
     channel: channel === "chromium" ? undefined : channel,
     trace: "retain-on-failure",
   },
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000/login",
-    reuseExistingServer: true,
-    timeout: 120_000,
-  },
+  // With E2E_BASE_URL the server is already running (e.g. `npm run dev:local` on the local
+  // Supabase stack), so Playwright mustn't start one against your real project.
+  webServer: process.env.E2E_BASE_URL
+    ? undefined
+    : {
+        command: "npm run dev",
+        url: "http://localhost:3000/login",
+        reuseExistingServer: true,
+        timeout: 120_000,
+      },
 });
