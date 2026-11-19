@@ -273,6 +273,7 @@ export function NotebooksView({ initialNotebooks }: { initialNotebooks: Notebook
             <NotebooksBoard
               notebooks={visible}
               onAdd={(s) => setDialog({ open: true, status: s, stay: true })}
+              onReorder={(n, next, beforeId, afterId) => void move(n, next, beforeId, afterId)}
               renamingId={renamingId}
               onRenameDone={onRenameDone}
               {...handlers}

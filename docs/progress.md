@@ -129,3 +129,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `/app/notebooks`: header + New notebook (Ctrl/⌘ N from the shell), Grid · List · Board switch (in the URL, remembered), search (150 ms debounce), status/subject filters, sort; responsive grid 1/2/3/4; list view on DataTable with bulk Move to… and Delete; create/edit dialog (subject combobox with "Use …", five named colour swatches, exam date); inline rename (Enter/Esc); delete with Undo, no confirm; first-notebook and no-results empty states; 300 ms skeleton; error with Try again. Sidebar shows recent notebooks + View all; Home links to New notebook.
 - Verified: lint, typecheck, 232 unit tests; `npm run e2e:local` (local stack) 7/7 incl. axe light/dark at 1440 and 390 in all three views and keyboard-only create.
+
+## 2026-11-20 — P3.4 — Board view with drag and drop
+
+- Board on @dnd-kit: mouse (6 px), touch (250 ms long press) and keyboard (Space, arrows, Space; Esc cancels) with spoken announcements ("Picked up Alpha. To read, position 1 of 3."). Lifted card uses shadow-3 with no rotation; dashed placeholder; target column highlighted; counts update on drop; empty columns read "Drag notebooks here". Optimistic move with rollback + error toast (network failures included). Reduced motion: no sortable transitions, no drop animation. Pure logic in `src/lib/notebooks/board.ts` (unit-tested).
+- Mobile choice: columns stack vertically below 768 px instead of scrolling sideways (no overflow at 320 px, every card visible); long press starts a drag so swipes still scroll; "Move to…" in the card menu is the quick path.
+- Verified: board unit tests; e2e (local stack) 5/5 — mouse drag persists after reload, keyboard within and across columns, Esc cancels, failed move rolls back, reduced motion, mobile stacking + axe.

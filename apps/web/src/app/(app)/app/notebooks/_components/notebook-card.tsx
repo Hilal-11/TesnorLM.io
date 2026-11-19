@@ -14,6 +14,8 @@ type NotebookCardProps = NotebookMenuHandlers & {
   onRenameDone?: (title: string | null) => void;
   /** Board density: no description, tighter padding. */
   compact?: boolean;
+  /** Board only: the drag handle, placed before the options menu. */
+  dragHandle?: React.ReactNode;
   className?: string;
 };
 
@@ -26,6 +28,7 @@ export function NotebookCard({
   renaming = false,
   onRenameDone,
   compact = false,
+  dragHandle,
   className,
   ...handlers
 }: NotebookCardProps) {
@@ -46,6 +49,7 @@ export function NotebookCard({
         <span className="min-w-0 flex-1 truncate text-small text-graphite">
           {notebook.subject ?? "No subject"}
         </span>
+        {dragHandle}
         <NotebookMenu notebook={notebook} {...handlers} />
       </div>
 

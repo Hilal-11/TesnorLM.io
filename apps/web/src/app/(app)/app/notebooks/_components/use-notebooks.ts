@@ -11,6 +11,15 @@ import {
 } from "@/lib/notebooks/shared";
 import { deleteNotebooks, moveNotebook, restoreNotebooks, updateNotebook } from "../actions";
 
+/** A server action call that never throws: a network failure reads as "no answer" (null). */
+async function call<T>(promise: Promise<T>): Promise<T | null> {
+  try {
+    return await promise;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The notebooks page's list: server data in, optimistic changes on top, rolled back with a toast
  * that says what failed when the server refuses. A fresh server render replaces it.
@@ -35,11 +44,13 @@ export function useNotebookList(initial: NotebookWithCounts[]) {
     async (notebook: Notebook, patch: NotebookPatch) => {
       const before = list.find((n) => n.id === notebook.id);
       merge([{ ...notebook, ...patch } as Notebook]);
-      const res = await updateNotebook(null, {
-        id: notebook.id,
-        updatedAt: notebook.updated_at,
-        patch,
-      });
+      const res = await call(
+        updateNotebook(null, {
+          id: notebook.id,
+          updatedAt: notebook.updated_at,
+          patch,
+        }),
+      );
       if (res?.ok && res.data) return (merge([res.data]), true);
       if (res && !res.ok && res.code === "conflict" && res.data) merge([res.data]);
       else if (before) merge([before]);
@@ -71,7 +82,7 @@ export function useNotebookList(initial: NotebookWithCounts[]) {
           ? positionBetween(last ?? null, null)
           : positionBetween(lower, upper);
       merge([{ ...notebook, status, position }]);
-      const res = await moveNotebook(null, { id: notebook.id, status, beforeId, afterId });
+      const res = await call(moveNotebook(null, { id: notebook.id, status, beforeId, afterId }));
       if (res?.ok && res.data) return (merge([res.data]), true);
       if (before) merge([before]);
       toast.error(`Couldn't move "${notebook.title}". Try again.`, {
@@ -84,7 +95,7 @@ export function useNotebookList(initial: NotebookWithCounts[]) {
 
   const restore = useCallback(
     async (ids: string[]) => {
-      const res = await restoreNotebooks(null, { ids });
+      const res = await call(restoreNotebooks(null, { ids }));
       if (res?.ok && res.data) merge(res.data);
       else toast.error("Couldn't restore", { description: res && !res.ok ? res.error : undefined });
     },
@@ -96,7 +107,7 @@ export function useNotebookList(initial: NotebookWithCounts[]) {
     async (ids: string[]) => {
       const removed = list.filter((n) => ids.includes(n.id));
       setList((current) => current.filter((n) => !ids.includes(n.id)));
-      const res = await deleteNotebooks(null, { ids });
+      const res = await call(deleteNotebooks(null, { ids }));
       if (res?.ok) {
         toast.success(res.message ?? "Notebook deleted", {
           action: { label: "Undo", onClick: () => void restore(ids) },
