@@ -18,6 +18,20 @@ Follow `.claude/skills/tensorlm-design/SKILL.md`; it overrides older docs and pr
 removed, so only TensorLM tokens exist (`bg-paper`, `text-ink`, `rounded-sm`, `shadow-2`,
 `text-h2`, `duration-(--dur-fast) ease-out`). Preview them at `/dev/tokens` (dev only).
 
+## Components
+
+- `apps/web/src/components/ui/<name>.tsx` — one family per file, named exports, Radix primitives,
+  `cn()` from `@/lib/utils`, variants via `cva`. Showcase: `/dev/components` (dev only), sections in
+  `src/app/dev/components/sections/`.
+- `hover:`, `active:` and `focus-visible:` also match `data-force="hover|pressed|focus"` (custom
+  variants in `globals.css`), so the showcase renders every state statically. Real hover/press
+  skip disabled controls.
+- Overlays portal through `usePortalContainer()`, so menus/dialogs opened inside a `.dark` region
+  stay dark.
+- Component tests are `*.test.tsx` (jsdom, Testing Library, `expectNoAxeViolations` from
+  `src/test/axe.ts`); unit tests are `*.test.ts` (node). Render with `renderUI` from `src/test/render`.
+- `npm run shots:components` — per-section screenshots at 1440/1024/768/390, light and dark.
+
 ## Commands
 
 Web (`cd apps/web`):

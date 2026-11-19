@@ -54,3 +54,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - DataTable (TanStack v9 tableFeatures API), Pagination, RelativeTime.
 - Verified: 9 tests (sort cycle, select-all, Shift range, bulk Undo toast, states, pagination math); axe clean; no overflow at 320 or 390.
+
+## 2026-11-19 — P1.7 — Settings group and rows
+
+- SettingsSection/Group/Row/SubOptions + useAutoSave (Saved toast; error toast with Try again).
+- Whole page: real-browser axe (WCAG 2.1 A/AA, light and dark) 0 violations; no horizontal overflow at 320/390; 129 tests; build passes.
+- Open: P1.8 (Playwright e2e specs + CI a11y job) needs Phase 0 P3 (CI).
