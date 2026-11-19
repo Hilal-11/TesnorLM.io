@@ -10,3 +10,7 @@ supabase/.temp/
 
 # Local design review screenshots (regenerate with npm run shots*)
 docs/screenshots/
+
+# Generated worker test PDFs (python services/worker/tests/fixtures/make_fixtures.py)
+services/worker/tests/fixtures/generated/
+.coverage

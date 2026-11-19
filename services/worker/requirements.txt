@@ -1,7 +1,25 @@
-fastapi
-uvicorn[standard]
-docling
-openai
-supabase
-python-dotenv
-tiktoken
+# Worker runtime dependencies, pinned to the versions the test suite runs against.
+# torch/torchvision are installed first from the CPU-only index in the Dockerfile (no CUDA).
+torch==2.15.0
+torchvision==0.29.2
+docling==2.150.1
+docling-core==2.107.1
+docling-ibm-models==4.0.4
+docling-parse==7.26.0
+rapidocr==3.10.0
+onnxruntime==1.32.0
+pypdfium2==5.15.2
+pillow==13.0.0
+numpy==2.5.5
+opencv-python-headless==5.1.0.95
+tiktoken==0.14.0
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+inngest==0.5.20
+supabase==2.34.1
+httpx==0.28.1
+openai==3.55.1
+anthropic==2.10.0
+pydantic==2.14.3
+pydantic-settings==2.16.3
+python-dotenv==1.2.4

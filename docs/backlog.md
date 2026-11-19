@@ -72,7 +72,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 - [x] P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
 - [x] P3.4 — Board view with drag and drop
 - [ ] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs
-- [ ] P3.6 — Worker: page count + file validation; stage column updates
+- [x] P3.6 — Worker: page count + file validation; stage column updates
 - [ ] P3.7 — OCR fallback for scanned pages
 - [ ] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
 - [ ] P3.9 — Figures: extract and store; caption and embed
