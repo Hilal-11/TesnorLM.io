@@ -39,6 +39,9 @@ Web (`cd apps/web`):
 - `npm run dev` — dev server on <http://localhost:3000>
 - `npm run lint` · `npm run typecheck` · `npm test` · `npm run build`
 - `npm run format` · `npm run format:check`
+- `npm run e2e` — Playwright (reuses `npm run dev`; local Edge). Signed-in flow: `E2E_AUTH=1` + test project.
+- `npm run test:rls` — RLS isolation against the TEST Supabase project (repo-root `.env.test`).
+- `npm run db:types` — regenerate `src/lib/database.types.ts` after every migration.
 - `npm run shots -- <route> <outDir> [widths]` — full-page screenshots in light and dark (needs
   `npm run dev`; uses local Edge/Chrome). `npm run shots:tokens` for `/dev/tokens`.
 
@@ -55,6 +58,14 @@ Worker (`cd services/worker`):
 4. Never mark a task done while checks fail.
 5. Finish: tick the task in `docs/backlog.md`, append a 2–3 line entry to `docs/progress.md`,
    and make one commit for the task.
+
+## Auth
+
+- Server: verify with `getUser()` / `getClaims()` (never `getSession()`); guards in `src/lib/auth.ts`;
+  `src/proxy.ts` refreshes sessions and does optimistic redirects only.
+- Pages that read the session render inside `<Suspense>` (Cache Components). Server actions use
+  `defineAction` (zod) from `src/lib/errors.ts`; routes use `withErrorHandling`.
+- Redirect targets go through `safeNext()`. Never log emails, codes or tokens unmasked (`src/lib/logger.ts`).
 
 ## Rules
 

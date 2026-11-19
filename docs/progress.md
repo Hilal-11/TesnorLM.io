@@ -99,3 +99,10 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - Test suite and migration 0003 written; `npm run test:rls` stops with a clear message until `.env.test` exists.
 - Open: create the test project, apply 0001-0003, add `.env.test`, run test:rls; apply 0003 to the main project; CI job after Phase 0 P3.
+
+## 2026-11-19 — P2.8 — Phase 2 polish and audit (in progress)
+
+- Audit: browser axe (WCAG 2.1 A/AA, light + dark) 0 violations on auth pages, shell (1440/390) and all onboarding steps; no overflow at 320px.
+- Security: no off-site redirects (`//evil.com`, `https://evil.com`, `/\evil.com`); client bundle has no server env names or secret values (only supabase-js's `sb_secret_` prefix check); verify cookie httpOnly, `secure` in production; auth copy never reveals account existence; rate-limit message mapped.
+- Checks: lint, typecheck, 180 unit/component tests, build, 33 e2e passed (signed-in flow skipped until the test project exists).
+- Open (needs you): OAuth manual check, signed-in e2e and test:rls on the test project.

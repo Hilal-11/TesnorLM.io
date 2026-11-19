@@ -130,6 +130,36 @@ Add `@tailwindcss/typography` to your Tailwind CSS file so lesson text looks goo
 - [ ] Langfuse tracing, Upstash rate limits, Razorpay plans
 - [ ] Move ingestion to Inngest / Trigger.dev queue
 
+## Auth setup (Phase 2)
+
+Do these once in the dashboards; secrets go in `.env` only (never in chat or git).
+Supabase callback URL: `https://<project-ref>.supabase.co/auth/v1/callback`.
+
+1. **Supabase → Authentication → URL Configuration**: Site URL `http://localhost:3000` (`https://tensorlm.io`
+   at launch). Redirect URLs: `http://localhost:3000/**`, `https://tensorlm.io/**`, later your Vercel
+   preview pattern.
+2. **Email provider**: enabled, "Confirm email" on, minimum password length 8; leaked-password protection
+   on if your plan has it.
+3. **Email templates**: paste the four files from `docs/email-templates/` (confirm signup, magic link,
+   reset password, change email). They send a 6-digit code plus a backup link through `/auth/confirm`.
+4. **SMTP (Resend)**: host `smtp.resend.com`, port 465, user `resend`, password = Resend API key, sender
+   `hello@tensorlm.io` / `TensorLM`. The built-in sender only allows a few emails an hour.
+5. **Google**: Google Cloud → OAuth client (Web). Origins `http://localhost:3000`, `https://tensorlm.io`;
+   redirect URI = the Supabase callback URL. Paste the ID/secret into Supabase → Providers → Google.
+6. **GitHub**: Settings → Developer settings → OAuth Apps → callback = the Supabase callback URL. Paste the
+   ID/secret into Supabase → Providers → GitHub.
+7. **Manual linking**: turn on "Allow manual linking" (Settings → Linked accounts uses it).
+8. **Turnstile (optional)**: Cloudflare Turnstile site key in `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; secret in
+   Supabase → Attack Protection.
+9. **.env**: add `NEXT_PUBLIC_SITE_URL=http://localhost:3000`, then copy `.env` to `apps/web/.env.local`
+   (on Windows `setup.sh`'s symlink becomes a copy, so repeat after every edit).
+10. **RLS test project**: a second Supabase project with all migrations applied
+    (`npx supabase db push --db-url <test-db-url>`), and its keys in a repo-root `.env.test`:
+    `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`, `TEST_SUPABASE_SERVICE_ROLE_KEY`. Then `npm run test:rls`.
+
+Checks: `npm run lint && npm run typecheck && npm test && npm run build`, `npm run e2e` (Playwright),
+`npm run test:rls` (test project only), `npm run db:types` after every migration.
+
 ## 7. Deploy
 
 - **Web:** push to GitHub → import in Vercel → set root directory `apps/web` → add env vars.
