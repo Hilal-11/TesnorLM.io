@@ -23,7 +23,7 @@ only from TensorLM design tokens, keyboard-operable, with zero serious axe issue
 - [x] P1.0 — Token alignment: tokens, fonts and motion match the design skill
 - [x] P1.1 — Buttons, icon button, split button, copy button
 - [x] P1.2 — Inputs
-- [ ] P1.3 — Display components
+- [x] P1.3 — Display components
 - [ ] P1.4 — Overlays
 - [ ] P1.5 — Navigation
 - [ ] P1.6 — Data table and pagination

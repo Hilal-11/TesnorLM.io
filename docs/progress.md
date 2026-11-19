@@ -31,3 +31,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - Field wiring, Input, SearchInput, Textarea, Select, Combobox, Checkbox, RadioCard, Switch, SegmentedControl.
 - Verified: 13 tests incl. keyboard paths and axe on a full form.
+
+## 2026-11-19 — P1.3 — Display components
+
+- StatusPill, LevelFlag, Avatar(+Stack), Progress (bar/dots/ring), Skeleton + DelayedSkeleton + presets, EmptyState.
+- Added success/warning/danger-strong tokens for status words on tints (light success/warning alone are 4.3/4.1:1).
+- Verified: 19 tests incl. fake-timer tooltip delay and DelayedSkeleton; axe clean.
