@@ -51,7 +51,9 @@ export default function Home() {
             <span aria-hidden className="size-1.5 rounded-full bg-success" />
             Learn research papers with interactive diagrams
           </span>
-          <h1 className="max-w-3xl text-display text-balance text-ink">Understand any research paper.</h1>
+          <h1 className="max-w-3xl text-display text-balance text-ink">
+            Understand any research paper.
+          </h1>
           <p className="max-w-xl text-body-read text-pretty text-graphite">
             Turn dense papers into clear explanations, diagrams that draw themselves, worked
             examples and quizzes, every claim tied back to the page it came from.
