@@ -11,13 +11,22 @@ Upload any paper, understand it deeply: AI explanations with diagrams, examples,
 - `supabase/migrations` — Postgres schema, pgvector, RLS, `hybrid_search()`, storage bucket.
 - `docs/backlog.md` — task list (tick tasks here). `docs/progress.md` — append-only work log.
 
+## Design rules
+
+Follow `.claude/skills/tensorlm-design/SKILL.md`; it overrides older docs and prompts. Tokens live in
+`apps/web/src/app/globals.css` — Tailwind's default palette, shadows, radii and text sizes are
+removed, so only TensorLM tokens exist (`bg-paper`, `text-ink`, `rounded-sm`, `shadow-2`,
+`text-h2`, `duration-(--dur-fast) ease-out`). Preview them at `/dev/tokens` (dev only).
+
 ## Commands
 
 Web (`cd apps/web`):
 
-- `npm run dev` — dev server on http://localhost:3000
+- `npm run dev` — dev server on <http://localhost:3000>
 - `npm run lint` · `npm run typecheck` · `npm test` · `npm run build`
 - `npm run format` · `npm run format:check`
+- `npm run shots -- <route> <outDir> [widths]` — full-page screenshots in light and dark (needs
+  `npm run dev`; uses local Edge/Chrome). `npm run shots:tokens` for `/dev/tokens`.
 
 Worker (`cd services/worker`):
 

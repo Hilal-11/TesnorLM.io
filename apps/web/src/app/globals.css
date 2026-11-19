@@ -2,129 +2,375 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * TensorLM design tokens — source of truth: .claude/skills/tensorlm-design/SKILL.md
+ *
+ * Raw tokens live on theme scopes (:root/.light and .dark) so any element can switch theme by
+ * class. Values derived from other tokens (shadcn names, highlights) sit in a rule that applies
+ * to every scope, because a custom property resolves where it is declared: a nested .dark
+ * wrapper must re-declare them or it would inherit the light values.
+ */
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────── Raw tokens: light (skill 2.1, 2.3, 2.4, 4.3) ───────────── */
+:root,
+.light {
+  color-scheme: light;
+
+  --paper: #f6f7f4;
+  --sheet: #ffffff;
+  --sheet-2: #ffffff;
+  --ink: #14212b;
+  --graphite: #5b6873;
+  --rule: #dce1de;
+  --cobalt: #2449d8;
+  --cobalt-soft: #e7ecfc;
+  --marker: #ffe066;
+  --muted: #edefec;
+
+  --success: #16855b;
+  --warning: #a86a00;
+  --danger: #c42b3a;
+
+  --primary-foreground: #ffffff;
+  --danger-foreground: #ffffff;
+
+  /* Source highlights sit behind ink at 45–60% (skill 2.1). */
+  --marker-strength: 55%;
+  --grid-line: #dce1de;
+
+  /* Diagram and chart palette, in order of use (skill 2.4). */
+  --chart-1: #2449d8;
+  --chart-2: #0e9f8e;
+  --chart-3: #d99a1e;
+  --chart-4: #d1497a;
+  --chart-5: #5b6873;
+
+  /* Shadows are tinted with ink, never grey (skill 4.3). */
+  --shadow-1: 0 1px 2px rgb(20 33 43 / 0.06);
+  --shadow-2: 0 2px 4px rgb(20 33 43 / 0.06), 0 8px 24px rgb(20 33 43 / 0.08);
+  --shadow-3: 0 4px 8px rgb(20 33 43 / 0.08), 0 24px 48px rgb(20 33 43 / 0.14);
+}
+
+/* ───────────── Raw tokens: dark — a night study desk (skill 2.2) ───────────── */
+.dark {
+  color-scheme: dark;
+
+  --paper: #0f1820;
+  --sheet: #17232d;
+  --sheet-2: #1f2d39;
+  --ink: #e6ecef;
+  --graphite: #93a1ac;
+  --rule: #2a3946;
+  --cobalt: #7b9bff;
+  --cobalt-soft: #1c2a55;
+  --marker: #e9c84a;
+  --muted: #1a2631;
+
+  --success: #4cc38a;
+  --warning: #f0b44c;
+  --danger: #ff7a85;
+
+  --primary-foreground: #0f1820;
+  --danger-foreground: #0f1820;
+
+  /* Dark highlights sit at 22–30%; text stays ink. */
+  --marker-strength: 26%;
+  --grid-line: #22303b;
+
+  --chart-1: #7b9bff;
+  --chart-2: #3ccbb8;
+  --chart-3: #f0b44c;
+  --chart-4: #f07aa3;
+  --chart-5: #93a1ac;
+
+  /* Dark mode drops shadows almost entirely: depth comes from sheet → sheet-2 plus a rule border.
+     Only dialogs keep a faint deep shadow so they separate from the page beneath. */
+  --shadow-1: none;
+  --shadow-2: none;
+  --shadow-3: 0 24px 48px rgb(4 9 14 / 0.5);
+}
+
+/* ───────────── Derived tokens, re-declared in every theme scope ───────────── */
+:root,
+.light,
+.dark {
+  --info: var(--cobalt);
+  --highlight: color-mix(in oklab, var(--marker) var(--marker-strength), transparent);
+
+  /* shadcn mapping (skill 2.6) — keeps generated components working on TensorLM tokens. */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--sheet);
+  --card-foreground: var(--ink);
+  --popover: var(--sheet-2);
+  --popover-foreground: var(--ink);
+  --primary: var(--cobalt);
+  --secondary: var(--cobalt-soft);
+  --secondary-foreground: var(--cobalt);
+  --muted-foreground: var(--graphite);
+  --accent: var(--cobalt-soft);
+  --accent-foreground: var(--ink);
+  --destructive: var(--danger);
+  --destructive-foreground: var(--danger-foreground);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--cobalt);
+  --radius: 0.5rem;
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--cobalt);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--cobalt-soft);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: var(--cobalt);
+}
+
+/* ───────────── Theme-independent tokens ───────────── */
+:root {
+  /* Fonts: next/font sets --font-hanken / --font-literata / --font-jetbrains on <html>. */
+  --font-ui: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-read: var(--font-literata), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  /* Motion (skill 7.1). Use as duration-(--dur-fast) and ease-out / ease-spring. */
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+  --dur-draw: 700ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* ───────────── Tailwind theme: TensorLM tokens only ───────────── */
 @theme inline {
+  /* TensorLM tokens only: drop Tailwind's default colour palette, grey shadows and extra radii. */
+  --color-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --radius-*: initial;
+  --text-*: initial;
+
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-sheet-2: var(--sheet-2);
+  --color-ink: var(--ink);
+  --color-graphite: var(--graphite);
+  --color-rule: var(--rule);
+  --color-cobalt: var(--cobalt);
+  --color-cobalt-soft: var(--cobalt-soft);
+  --color-marker: var(--marker);
+  --color-highlight: var(--highlight);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-info: var(--info);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-ui: var(--font-ui);
+  --font-sans: var(--font-ui);
+  --font-read: var(--font-read);
+  --font-serif: var(--font-read);
+  --font-mono: var(--font-mono);
+
+  /* Radius scale by hierarchy (skill 4.2): rounded-xs/sm/md/lg; rounded-full is built in. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+
+  --ease-out: var(--ease-out);
+  --ease-in: var(--ease-in);
+  --ease-inout: var(--ease-inout);
+  --ease-spring: var(--spring);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* ───────────── Type roles (skill 3.1) — the only text sizes ───────────── */
+@utility text-display {
+  font-family: var(--font-ui);
+  font-size: 2.25rem; /* 36 / 42 on mobile */
+  line-height: 2.625rem;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  @media (width >= 48rem) {
+    font-size: 3rem; /* 48 / 54 */
+    line-height: 3.375rem;
+  }
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+@utility text-h1 {
+  font-family: var(--font-ui);
+  font-size: 1.625rem; /* 26 / 34 on mobile */
+  line-height: 2.125rem;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  @media (width >= 48rem) {
+    font-size: 2rem; /* 32 / 40 */
+    line-height: 2.5rem;
+  }
 }
 
+@utility text-h2 {
+  font-family: var(--font-ui);
+  font-size: 1.5rem; /* 24 / 32 */
+  line-height: 2rem;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+@utility text-h3 {
+  font-family: var(--font-ui);
+  font-size: 1.1875rem; /* 19 / 28 */
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+
+@utility text-body-read {
+  font-family: var(--font-read);
+  font-size: 1.0625rem; /* 17 / 29 — never shrinks on mobile */
+  line-height: 1.8125rem;
+}
+
+@utility text-body {
+  font-family: var(--font-ui);
+  font-size: 0.9375rem; /* 15 / 24 */
+  line-height: 1.5rem;
+}
+
+@utility text-small {
+  font-family: var(--font-ui);
+  font-size: 0.8125rem; /* 13 / 20 */
+  line-height: 1.25rem;
+}
+
+@utility text-code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem; /* 14 / 22 */
+  line-height: 1.375rem;
+}
+
+/* Reading measure for answers: 60–72 characters (skill 3.2). */
+@utility measure {
+  max-width: 68ch;
+}
+
+/* ───────────── Textures and AI states ───────────── */
+
+/* Graph paper (skill 4.4): diagram canvas and new-notebook empty state only.
+   The grid sits on ::before so the edge fade masks the lines, not the content. */
+@utility graph-paper {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--paper);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+    mask-image: radial-gradient(ellipse at center, #000 40%, transparent 85%);
+  }
+}
+
+/* Thinking shimmer (skill 7.4): "Reading 3 sources…" while retrieving. */
+@utility shimmer {
+  background: linear-gradient(90deg, var(--graphite) 0%, var(--ink) 50%, var(--graphite) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background: none;
+    color: var(--graphite);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* ───────────── Base ───────────── */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border;
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-ui);
+  }
+  body {
+    @apply bg-background text-body text-foreground;
+  }
+  /* Focus ring (skill 8.1): 2px cobalt, 2px offset, keyboard only. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion: everything visible instantly, nothing loops (skill 7.3). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

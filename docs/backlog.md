@@ -11,9 +11,30 @@ Milestone: repo runs locally, checks run in CI, design tokens exist in code.
 - [ ] P5 — `src/lib/models.ts`: single source of model choice
 - [ ] P6 — All LLM prompts in `src/prompts/`
 - [ ] P7 — Env validation (zod for web, pydantic-settings for worker)
-- [ ] P8 — Design tokens + `/dev/tokens` page
+- [x] P8 — Design tokens + `/dev/tokens` page — superseded by P1.0 (tokens follow the design skill)
 - [ ] P9 — Theme provider (light / dark / system), no flash
 - [ ] P10 — Error and logging helpers
+
+## Phase 1 — Design system components
+
+Milestone: `/dev/components` shows every core component in all states, in light and dark, built
+only from TensorLM design tokens, keyboard-operable, with zero serious axe issues.
+
+- [x] P1.0 — Token alignment: tokens, fonts and motion match the design skill
+- [ ] P1.1 — Buttons, icon button, split button, copy button
+- [ ] P1.2 — Inputs
+- [ ] P1.3 — Display components
+- [ ] P1.4 — Overlays
+- [ ] P1.5 — Navigation
+- [ ] P1.6 — Data table and pagination
+- [ ] P1.7 — Settings group and rows
+- [ ] P1.8 — Accessibility pass (needs Phase 0 P3 CI for the a11y job)
+
+Open design questions:
+
+- [ ] Light `success` (#16855B, 4.30:1) and `warning` (#A86A00, 4.13:1) are below 4.5:1 as small
+      text on `paper` (they pass 3:1 for icons). Decide: darken them in the skill, or only use them
+      for icons/large text with ink words.
 
 ## Found in setup review — not yet scheduled
 

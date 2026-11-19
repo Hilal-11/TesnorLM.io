@@ -11,7 +11,9 @@
     "test": "node scripts/vitest.mjs run",
     "test:watch": "node scripts/vitest.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "shots": "node scripts/screenshots.mjs",
+    "shots:tokens": "node scripts/screenshots.mjs /dev/tokens ../../docs/screenshots/phase1/p1.0 1440 390"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.106",
@@ -39,6 +41,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^22.20.5",

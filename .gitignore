@@ -7,3 +7,6 @@ __pycache__/
 *.pyc
 .DS_Store
 supabase/.temp/
+
+# Local design review screenshots (regenerate with npm run shots*)
+docs/screenshots/
