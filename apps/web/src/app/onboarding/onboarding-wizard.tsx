@@ -311,8 +311,6 @@ export function OnboardingWizard({
               ))}
             </RadioCardGroup>
           )}
-
-          {/* TODO(Phase 3): wire "sample paper" and "upload my own" to real uploads (docs/backlog.md). */}
           {step === 4 && (
             <div className="flex flex-col gap-3">
               <RadioCardGroup

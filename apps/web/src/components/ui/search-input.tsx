@@ -76,7 +76,7 @@ export function SearchInput({
           }}
         />
       ) : (
-        shortcut && <Kbd keys={shortcut} className="mr-2" />
+        shortcut && shortcut.length > 0 && <Kbd keys={shortcut} className="mr-2" />
       )}
     </div>
   );

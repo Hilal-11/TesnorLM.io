@@ -1,6 +1,7 @@
 import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import { unauthorized } from "@/lib/errors";
 import { getProfile } from "@/lib/profile";
@@ -11,6 +12,9 @@ import { createClient } from "@/lib/supabase/server";
  * Never use getSession() for authorization on the server.
  */
 export const getOptionalUser = cache(async (): Promise<User | null> => {
+  // Request time: the session check reads the clock (token expiry), which can't be prerendered
+  // (Cache Components). Every page and route that needs the person goes through here.
+  await connection();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   return error ? null : data.user;

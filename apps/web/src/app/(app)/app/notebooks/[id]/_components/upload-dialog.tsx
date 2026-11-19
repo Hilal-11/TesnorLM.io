@@ -16,12 +16,12 @@ import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { ProgressBar } from "@/components/ui/progress";
-import { StatusPill } from "@/components/ui/status-pill";
 import { formatBytes, middleTruncate, type Source } from "@/lib/documents/shared";
 import { LIMITS } from "@/lib/ingestion/contract";
 import { getUploadManager, useUploads } from "@/lib/uploads/browser";
 import type { UploadItem } from "@/lib/uploads/manager";
 import { cn } from "@/lib/utils";
+import { StatusLines } from "./source-card";
 import { isBusy, uploadStatus } from "./upload-status";
 
 export const ACCEPT = "application/pdf,.pdf";
@@ -166,7 +166,6 @@ export function UploadRow({
   const status = uploadStatus(item, source);
   const manager = getUploadManager();
   const busy = isBusy(item);
-  const says = status.line.toLowerCase().includes(status.word.toLowerCase());
   return (
     <li className="flex items-start gap-3 p-3" data-phase={item.phase}>
       <span
@@ -178,17 +177,14 @@ export function UploadRow({
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-baseline justify-between gap-3">
           <span className="min-w-0 truncate text-body font-medium text-ink" title={item.name}>
-            {middleTruncate(item.name, 36)}
+            <span aria-hidden>{middleTruncate(item.name, 36)}</span>
+            <span className="sr-only">{item.name}</span>
           </span>
           <span className="shrink-0 text-small text-graphite tabular-nums">
             {formatBytes(item.size)}
           </span>
         </div>
-        <StatusPill
-          status={status.pill}
-          className="max-w-full px-0"
-          {...(says ? { label: status.line } : { detail: status.line })}
-        />
+        <StatusLines status={status} />
         {status.progress !== null && busy && (
           <ProgressBar value={status.progress} label={`${item.name}: ${status.line}`} />
         )}

@@ -8,10 +8,29 @@ import type { SourceStatus } from "@/lib/documents/live";
 import { middleTruncate } from "@/lib/documents/shared";
 import { cn } from "@/lib/utils";
 
-/** The line says the word itself ("Reading page 18 of 42") or needs it in front ("Queued · …"). */
-function statusParts(status: SourceStatus) {
+/**
+ * The status as icon + word, and the detail on its own line when it doesn't already say the word
+ * ("Reading page 18 of 42" carries it; "Running OCR on page 3 of 9" sits under "Reading").
+ * Long lines wrap; they never push the word out of sight.
+ */
+export function StatusLines({ status }: { status: SourceStatus }) {
   const says = status.line.toLowerCase().includes(status.word.toLowerCase());
-  return says ? { label: status.line } : { detail: status.line };
+  return (
+    <>
+      <StatusPill
+        status={status.pill}
+        className="max-w-full px-0"
+        label={says ? status.line : undefined}
+      />
+      {!says && (
+        <p
+          className={status.pill === "failed" ? "text-small text-ink" : "text-small text-graphite"}
+        >
+          {status.line}
+        </p>
+      )}
+    </>
+  );
 }
 
 /**
@@ -61,11 +80,12 @@ export function SourceCard({
           onClick={onSelect}
           aria-pressed={onSelect ? selected : undefined}
           title={name}
+          aria-label={name}
           className="min-w-0 cursor-pointer truncate text-left text-body font-medium text-ink outline-none after:absolute after:inset-0 after:rounded-md"
         >
           {middleTruncate(name)}
         </button>
-        <StatusPill status={status.pill} className="max-w-full px-0" {...statusParts(status)} />
+        <StatusLines status={status} />
         {status.progress !== null && (
           <ProgressBar value={status.progress} label={`${name}: ${status.line}`} className="mt-1" />
         )}

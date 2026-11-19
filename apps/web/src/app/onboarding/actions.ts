@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUserForApi } from "@/lib/auth";
 import { badRequest, defineAction } from "@/lib/errors";
+import { createNotebook } from "@/lib/notebooks/repo";
 import { createClient } from "@/lib/supabase/server";
 import { onboardingStepSchema } from "./schema";
 
@@ -20,10 +21,13 @@ export const saveOnboardingStep = defineAction(onboardingStepSchema, async (inpu
   return { ok: true };
 });
 
-/** Finish or "Skip for now": onboarding is done and never shown again. */
+/**
+ * Finish or "Skip for now": onboarding is done and never shown again. Finishing creates the first
+ * notebook and opens it: "sample" loads the sample paper there, "upload" opens Add sources.
+ */
 export const finishOnboarding = defineAction(
   z.object({ skip: z.boolean().optional() }),
-  async () => {
+  async ({ skip }) => {
     const user = await requireUserForApi();
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -33,6 +37,13 @@ export const finishOnboarding = defineAction(
       .select("first_source")
       .maybeSingle();
     if (error) throw badRequest("We couldn't finish setup. Try again.", "save_failed");
-    redirect(data?.first_source === "sample" ? "/app?welcome=sample" : "/app?welcome=1");
+    if (skip || !data?.first_source) redirect("/app?welcome=1");
+    const sample = data.first_source === "sample";
+    const notebook = await createNotebook(supabase, user.id, {
+      title: sample ? "Sample paper" : "My first notebook",
+      color: "cobalt",
+      status: "to_read",
+    });
+    redirect(`/app/notebooks/${notebook.id}?${sample ? "sample=1" : "add=1"}`);
   },
 );

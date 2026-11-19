@@ -1,7 +1,8 @@
 "use client";
 
 import { FileSearch } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { toast } from "@/components/ui/toast";
 import { apiFetch } from "@/lib/api-client";
@@ -43,7 +44,8 @@ export function NotebookWorkspace({
   const { items } = useUploads();
   const uploads = items.filter((i) => i.notebookId === notebook.id);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const params = useSearchParams();
+  const [uploadOpen, setUploadOpen] = useState(() => params.get("add") === "1");
   const selected = sources.find((s) => s.id === selectedId) ?? null;
 
   // Counts as "opened" only when someone actually looks at it (not on link prefetch).
@@ -62,6 +64,32 @@ export function NotebookWorkspace({
     },
     [notebook.id],
   );
+
+  // From onboarding: ?add=1 opens Add sources; ?sample=1 adds the sample paper (once).
+  // (params is read above: the dialog starts open for ?add=1)
+  const router = useRouter();
+  const pathname = usePathname();
+  const handledIntro = useRef(false);
+  useEffect(() => {
+    const add = params.get("add") === "1";
+    const sample = params.get("sample") === "1";
+    if (handledIntro.current || (!add && !sample)) return;
+    handledIntro.current = true;
+    router.replace(pathname, { scroll: false });
+    if (add) return; // the dialog already started open (initial state below the URL)
+    void (async () => {
+      const res = await fetch("/samples/sample-paper.pdf").catch(() => null);
+      if (!res?.ok) {
+        toast.info("The sample paper isn't available yet", {
+          description: "Add one of your own PDFs to get started.",
+        });
+        setUploadOpen(true);
+        return;
+      }
+      const blob = await res.blob();
+      addFiles([new File([blob], "sample-paper.pdf", { type: "application/pdf" })]);
+    })();
+  }, [params, pathname, router, addFiles]);
 
   // Ctrl/⌘ U opens "Add sources"; pasting a PDF adds it.
   useEffect(() => {

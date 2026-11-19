@@ -3,6 +3,7 @@ import { cache } from "react";
 import { z } from "zod";
 import type { Database } from "@/lib/database.types";
 import { LEVELS, ROLES } from "@/lib/levels";
+import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export { LEVELS, ROLES, type Level } from "@/lib/levels";
@@ -10,6 +11,7 @@ export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 /** The current person's profile (RLS limits the query to their own row), cached per request. */
 export const getProfile = cache(async (): Promise<Profile | null> => {
+  await connection(); // request time: the session check reads the clock (see lib/auth.ts)
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
