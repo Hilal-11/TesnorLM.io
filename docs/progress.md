@@ -94,3 +94,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Onboarding per spec, left-aligned 560px column, one primary action per step, no celebration motion.
 - Verified: schema tests reject invalid input; e2e axe on every step light/dark; one primary action per step.
 - Open: resume/skip end-to-end needs the test project (e2e/authed.spec.ts); step 4 upload wiring is a Phase 3 TODO.
+
+## 2026-11-19 — P2.7 — RLS proof with two test accounts (in progress)
+
+- Test suite and migration 0003 written; `npm run test:rls` stops with a clear message until `.env.test` exists.
+- Open: create the test project, apply 0001-0003, add `.env.test`, run test:rls; apply 0003 to the main project; CI job after Phase 0 P3.
