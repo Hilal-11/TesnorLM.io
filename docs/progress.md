@@ -151,3 +151,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `app/chunking.py`: Docling HybridChunker with the embedding model's tokenizer (tiktoken cl100k_base, 400 tokens), Markdown tables (`kind = table`), headings, `page_start/page_end` within 1..page_count, bboxes converted to top-left PDF points (spec section 10), contextual embedding text ("Document: title" + heading path + text); running headers/footers (repeated short lines) and page numbers moved to furniture and dropped. `app/embed.py`: batches of 96, backoff on 429/5xx (5 tries), 1536-dim check, per-document token cap.
 - Verified: paper_basic chunks all have valid pages, bboxes, headings, a table chunk; no "Preprint" header or page numbers in any chunk; embedding retry/batching/dimension tests.
+
+## 2026-11-20 — P3.9 — Figures: extract and store; caption and embed
+
+- `app/figures.py`: pictures with page, top-left bbox, label ("Fig. 3" → "Figure 3") and paper caption; tiny images and logos repeated on ≥ 3 pages skipped; largest 40 kept in reading order; WebP q85 ≤ 1600 px at `{user}/{doc}/figures/{run}/{n}.webp`. `app/captions.py` + `app/prompts/captioner.md`: FAST_MODEL (claude-haiku-5-5, effort low), 4 at a time, retries on 429/5xx, refusal or failure keeps the paper caption, cache by image hash (same person only), token usage logged. One `figure_caption` chunk per figure with `figure_id`, page and bbox.
+- Verified: paper_basic → 2 figures with labels/captions/WebP; logo_repeat keeps only the real figure; a failed caption keeps the figure and document Ready.
