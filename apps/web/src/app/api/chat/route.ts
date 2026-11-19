@@ -1,7 +1,11 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
-import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+import { requireUserForApi } from "@/lib/auth";
+import { readEnv } from "@/lib/env";
+import { badRequest, withErrorHandling } from "@/lib/errors";
 import { FULL_CONTEXT_TOKEN_LIMIT, formatContext, retrieve } from "@/lib/retrieval";
+import { createClient } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
@@ -17,16 +21,21 @@ Formatting rules:
 - Charts: a fenced \`\`\`chart block with JSON {"type":"line"|"bar","xKey":"...","series":["..."],"data":[...]}.
 - Structure: intuition first, then mechanism, then math, then a short worked example.`;
 
-export async function POST(req: Request) {
-  const { notebookId, question, level = "student" } = await req.json();
+const chatRequest = z.object({
+  notebookId: z.uuid(),
+  question: z.string().trim().min(1).max(4000),
+  level: z.enum(["beginner", "intermediate", "expert"]).default("intermediate"),
+});
+
+export const POST = withErrorHandling("/api/chat", async (req: Request) => {
+  await requireUserForApi();
+  const parsed = chatRequest.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) throw badRequest("Send a notebook and a question.");
+  const { notebookId, question, level } = parsed.data;
+  const env = readEnv("ai");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return new Response("Unauthorized", { status: 401 });
-
-  // Adaptive routing: whole documents for small notebooks, retrieval for big ones
+  // Adaptive routing: whole documents for small notebooks, retrieval for big ones (RLS-scoped).
   const { data: docs } = await supabase
     .from("documents")
     .select("title, markdown, token_count")
@@ -44,10 +53,10 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: anthropic(process.env.LLM_MODEL ?? "claude-sonnet-5-5"),
+    model: anthropic(env.LLM_MODEL),
     system: SYSTEM,
     prompt: `Learner level: ${level}\n\nSOURCES:\n${context}\n\nQUESTION: ${question}`,
   });
 
   return result.toTextStreamResponse();
-}
+});

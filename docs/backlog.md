@@ -43,7 +43,7 @@ shell on desktop and mobile; every table private per user, proven by an automate
 
 - [x] P2.1 — profiles table, signup trigger, RLS (+ level names)
 - [x] P2.2 — Auth pages (email, OTP, magic link, Google, GitHub, reset) + branded emails
-- [ ] P2.3 — Session refresh and route protection
+- [x] P2.3 — Session refresh and route protection
 - [ ] P2.4 — Desktop app shell
 - [ ] P2.5 — Mobile shell (bottom tab bar)
 - [ ] P2.6 — Onboarding (once, skippable, resumable)

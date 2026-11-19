@@ -72,3 +72,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Auth pages and flows per spec; verify email kept in an httpOnly cookie, not the URL; `safeNext()` on every redirect.
 - Verified: unit tests (OtpInput, auth errors), e2e (sign-in steps, axe on 6 pages x 2 themes, 320px fit), screenshots 1440/390/320.
 - Open: paste docs/email-templates into Supabase; manual Google/GitHub check on localhost.
+
+## 2026-11-19 — P2.3 — Session refresh and route protection
+
+- Proxy + server guards (defence in depth); onboarding check lives in the (app) layout, not the proxy.
+- Verified: routeDecision unit tests; e2e for redirects with next, 401 JSON, no off-site redirects.
