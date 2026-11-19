@@ -83,3 +83,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Shell per spec; sidebar width snaps (no width animation); level switch saves to the profile.
 - Verified: unit tests (aria-current, Ctrl+B persistence, Ctrl+K navigation, linked accounts), e2e + axe light/dark, screenshots 1440-768.
 - Removed one accessory: the plan badge appeared in both the switcher and the breadcrumb; kept it in the switcher.
+
+## 2026-11-19 — P2.5 — Mobile shell (bottom tab bar)
+
+- Tab bar with 44px+ targets and safe-area padding; content padded so nothing hides under it.
+- Verified: e2e at 390x844 (active tab, Ask sheet, drawer closes with Esc, 44px targets, axe) and no overflow at 320px.
