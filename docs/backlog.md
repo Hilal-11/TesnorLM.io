@@ -68,7 +68,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 
 - [x] P3.0 — Ingestion spec + shared contract (TS and Python loaders, parity fixture)
 - [x] P3.1 — Database: notebooks columns, document stages, chunks/figures by run, `finalize_ingest()`, `set_document_stage()`, Realtime, bucket limits, `ingest-artifacts` bucket
-- [ ] P3.2 — Notebooks data layer and actions (CRUD, ordering, soft delete)
+- [x] P3.2 — Notebooks data layer and actions (CRUD, ordering, soft delete)
 - [ ] P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
 - [ ] P3.4 — Board view with drag and drop
 - [ ] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs

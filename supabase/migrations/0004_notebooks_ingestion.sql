@@ -32,9 +32,28 @@ alter table public.notebooks
 create index notebooks_board_idx on public.notebooks (user_id, deleted_at, status, position);
 create index notebooks_recent_idx on public.notebooks (user_id, last_opened_at desc nulls last);
 
+-- updated_at drives "this changed somewhere else" checks, so opening a notebook (last_opened_at)
+-- doesn't count as a change.
+create or replace function public.notebooks_set_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if (new.title, new.description, new.status, new.subject, new.color, new.exam_date, new.position,
+      new.deleted_at)
+     is distinct from
+     (old.title, old.description, old.status, old.subject, old.color, old.exam_date, old.position,
+      old.deleted_at) then
+    new.updated_at := now();
+  end if;
+  return new;
+end;
+$$;
+
 create trigger notebooks_set_updated_at
   before update on public.notebooks
-  for each row execute function public.set_updated_at();
+  for each row execute function public.notebooks_set_updated_at();
 
 -- People create, edit and soft-delete their notebooks; only the cleanup job (service role) deletes.
 drop policy if exists "own notebooks" on public.notebooks;

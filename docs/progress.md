@@ -118,3 +118,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Migration 0004: notebook board columns (`position` in "C" collation), document stages + run ids (`ingest_run_id` processing, `ready_run_id` published), chunk/figure run keys and positions, `set_document_stage()`, `finalize_ingest()`, `start_ingest_run()` (service role only), `hybrid_search()` over published runs, Realtime, bucket limits, `ingest-artifacts` bucket. A trigger chooses `storage_path`; column grants stop people writing pipeline columns.
 - Verified on the local stack (`npx supabase start`, `npm run test:rls:local`): 73 tests incl. contract-vs-SQL transitions, stale/backward moves, atomic swap, search during re-process, Realtime to owner only, bucket limits. Old `/api/documents` route removed (P3.10 replaces it); chat reads published runs.
 - Open: apply 0003 + 0004 to your test and main projects; the old worker `main.py` no longer matches the schema until P3.5/P3.6.
+
+## 2026-11-19 — P3.2 — Notebooks data layer and actions
+
+- `src/lib/notebooks/` (shared schemas, fractional ordering, filter/sort; repo taking the caller's client), server actions (create, update with `updated_at` conflict check, move, touch, soft delete + `notebook/deleted` event, restore), `GET /api/notebooks`, hard-delete cleanup in `src/lib/cleanup.ts`.
+- Verified: unit tests (schemas, positions incl. 50 random moves, filter/sort); database suite as two people (ownership 404s, order, soft delete/restore, conflict returns the fresh row, opening isn't an edit, live source counts, hard delete empties both buckets). 81 database tests pass locally.
+- Open: the hard-delete queue function is wired in P3.5.

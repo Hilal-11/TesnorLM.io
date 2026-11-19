@@ -68,7 +68,14 @@ export function withErrorHandling<C>(route: string, handler: RouteHandler<C>): R
 /** Result of a server action: never throws to the client (redirects still work). */
 export type ActionState<T = undefined> =
   | { ok: true; data?: T; message?: string }
-  | { ok: false; error: string; code: string; fieldErrors?: Record<string, string> }
+  | {
+      ok: false;
+      error: string;
+      code: string;
+      fieldErrors?: Record<string, string>;
+      /** Fresh state the person should see instead (e.g. the latest row after a "conflict"). */
+      data?: T;
+    }
   | null;
 
 /**
