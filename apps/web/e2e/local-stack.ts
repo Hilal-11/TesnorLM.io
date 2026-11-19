@@ -39,6 +39,7 @@ export async function signInNewPerson(page: Page, name = "Ada Test") {
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/app(\?.*)?$/);
+  // The first sign-in after a dev server start compiles /app: allow for it.
+  await expect(page).toHaveURL(/\/app(\?.*)?$/, { timeout: 30_000 });
   return { userId: data.user.id, email };
 }

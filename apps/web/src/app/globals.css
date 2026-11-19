@@ -470,6 +470,18 @@
   }
 }
 
+/* Drop zone (skill 5.3): the only wash in the app, shown while files are dragged over. It uses
+   the action colour (monochrome UI) and stays under 10% opacity. */
+@utility drop-wash {
+  background:
+    radial-gradient(
+      60% 50% at 50% 40%,
+      color-mix(in oklab, var(--primary) 8%, transparent),
+      transparent 70%
+    ),
+    var(--paper);
+}
+
 /* Thinking shimmer (skill 7.4): "Reading 3 sources…" while retrieving. */
 @utility shimmer {
   background: linear-gradient(90deg, var(--graphite) 0%, var(--ink) 50%, var(--graphite) 100%);

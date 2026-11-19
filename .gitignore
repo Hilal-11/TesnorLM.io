@@ -14,3 +14,7 @@ docs/screenshots/
 # Generated worker test PDFs (python services/worker/tests/fixtures/make_fixtures.py)
 services/worker/tests/fixtures/generated/
 .coverage
+
+# Playwright output
+apps/web/test-results/
+apps/web/playwright-report/

@@ -76,7 +76,7 @@ Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
 - [x] P3.7 — OCR fallback for scanned pages
 - [x] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
 - [x] P3.9 — Figures: extract and store; caption and embed
-- [ ] P3.10 — Upload flow (resumable) + upload modal
+- [x] P3.10 — Upload flow (resumable) + upload modal
 - [ ] P3.11 — Live pipeline progress (notebook sources view)
 - [ ] P3.12 — Re-process and delete with cleanup
 - [x] P3.13 — Worker test suite with fixtures

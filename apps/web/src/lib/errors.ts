@@ -8,6 +8,8 @@ export class AppError extends Error {
     public code: string,
     message: string,
     public status = 400,
+    /** Extra JSON fields for the client (e.g. an error's fix and values). Never secrets. */
+    public details?: Record<string, unknown>,
   ) {
     super(message);
   }
@@ -31,7 +33,10 @@ export const upstreamError = (
 export function toErrorResponse(err: unknown, requestId?: string) {
   const headers = requestId ? { "x-request-id": requestId } : undefined;
   if (err instanceof AppError) {
-    return Response.json({ error: err.message, code: err.code }, { status: err.status, headers });
+    return Response.json(
+      { ...err.details, error: err.message, code: err.code },
+      { status: err.status, headers },
+    );
   }
   return Response.json(
     { error: "We couldn't finish that. Try again in a moment.", code: "internal" },
