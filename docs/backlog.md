@@ -108,9 +108,9 @@ Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
 - [x] P4.7 — Structured citations (server mapping and validation)
 - [x] P4.8 — LessonRenderer v2 (directives, math, code, charts, sanitize)
 - [x] P4.9 — Diagram card: self-drawing diagrams + Mermaid auto-repair
-- [ ] P4.10 — Chat UI (states, actions, follow-ups, feedback)
-- [ ] P4.11 — Prompt box (composer)
-- [ ] P4.12 — Citation chips with hover preview
+- [x] P4.10 — Chat UI (states, actions, follow-ups, feedback)
+- [x] P4.11 — Prompt box (composer)
+- [x] P4.12 — Citation chips with hover preview
 - [ ] P4.13 — PDF viewer pane with highlights
 - [ ] P4.14 — Text selection in PDF → floating toolbar; notes
 - [ ] P4.15 — Quality gate: smoke evals, performance, accessibility, audit

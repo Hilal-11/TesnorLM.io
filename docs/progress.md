@@ -224,3 +224,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 ## 2026-11-20 — P4.3 — Sources pane: use in answers
 
 - Ready source cards get a "Use … in answers" checkbox (`documents.included`, `setSourceIncluded` action, optimistic with rollback); unticked sources dim and are skipped by retrieval. The composer shows "Asking k of n sources" (or the @-picked ones). Selecting a source opens it in the canvas. Figures stay in Source details (canvas ⓘ) for now.
+
+## 2026-11-20 — P4.10 + P4.11 + P4.12 — Chat UI, composer, citation chips in answers
+
+- `_components/chat/`: `useChatStream` reads the UI message stream (meta ids replace temp ids, status lines "Understanding your question…" / "Reading …", tokens, `data-final` swap to validated text + citations, follow-ups, errors); Stop aborts (saved as stopped) → Continue; Regenerate adds a version with a 1/2 switcher; copy, 👍/👎 with reasons + comment (upsert), "not grounded" note, follow-up chips, jump to latest, Esc stops. Chat switcher (new, open, rename, delete with Undo; `?chat=` in the URL; `loadMessages` action).
+- Composer: grows to 8 lines, Enter sends / Shift+Enter newline (IME-safe), `/` commands and `@` source picker as a listbox with arrows/Enter/Tab/Esc, quote chips from the PDF, level segmented control (remembered per chat), counter near the limit, Stop while streaming, disabled with a reason when nothing is ready. Citation chips use the provisional map while streaming and open the PDF at the cited boxes. 9 tests (incl. axe).

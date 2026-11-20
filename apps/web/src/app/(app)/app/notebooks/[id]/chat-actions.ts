@@ -14,6 +14,7 @@ import {
   type Chat,
 } from "@/lib/chats/shared";
 import { defineAction, notFound } from "@/lib/errors";
+import { createAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 export const createChat = defineAction(createChatSchema, async ({ notebookId, level }) => {
@@ -109,3 +110,11 @@ export const setSourceIncluded = defineAction(
     return { ok: true };
   },
 );
+
+/** A chat's messages, for switching chats in the workspace (404 for someone else's chat). */
+export const loadMessages = defineAction(chatIdSchema, async ({ id }) => {
+  await requireUserForApi();
+  const db = await createClient();
+  await chats.getChat(db, id);
+  return { ok: true, data: await chats.listMessages(db, createAdmin(), id) };
+});

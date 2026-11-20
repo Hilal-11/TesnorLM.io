@@ -59,6 +59,7 @@ export const DIRECTIVES = FORMAT.directives;
 export const LIMITS = FORMAT.limits;
 export const MERMAID = FORMAT.mermaid;
 export const CITATIONS = FORMAT.citations;
+export const FORMAT_COMMANDS = FORMAT.commands;
 
 export const levelSchema = z.enum(LEVELS as [Level, ...Level[]]);
 export const commandSchema = z.enum(COMMANDS as [Command, ...Command[]]);
