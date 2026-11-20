@@ -134,6 +134,38 @@ Waiting on you (Phase 4):
 - [ ] Upstash Redis (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) — optional: the database limits chats without them
 - [ ] Anthropic spend cap checked; "Attention Is All You Need" PDF uploaded to a notebook for manual testing (never committed)
 
+## Phase 5 — Notes (v2, starts after Part A verification has zero FAIL)
+
+Milestone: notes live on their own page with a rich editor, autosave and every common operation; answers and
+passages save into notes with working citations.
+Plan: `docs/plans/TensorLM-v2-Part-B-Phases-5-6.md`. Note: a v1 `notes` table already exists (migration 0005,
+`notebook_id NOT NULL`, cascade delete), so P5.1 alters and migrates it.
+
+- [ ] P5.1 — Notes schema, versions, trash, RLS (alter the v1 table; nullable notebook_id for Unfiled)
+- [ ] P5.2 — /notes workspace: list, filters, search, full-page editor (no popups)
+- [ ] P5.3 — Editor: rich text, checklists, code, math, diagrams, tables, images, citation chips, slash and bubble menus
+- [ ] P5.4 — Operations: create, rename, duplicate, pin, tag, move, archive, delete (confirm), trash, export, version history
+- [ ] P5.5 — Integrations: save answer to note, add passage to note, turn note into source, notes panel in notebook
+- [ ] P5.6 — AI in notes: summarise, rewrite clearer, explain selection, continue writing (accept/discard)
+- [ ] P5.7 — Notes quality gate (tests, a11y, performance)
+
+## Phase 6 — Quality, depth and trust (v2)
+
+Milestone: measured answer quality with a 50-question eval suite, full tracing, reranking, on-demand deep
+explanations, runnable code examples and interactive visuals; trust-focused UI pass complete.
+Plan: `docs/plans/TensorLM-v2-Part-B-Phases-5-6.md` (Part 9).
+
+- [ ] P6.1 — Eval suite (50 questions, all source types) + promptfoo + baseline and CI gate
+- [ ] P6.2 — Observability: Langfuse traces (metadata only), Sentry, cost dashboard
+- [ ] P6.3 — Reranker (20 → 8) with measured improvement
+- [ ] P6.4 — On-demand deep explanations and study guides (only when asked), saved as notes
+- [ ] P6.5 — Runnable code: Python in a browser sandbox (Pyodide) with Run, output, timeouts
+- [ ] P6.6 — Interactive visuals: attention heatmap, matrix-multiplication stepper, formula sliders (declarative specs only)
+- [ ] P6.7 — Trust UI pass: confirmations, action colours, error and empty states, microcopy audit
+- [ ] P6.8 — Phase 6 verification report
+
+Waiting on you (Phase 6, later): reranker provider key (e.g. Cohere) or a local BGE model; Sentry projects for web and worker.
+
 ## Found in setup review — not yet scheduled
 
 - [ ] Worker crashes in Docker: `main.py` uses `Path(__file__).parents[3]`, which doesn't exist at `/app/app/main.py`
