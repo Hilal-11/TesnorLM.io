@@ -220,3 +220,7 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `src/components/answer/`: `AnswerMarkdown` (react-markdown + GFM + math + directives, rehype-sanitize allow-list — no raw HTML, scripts, handlers or `javascript:` links), callouts Key idea (one per answer; extras become notes) / Note / Important / Not from your sources, citation chips with 300 ms preview, KaTeX with Show LaTeX + copy and a source fallback for broken formulas, code blocks, validated Recharts charts with a data table, worked-example cards, and streaming placeholders that hold back half-written fences/formulas.
 - `DiagramCard`: Mermaid (lazy, strict security, token theme), step-by-step drawing with Prev/Next/Replay and keys, "Describe this diagram" built from the code, SVG/PNG download, one automatic repair via `POST /api/diagram/repair` (fast model, own messages only) and `PUT` to save the fix into the message. Verified: 12 renderer tests (incl. axe on the spec's example answers), 3 describe tests, `tests/rls/diagram-repair.test.ts` 4 passed.
+
+## 2026-11-20 — P4.3 — Sources pane: use in answers
+
+- Ready source cards get a "Use … in answers" checkbox (`documents.included`, `setSourceIncluded` action, optimistic with rollback); unticked sources dim and are skipped by retrieval. The composer shows "Asking k of n sources" (or the @-picked ones). Selecting a source opens it in the canvas. Figures stay in Source details (canvas ⓘ) for now.

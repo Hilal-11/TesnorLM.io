@@ -2,6 +2,7 @@
 
 import { FileText } from "lucide-react";
 import type { ReactNode } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ProgressBar } from "@/components/ui/progress";
 import { StatusPill } from "@/components/ui/status-pill";
 import type { SourceStatus } from "@/lib/documents/live";
@@ -45,6 +46,7 @@ export function SourceCard({
   onSelect,
   menu,
   actions,
+  include,
 }: {
   name: string;
   status: SourceStatus;
@@ -52,6 +54,8 @@ export function SourceCard({
   onSelect?: () => void;
   menu?: ReactNode;
   actions?: ReactNode;
+  /** "Use in answers" for a ready source; unchecked sources are skipped when answering. */
+  include?: { checked: boolean; onChange: (checked: boolean) => void };
 }) {
   const failed = status.pill === "failed";
   return (
@@ -64,6 +68,7 @@ export function SourceCard({
         "transition-[border-color,box-shadow] duration-(--dur-fast) ease-out hover:border-rule-strong",
         "has-[button[data-select]:focus-visible]:outline-2 has-[button[data-select]:focus-visible]:outline-offset-2 has-[button[data-select]:focus-visible]:outline-(--ring)",
         "data-selected:border-l-2 data-selected:border-l-primary data-selected:bg-accent",
+        include && !include.checked && "[&_[data-select]]:text-graphite",
       )}
     >
       <span
@@ -92,6 +97,16 @@ export function SourceCard({
         {failed && status.fix && <p className="text-small text-graphite">{status.fix}</p>}
         {actions && <div className="relative z-10 mt-1 flex flex-wrap gap-2">{actions}</div>}
       </div>
+      {include && (
+        <div className="relative z-10 pt-0.5">
+          <Checkbox
+            checked={include.checked}
+            onCheckedChange={(v) => include.onChange(v === true)}
+            aria-label={`Use ${name} in answers`}
+            title={include.checked ? "Used in answers" : "Not used in answers"}
+          />
+        </div>
+      )}
       {menu && <div className="relative z-10 -mt-1 -mr-1">{menu}</div>}
     </article>
   );

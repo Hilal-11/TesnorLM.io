@@ -12,7 +12,7 @@ export type DocumentRow = Database["public"]["Tables"]["documents"]["Row"];
 export const SOURCE_FIELDS =
   "id, notebook_id, user_id, title, original_filename, file_size, page_count, stage, progress, " +
   "stage_detail, error_code, error_vars, ingest_run_id, ready_run_id, attempt, ocr_used, " +
-  "figure_count, chunk_count, stage_timings, started_at, finished_at, created_at, updated_at, deleted_at";
+  "figure_count, chunk_count, stage_timings, started_at, finished_at, created_at, updated_at, deleted_at, included";
 
 export type Source = Pick<
   DocumentRow,
@@ -40,6 +40,7 @@ export type Source = Pick<
   | "created_at"
   | "updated_at"
   | "deleted_at"
+  | "included"
 >;
 
 export const MB = 1024 * 1024;

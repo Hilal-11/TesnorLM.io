@@ -35,6 +35,7 @@ const base: Source = {
   created_at: "2026-11-20T10:00:00Z",
   updated_at: "2026-11-20T10:00:01Z",
   deleted_at: null,
+  included: true,
 };
 const row = (over: Partial<Source>): Source => ({ ...base, ...over });
 

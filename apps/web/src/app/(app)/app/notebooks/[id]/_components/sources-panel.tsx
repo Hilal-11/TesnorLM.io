@@ -27,6 +27,7 @@ export type SourceHandlers = {
   onDelete: (source: Source) => void;
   onCancelUpload: (source: Source) => void;
   onAddSource: () => void;
+  onToggleIncluded?: (source: Source, included: boolean) => void;
 };
 
 /**
@@ -111,6 +112,11 @@ export function SourcesPanel({
                   onSelect={() => handlers.onSelect(source.id)}
                   menu={<SourceMenu source={source} {...handlers} />}
                   actions={<FailedActions source={source} upload={upload} {...handlers} />}
+                  include={
+                    source.stage === "ready" && handlers.onToggleIncluded
+                      ? { checked: source.included, onChange: (v) => handlers.onToggleIncluded?.(source, v) }
+                      : undefined
+                  }
                 />
               </li>
             );
