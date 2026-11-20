@@ -5,6 +5,10 @@
 # (start-local.ps1 does the same on a local Docker database instead.)
 $root = $PSScriptRoot
 
+# A production build ("next build") leaves files in apps\web\.next that confuse the dev server
+# (endless reloads, "could not finish this Suspense boundary"). Start from a clean folder.
+Remove-Item -Recurse -Force (Join-Path $root "apps\web\.next") -ErrorAction SilentlyContinue
+
 Start-Process powershell -ArgumentList "-NoExit", "-Command",
   "cd '$root'; npx --yes inngest-cli@1.53.0 dev --no-discovery -u http://localhost:3000/api/inngest -u http://localhost:8000/api/inngest"
 
