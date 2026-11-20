@@ -18,3 +18,6 @@ services/worker/tests/fixtures/generated/
 # Playwright output
 apps/web/test-results/
 apps/web/playwright-report/
+
+# pdf.js copied at dev/build time (scripts/sync-pdfjs.mjs)
+apps/web/public/vendor/

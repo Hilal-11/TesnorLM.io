@@ -185,3 +185,46 @@ describe("the owner's lifecycle", () => {
     expect(limited).toMatchObject({ code: "rate_limited", status: 429 });
   });
 });
+
+describe("quota", () => {
+  it("a notebook takes MAX_SOURCES_FREE live, non-failed sources; failed ones don't count", async () => {
+    const previous = process.env.MAX_SOURCES_FREE;
+    process.env.MAX_SOURCES_FREE = "2";
+    try {
+      const nb = must(
+        await A.client
+          .from("notebooks")
+          .insert({ user_id: A.user.id, title: "Quota" })
+          .select("id")
+          .single(),
+      ).id;
+      const add = (n: number, force = true) =>
+        createDocument(A.client, A.user, nb, {
+          filename: `q${n}.pdf`,
+          size: 5,
+          sha256: String(n).repeat(64).slice(0, 64),
+          force,
+        });
+      await add(1);
+      const second = await add(2);
+      const third = await add(3).catch((e: unknown) => e);
+      expect(third).toMatchObject({
+        code: "quota_exceeded",
+        status: 403,
+        message: "This notebook has reached its limit of 2 sources.",
+      });
+      // A failed source frees its place.
+      must(
+        await admin
+          .from("documents")
+          .update({ stage: "failed" })
+          .eq("id", second.documentId)
+          .select("id"),
+      );
+      await expect(add(4)).resolves.toMatchObject({ documentId: expect.any(String) });
+    } finally {
+      if (previous === undefined) delete process.env.MAX_SOURCES_FREE;
+      else process.env.MAX_SOURCES_FREE = previous;
+    }
+  });
+});

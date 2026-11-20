@@ -20,7 +20,14 @@ const THEMES = ["light", "dark"] as const;
 async function seed(userId: string) {
   const db = admin();
   const notebooks = [
-    { title: "Transformers", subject: "Machine learning & AI", color: "cobalt", status: "learning", exam_date: "2026-12-12", description: "Attention, encoders and decoders." },
+    {
+      title: "Transformers",
+      subject: "Machine learning & AI",
+      color: "cobalt",
+      status: "learning",
+      exam_date: "2026-12-12",
+      description: "Attention, encoders and decoders.",
+    },
     { title: "Linear algebra", subject: "Mathematics", color: "teal", status: "to_read" },
     { title: "Organic chemistry", subject: "Chemistry", color: "amber", status: "reviewing" },
     { title: "Signals and systems", subject: "Electronics", color: "rose", status: "mastered" },
@@ -29,23 +36,57 @@ async function seed(userId: string) {
   if (error) throw error;
   const main = data!.find((n) => n.title === "Transformers")!.id;
   const rows = [
-    { name: "attention-is-all-you-need-annotated.pdf", stage: "ready", progress: 100, page_count: 15, chunk_count: 48, figure_count: 6 },
-    { name: "bert-pretraining.pdf", stage: "parsing", progress: 22, stage_detail: "Reading page 7 of 16" },
-    { name: "scanned-lecture-notes.pdf", stage: "ocr", progress: 30, stage_detail: "Running OCR on page 3 of 9", ocr_used: true },
-    { name: "vision-transformer.pdf", stage: "indexing", progress: 80, stage_detail: "Indexing 128 passages" },
+    {
+      name: "attention-is-all-you-need-annotated.pdf",
+      stage: "ready",
+      progress: 100,
+      page_count: 15,
+      chunk_count: 48,
+      figure_count: 6,
+    },
+    {
+      name: "bert-pretraining.pdf",
+      stage: "parsing",
+      progress: 22,
+      stage_detail: "Reading page 7 of 16",
+    },
+    {
+      name: "scanned-lecture-notes.pdf",
+      stage: "ocr",
+      progress: 30,
+      stage_detail: "Running OCR on page 3 of 9",
+      ocr_used: true,
+    },
+    {
+      name: "vision-transformer.pdf",
+      stage: "indexing",
+      progress: 80,
+      stage_detail: "Indexing 128 passages",
+    },
     { name: "locked-handout.pdf", stage: "failed", error_code: "encrypted_pdf" },
-    { name: "huge-thesis.pdf", stage: "failed", error_code: "too_many_pages", error_vars: { pages: 312, limit: 200 } },
+    {
+      name: "huge-thesis.pdf",
+      stage: "failed",
+      error_code: "too_many_pages",
+      error_vars: { pages: 312, limit: 200 },
+    },
   ];
   for (const [i, r] of rows.entries()) {
     const ins = await db
       .from("documents")
-      .insert({ notebook_id: main, user_id: userId, title: r.name, original_filename: r.name, file_size: 1_200_000 + i * 90_000 })
+      .insert({
+        notebook_id: main,
+        user_id: userId,
+        title: r.name,
+        original_filename: r.name,
+        file_size: 1_200_000 + i * 90_000,
+      })
       .select("id")
       .single();
     if (ins.error) throw ins.error;
     const t0 = Date.now() - 60_000;
     const at = (s: number) => new Date(t0 + s * 1000).toISOString();
-    const { name: _n, ...fields } = r;
+    const fields = Object.fromEntries(Object.entries(r).filter(([k]) => k !== "name"));
     const up = await db
       .from("documents")
       .update({
@@ -101,7 +142,9 @@ test("phase 3 screens", async ({ page }) => {
       await setTheme(page, theme);
       await page.locator("[data-slot=source-card]").first().waitFor();
       await shot(page, "sources", width, theme);
-      await page.getByRole("button", { name: "attention-is-all-you-need-annotated.pdf", exact: true }).click();
+      await page
+        .getByRole("button", { name: "attention-is-all-you-need-annotated.pdf", exact: true })
+        .click();
       await page.getByRole("list", { name: "Stage timeline" }).waitFor();
       await shot(page, "source-detail", width, theme);
 

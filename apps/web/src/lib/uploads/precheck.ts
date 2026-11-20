@@ -69,7 +69,7 @@ type ScanReply = { source: typeof SCAN_MESSAGE; result?: ScanResult; error?: str
 /** Runs the scan in a Web Worker so hashing a 50 MB file never freezes the page. */
 export function scanInWorker(file: File): Promise<ScanResult> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL("./precheck.worker.ts", import.meta.url), { type: "module" });
+    const worker = new Worker("/workers/precheck.mjs", { type: "module" }); // public/workers
     const done = () => worker.terminate();
     worker.onmessage = (event: MessageEvent<ScanReply | unknown>) => {
       const reply = event.data as ScanReply | null;

@@ -20,11 +20,12 @@
     "test:rls:local": "node scripts/with-local-supabase.mjs --test node scripts/vitest.mjs run --config vitest.rls.config.mts",
     "db:types:local": "supabase gen types typescript --local --schema public --workdir ../.. > src/lib/database.types.ts",
     "e2e": "playwright test",
-    "dev:local": "node scripts/with-local-supabase.mjs --app next dev --port 3100",
+    "dev:local": "node scripts/sync-pdfjs.mjs && node scripts/with-local-supabase.mjs --app next dev --port 3100",
     "e2e:local": "node scripts/with-local-supabase.mjs --e2e playwright test",
     "contract:sync": "node scripts/sync-contract.mjs",
-    "predev": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs",
-    "prebuild": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs"
+    "predev": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs && node scripts/sync-pdfjs.mjs",
+    "prebuild": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs && node scripts/sync-pdfjs.mjs",
+    "pdfjs:sync": "node scripts/sync-pdfjs.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.106",

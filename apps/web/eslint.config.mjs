@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Playwright output (traces contain bundled JS)
     "test-results/**",
+    "public/vendor/**", // pdf.js copied by scripts/sync-pdfjs.mjs
     "playwright-report/**",
   ]),
 ]);
