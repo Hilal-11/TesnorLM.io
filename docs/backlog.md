@@ -59,61 +59,74 @@ Waiting on you (dashboards and secrets):
 - [ ] CI job for `test:rls` (needs Phase 0 P3 CI first)
 - [ ] Phase 3: wire onboarding step 4 ("sample paper" / "upload my own") to real uploads (TODO in onboarding-wizard)
 
-## Phase 3 — Notebooks & ingestion
+## Phase 3 — Sources & ingestion in the main shell (v2)
 
-Milestone: a person creates a notebook, uploads up to 10 PDFs at once on a patchy connection,
-watches each move through honest live stages, and sees it Ready with page-aware chunks, figures and
-captions in the database. Failures explain the reason and the fix. Five uploads at once all finish.
-Spec: `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
+Milestone: from Home, add any supported source (files, web, YouTube, Drive, text, web search); every PDF is
+accepted; text is askable within seconds (fast pass) and fully enriched later (deep pass); an overview and
+5 suggested questions appear; 5 uploads at once all finish.
+Plan: `docs/plans/TensorLM-v2-Part-A-Phases-3-4.md` (task prompts, shared rules, verification).
+Specs: `docs/specs/product-flow.md`, `docs/specs/ingestion.md`; contract: `contracts/ingestion.json`.
+v1 (done, extended by v2): P3.0–P3.13 — spec + contract, DB, notebooks CRUD/grid/list/board, Inngest queue,
+validation, OCR, page-aware chunks, figures + captions, resumable uploads, live progress, reprocess/delete,
+worker tests. v1 P3.14 (hardening, load test, deploy) folds into P3.15v2.
 
-- [x] P3.0 — Ingestion spec + shared contract (TS and Python loaders, parity fixture)
-- [x] P3.1 — Database: notebooks columns, document stages, chunks/figures by run, `finalize_ingest()`, `set_document_stage()`, Realtime, bucket limits, `ingest-artifacts` bucket
-- [x] P3.2 — Notebooks data layer and actions (CRUD, ordering, soft delete)
-- [x] P3.3 — Notebooks page: grid and list, create/rename/delete, empty states
-- [x] P3.4 — Board view with drag and drop
-- [x] P3.5 — Move ingestion to a queue (Inngest) + cleanup jobs
-- [x] P3.6 — Worker: page count + file validation; stage column updates
-- [x] P3.7 — OCR fallback for scanned pages
-- [x] P3.8 — Keep page numbers on chunks (page-aware chunking + embeddings)
-- [x] P3.9 — Figures: extract and store; caption and embed
-- [x] P3.10 — Upload flow (resumable) + upload modal
-- [x] P3.11 — Live pipeline progress (notebook sources view)
-- [x] P3.12 — Re-process and delete with cleanup
-- [x] P3.13 — Worker test suite with fixtures
-- [ ] P3.14 — Production hardening, load test and deploy
+- [ ] S0 — Product spec v2, contracts v2 and design-skill amendment (confirmations, action colours)
+- [ ] P3.1v2 — DB v2: source types, new stages, needs_password, datasets, notebook insights, notebook auto-title
+- [ ] P3.2v2 — Notebooks data layer + Library page (grid, list, board) with confirmation dialogs
+- [ ] P3.3v2 — Main shell: Home = lazy "Untitled notebook" workspace; sidebar notebooks; shallow URL change
+- [ ] P3.4v2 — Add sources dialog: upload files, websites & YouTube, Google Drive, copied text, web search
+- [ ] P3.5v2 — Upload pipeline v2: resumable uploads for every file type, sniffing, quotas (no rejection by type)
+- [ ] P3.6v2 — Queue (Inngest): ingestion functions per source type, fast pass priority, retries, concurrency, cancel
+- [ ] P3.7v2 — Accept-all PDF handling: repair, permission locks, password prompt, disguised files, scans, huge files
+- [ ] P3.8v2 — Two-pass ingestion: fast pass (seconds) + deep pass (Docling) with atomic swap
+- [ ] P3.9v2 — OCR fallback with honest status; page-aware chunking + embeddings; figures + captions as searchable chunks
+- [ ] P3.10v2 — Other formats: DOCX, PPTX, HTML, Markdown, TXT, images, CSV, Excel, JSON (datasets)
+- [ ] P3.11v2 — Web pages, YouTube transcripts, Google Drive files, copied text, web search import
+- [ ] P3.12v2 — Notebook guide: auto title, overview, 5 suggested questions, per-source summary
+- [ ] P3.13v2 — Live progress UI in the sources pane (Realtime + polling fallback)
+- [ ] P3.14v2 — Remove, reprocess and delete with confirmation dialogs and full cleanup
+- [ ] P3.15v2 — Tests (all formats), load test (5 and 10 at once), hardening, deploy
 
 Waiting on you (Phase 3):
 
+- [ ] v2: Google Cloud — enable Drive API + Picker API, browser API key (referrer-restricted), OAuth web client origins, `drive.file` scope, project number → `NEXT_PUBLIC_GOOGLE_API_KEY`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_GOOGLE_APP_ID`
+- [ ] v2: Web search provider account (e.g. Tavily) → `WEB_SEARCH_PROVIDER`, `TAVILY_API_KEY`
+- [ ] v2: Choose YouTube transcripts: free library (accept failures) or paid API → `YOUTUBE_TRANSCRIPT_PROVIDER`
+- [ ] v2: File size limit — stay at 50 MB (free Supabase) or upgrade to Pro and raise bucket limits; set `MAX_UPLOAD_MB`, `MAX_PAGES=2000`, `FAST_PASS_PAGE_BATCH=50`
+- [ ] v2: Upstash Redis is now required for PDF passwords (10-minute TTL, never in the database)
 - [ ] Confirm: the free source limit (20) is per notebook, not per account (spec section 17)
 - [ ] Inngest app `tensorlm` + Production event and signing keys; Railway plan with ≥ 4 GB RAM
 - [ ] Sample paper with a redistributable licence at `apps/web/public/samples/sample-paper.pdf` + `docs/samples.md`
 - [ ] Phase 3 variables in `.env` (names in `.env.example`); test project gets every migration
 - [ ] Apply migrations 0003 + 0004 to the test and main projects (`npx supabase db push` from the repo root, after `supabase link`), then `npm run db:types` — verified locally with `npm run test:rls:local`
 
-## Phase 4 — Chat with sources
+## Phase 4 — Chat in the main shell (v2)
 
-Milestone: in a notebook with the Transformer paper, "How does multi-head attention work?" streams an
-answer in reading type, at the chosen level, with citations [1][2] that open the exact page with the
-passage highlighted, a diagram that draws itself, correct formulas, and "Not from your sources" on
-general knowledge. Chats persist and can be stopped, continued, regenerated and rated.
-Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
+Milestone: in the main shell, small talk gets a natural reply, general questions work without sources, and a
+question about the Transformer paper gets a streamed, cited answer with a self-drawing diagram, code or visual
+when useful, at the chosen level.
+Plan: `docs/plans/TensorLM-v2-Part-A-Phases-3-4.md`. Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
+v1 (done, extended by v2): P4.0–P4.14 — answer spec + contract, chats/messages/feedback DB, three-pane
+workspace, sources pane, chat persistence, retrieval pipeline, streaming chat route, validated citations,
+renderer + self-drawing diagrams, chat UI, composer, citation chips, PDF viewer, selection toolbar.
+v1 P4.15 (quality gate) is partial: `docs/reports/phase-4-verification.md`.
 
-- [x] P4.0 — Answer spec + contract (levels, directives, blocks, citations, commands)
-- [x] P4.1 — Database: chats, messages, feedback, notes, source selection
-- [x] P4.2 — Notebook workspace layout (tabs, resizable panes, canvas)
-- [x] P4.3 — Sources pane: include/exclude, figures, add source
-- [x] P4.4 — Chats + messages persistence; chat list per notebook; new chat
-- [x] P4.5 — Retrieval and routing pipeline (rewrite, route, numbered context, history)
-- [x] P4.6 — Chat route v2 (streaming status, levels, prompt caching, tracing, rate limits)
-- [x] P4.7 — Structured citations (server mapping and validation)
-- [x] P4.8 — LessonRenderer v2 (directives, math, code, charts, sanitize)
-- [x] P4.9 — Diagram card: self-drawing diagrams + Mermaid auto-repair
-- [x] P4.10 — Chat UI (states, actions, follow-ups, feedback)
-- [x] P4.11 — Prompt box (composer)
-- [x] P4.12 — Citation chips with hover preview
-- [x] P4.13 — PDF viewer pane with highlights
-- [x] P4.14 — Text selection in PDF → floating toolbar; notes
-- [ ] P4.15 — Quality gate: smoke evals, performance, accessibility, audit
+- [ ] P4.0v2 — Answer spec v2 + contract (modes, visual blocks, thinking, suggestions)
+- [ ] P4.1v2 — DB: chats, messages, feedback, source selection (modes, reasoning summary; notes stay in Phase 5)
+- [ ] P4.2v2 — Workspace panes in the main shell: Sources · Conversation · Canvas (Diagram, Source); mobile tabs
+- [ ] P4.3v2 — Sources pane: selection, figures, per-source summary, "N sources" in composer
+- [ ] P4.4v2 — Chats persistence, chat switcher, new chat, auto titles (delete chat confirms)
+- [ ] P4.5v2 — Pipeline: intent (small talk, general, grounded), rewrite, adaptive routing, numbered context
+- [ ] P4.6v2 — Chat route v2: streaming, levels, optional thinking, prompt caching, tracing, rate limits, stop/continue
+- [ ] P4.7v2 — Validated citations (transcript, dataset, web; survive the deep swap)
+- [ ] P4.8v2 — Renderer v2 with visual blocks (diagram, chart, matrix, tensor shape, steps, compare, timeline) and code
+- [ ] P4.9v2 — Self-drawing diagrams + Mermaid repair
+- [ ] P4.10v2 — Chat UI: states, actions, follow-ups, feedback, "Thinking" collapsible
+- [ ] P4.11v2 — Advanced composer: N sources, settings (level, length, visuals, thinking), attach, /, @, voice, drafts
+- [ ] P4.12v2 — Citation chips + previews
+- [ ] P4.13v2 — Source viewers: PDF (highlights), web page reader, YouTube transcript (timestamps), dataset table, documents
+- [ ] P4.14v2 — Selection toolbar (Explain, Simplify, Diagram, Add to note, Copy)
+- [ ] P4.15v2 — Quality gate: smoke evals (grounded, general, small talk, suggestions, formats), performance, a11y, security
 
 Waiting on you (Phase 4):
 
