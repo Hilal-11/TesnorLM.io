@@ -190,3 +190,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 - Embeddings (`text-embedding-3-small`, $0.02 / 1M tokens): ~500 words/page → ~13k tokens of text, plus the contextual prefix (title + heading path, ~20 tokens × ~35 chunks) ≈ 14k tokens → **≈ $0.0003**.
 - Figure captions (`claude-haiku-5-5`, $0.10 in / $0.50 out per 1M, effort low): per figure ≈ 2,100 image tokens (1600 × 1000 WebP) + ~300 prompt/context in, ~350 out incl. thinking → ≈ $0.0004; 8 figures **≈ $0.0034**. Cache by image hash makes re-processing the same paper free.
 - Total **≈ $0.004 per 20-page paper** (well under a cent). Estimates, not measurements: the e2e and load tests ran with `WORKER_FAKE_AI=1`; the worker logs real `caption usage` and `embedding_tokens` per document, so check them on the first real uploads.
+
+## 2026-11-20 — P4.0 — Answer spec + contract
+
+- `docs/specs/answers.md` (flow, routing, context format and prompt-injection rule, answer format, citations, levels, no-match, stop/continue/regenerate, states, feedback, limits, cost, acceptance) and `docs/specs/answers.examples.md` (one question at three levels).
+- `contracts/answer-format.json` → `src/lib/answers/format.generated.ts` (sync script now handles both contracts) + zod loader `src/lib/answers/format.ts` (levels, directives, chart schema, commands, limits); `src/lib/models.ts` (models + prices + cost). 13 tests.

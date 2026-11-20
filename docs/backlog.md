@@ -90,6 +90,37 @@ Waiting on you (Phase 3):
 - [ ] Phase 3 variables in `.env` (names in `.env.example`); test project gets every migration
 - [ ] Apply migrations 0003 + 0004 to the test and main projects (`npx supabase db push` from the repo root, after `supabase link`), then `npm run db:types` — verified locally with `npm run test:rls:local`
 
+## Phase 4 — Chat with sources
+
+Milestone: in a notebook with the Transformer paper, "How does multi-head attention work?" streams an
+answer in reading type, at the chosen level, with citations [1][2] that open the exact page with the
+passage highlighted, a diagram that draws itself, correct formulas, and "Not from your sources" on
+general knowledge. Chats persist and can be stopped, continued, regenerated and rated.
+Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
+
+- [x] P4.0 — Answer spec + contract (levels, directives, blocks, citations, commands)
+- [ ] P4.1 — Database: chats, messages, feedback, notes, source selection
+- [ ] P4.2 — Notebook workspace layout (tabs, resizable panes, canvas)
+- [ ] P4.3 — Sources pane: include/exclude, figures, add source
+- [ ] P4.4 — Chats + messages persistence; chat list per notebook; new chat
+- [ ] P4.5 — Retrieval and routing pipeline (rewrite, route, numbered context, history)
+- [ ] P4.6 — Chat route v2 (streaming status, levels, prompt caching, tracing, rate limits)
+- [ ] P4.7 — Structured citations (server mapping and validation)
+- [ ] P4.8 — LessonRenderer v2 (directives, math, code, charts, sanitize)
+- [ ] P4.9 — Diagram card: self-drawing diagrams + Mermaid auto-repair
+- [ ] P4.10 — Chat UI (states, actions, follow-ups, feedback)
+- [ ] P4.11 — Prompt box (composer)
+- [ ] P4.12 — Citation chips with hover preview
+- [ ] P4.13 — PDF viewer pane with highlights
+- [ ] P4.14 — Text selection in PDF → floating toolbar; notes
+- [ ] P4.15 — Quality gate: smoke evals, performance, accessibility, audit
+
+Waiting on you (Phase 4):
+
+- [ ] Langfuse project `tensorlm` keys (LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, LANGFUSE_BASEURL) — optional: tracing is skipped without them
+- [ ] Upstash Redis (UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN) — optional: the database limits chats without them
+- [ ] Anthropic spend cap checked; "Attention Is All You Need" PDF uploaded to a notebook for manual testing (never committed)
+
 ## Found in setup review — not yet scheduled
 
 - [ ] Worker crashes in Docker: `main.py` uses `Path(__file__).parents[3]`, which doesn't exist at `/app/app/main.py`
