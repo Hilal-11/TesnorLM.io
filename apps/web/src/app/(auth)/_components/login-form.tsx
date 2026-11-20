@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { safeNext } from "@/lib/safe-next";
 import { requestEmailCode, signInWithPassword } from "../actions";
-import { AuthCard, FormError, OrDivider } from "./auth-card";
+import { AuthCard, FormError } from "./auth-card";
 import { LAST_METHOD_KEY, OAuthButtons, type AuthMethod } from "./oauth-buttons";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,7 +43,6 @@ export function LoginForm() {
       }
     >
       <OAuthButtons next={next} />
-      <OrDivider />
 
       {step === "email" ? (
         <form

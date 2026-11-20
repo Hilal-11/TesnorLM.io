@@ -8,7 +8,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { usePersistentState } from "@/hooks/use-persistent-state";
 import { signUp } from "../actions";
-import { AuthCard, FormError, OrDivider } from "./auth-card";
+import { AuthCard, FormError } from "./auth-card";
 import { LAST_METHOD_KEY, OAuthButtons, type AuthMethod } from "./oauth-buttons";
 import { PasswordField } from "./password-field";
 
@@ -34,7 +34,6 @@ export function SignupForm() {
       }
     >
       <OAuthButtons next="/onboarding" />
-      <OrDivider />
       <form action={action} onSubmit={() => setLastMethod("email")} className="flex flex-col gap-4">
         <Field label="Name" error={fieldErrors?.full_name} required>
           <Input name="full_name" autoComplete="name" size="lg" />

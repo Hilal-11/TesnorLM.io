@@ -9,6 +9,7 @@ import { publicEnv } from "@/lib/public-env";
 import { safeNext } from "@/lib/safe-next";
 import { createClient } from "@/lib/supabase/server";
 import { clearVerifyFlow, readVerifyFlow, setVerifyFlow } from "@/lib/verify-flow";
+import { fetchEnabledProviders } from "@/lib/auth-providers";
 
 const email = z.string().trim().toLowerCase().email("Enter a valid email address.");
 const password = z
@@ -193,6 +194,16 @@ export const updatePassword = defineAction(z.object({ password }), async (input)
 export const signInWithProvider = defineAction(
   z.object({ provider: z.enum(["google", "github"]), next }),
   async (input) => {
+    // A provider the project hasn't turned on would land on Supabase's raw error page.
+    const enabled = await fetchEnabledProviders(publicEnv.supabaseUrl, publicEnv.supabaseAnonKey);
+    if (!enabled.includes(input.provider)) {
+      const name = input.provider === "google" ? "Google" : "GitHub";
+      throw new AppError(
+        "provider_disabled",
+        `Sign-in with ${name} isn't set up yet. Use your email instead.`,
+        400,
+      );
+    }
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: input.provider,
