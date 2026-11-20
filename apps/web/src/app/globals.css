@@ -295,6 +295,12 @@
   --animate-indeterminate: indeterminate 1.6s var(--ease-inout) infinite;
 }
 
+@keyframes highlight-in {
+  0% { opacity: 0; transform: scale(1.04); }
+  40% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -657,4 +663,52 @@
   .answer-prose strong {
     font-weight: 600;
   }
+}
+
+/* pdf.js text layer (from pdfjs-dist web/pdf_viewer.css, trimmed): transparent, selectable text
+   over the page canvas. The container sets --total-scale-factor. */
+@layer components {
+  .textLayer {
+    position: absolute;
+    inset: 0;
+    overflow: clip;
+    line-height: 1;
+    text-align: initial;
+    text-size-adjust: none;
+    forced-color-adjust: none;
+    transform-origin: 0 0;
+    z-index: 1;
+    --min-font-size: 1;
+    --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+    --min-font-size-inv: calc(1 / var(--min-font-size));
+  }
+  .textLayer :is(span, br) {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+    user-select: text;
+  }
+  .textLayer > :not(.markedContent),
+  .textLayer .markedContent span:not(.markedContent) {
+    z-index: 1;
+    --font-height: 0;
+    font-size: calc(var(--text-scale-factor) * var(--font-height));
+    --scale-x: 1;
+    --rotate: 0deg;
+    transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+  }
+  .textLayer .markedContent { display: contents; }
+  .textLayer ::selection { background: color-mix(in srgb, var(--color-ink) 22%, transparent); color: transparent; }
+  .textLayer br::selection { background: transparent; }
+  .textLayer .endOfContent {
+    display: block;
+    position: absolute;
+    inset: 100% 0 0;
+    z-index: 0;
+    cursor: default;
+    user-select: none;
+  }
+  .textLayer.selecting .endOfContent { top: 0; }
 }

@@ -111,8 +111,8 @@ Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
 - [x] P4.10 — Chat UI (states, actions, follow-ups, feedback)
 - [x] P4.11 — Prompt box (composer)
 - [x] P4.12 — Citation chips with hover preview
-- [ ] P4.13 — PDF viewer pane with highlights
-- [ ] P4.14 — Text selection in PDF → floating toolbar; notes
+- [x] P4.13 — PDF viewer pane with highlights
+- [x] P4.14 — Text selection in PDF → floating toolbar; notes
 - [ ] P4.15 — Quality gate: smoke evals, performance, accessibility, audit
 
 Waiting on you (Phase 4):
