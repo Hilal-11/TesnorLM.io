@@ -5,6 +5,7 @@
 //
 //   contracts/ingestion.json     → src/lib/ingestion/contract.generated.ts  (export CONTRACT)
 //   contracts/answer-format.json → src/lib/answers/format.generated.ts      (export FORMAT)
+//   contracts/chat-events.json   → src/lib/chat/events.generated.ts         (export CHAT_EVENTS)
 //
 // Runs before `npm run dev` and `npm run build`; run `npm run contract:sync` after editing a JSON.
 // `--check` exits 1 instead of writing. No contracts folder (a deploy that only has apps/web) =
@@ -16,6 +17,7 @@ const check = process.argv.includes("--check");
 const CONTRACTS = [
   { json: "ingestion.json", ts: "../src/lib/ingestion/contract.generated.ts", name: "CONTRACT" },
   { json: "answer-format.json", ts: "../src/lib/answers/format.generated.ts", name: "FORMAT" },
+  { json: "chat-events.json", ts: "../src/lib/chat/events.generated.ts", name: "CHAT_EVENTS" },
 ];
 
 let stale = false;

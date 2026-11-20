@@ -100,6 +100,37 @@ Waiting on you (Phase 3):
 - [ ] Phase 3 variables in `.env` (names in `.env.example`); test project gets every migration
 - [ ] Apply migrations 0003 + 0004 to the test and main projects (`npx supabase db push` from the repo root, after `supabase link`), then `npm run db:types` — verified locally with `npm run test:rls:local`
 
+## Chat Engine (do now, before the rest of Phase 4)
+
+Milestone: in the main shell, "hi" gets a natural reply; general questions get rich answers; after a PDF is
+processed 4–5 suggested questions appear and answers cite pages with native citations, inline figures and
+self-drawing diagrams; the composer has no level selector.
+Plan: `docs/plans/TensorLM-Chat-Engine-Phase.md`. Spec: `docs/specs/chat-engine.md`. API notes:
+`docs/research/claude-api-notes.md`. Contract: `contracts/chat-events.json`.
+Supersedes in Phase 4 v2: P4.0v2 (levels), P4.5v2 (intent classifier), P4.6v2/P4.7v2 (AI SDK route, `[n]`
+parser), P4.11v2 (level selector).
+
+- [ ] C0 — Read the docs; API notes, chat engine spec and event protocol — done except your review of spec section 1 (decisions D1–D11)
+- [ ] C1 — Claude client, model registry, pricing, observability, error mapping
+- [ ] C2 — Database changes (raw content, render, usage, attachments, chat system/tools versions)
+- [ ] C3 — Context builder: search results, pack via tool results, search tool, figures, cache breakpoints
+- [ ] C4 — Chat engine: streaming orchestration, tool loop, persistence, errors
+- [ ] C5 — Citation mapping
+- [ ] C6 — Suggested questions, follow-ups, chat titles
+- [ ] C7 — Browser stream client and chat state
+- [ ] C8 — Answer renderer v3
+- [ ] C9 — Composer v3 (no level selector)
+- [ ] C10 — Message actions and states
+- [ ] C11 — Performance and cost verification
+- [ ] C12 — Quality gate (eval:chat, security, accessibility, verification report)
+
+Waiting on you (Chat Engine):
+
+- [ ] Review spec section 1 (D1–D11), especially D3 (web search toggle), D6 (`CHAT_MAX_TOKENS` 32000) and D11 (refusal fallbacks on by default)
+- [ ] Confirm the prices in `docs/research/claude-api-notes.md` §12 (from the official pricing page, 2026-11-20)
+- [ ] Anthropic Console: monthly spend limit, usage tier/rate limits, web search enabled; credit on the account
+- [ ] `.env` additions from the plan's Part B (copy to `apps/web/.env.local`)
+
 ## Phase 4 — Chat in the main shell (v2)
 
 Milestone: in the main shell, small talk gets a natural reply, general questions work without sources, and a

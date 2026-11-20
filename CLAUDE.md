@@ -67,6 +67,19 @@ Worker (`cd services/worker`):
   `defineAction` (zod) from `src/lib/errors.ts`; routes use `withErrorHandling`.
 - Redirect targets go through `safeNext()`. Never log emails, codes or tokens unmasked (`src/lib/logger.ts`).
 
+## Chat (Claude)
+
+- Chat uses the official Anthropic TypeScript SDK (`@anthropic-ai/sdk`) on the server only
+  (`src/lib/claude/*`, `import "server-only"`). The browser never talks to Anthropic. Spec:
+  `docs/specs/chat-engine.md`; API facts with sources: `docs/research/claude-api-notes.md`.
+- Sources reach Claude only as `search_result` blocks with native citations, always inside
+  `tool_result` blocks. No `[n]` parsing.
+- History is **append-only**: send stored `raw_content` back exactly; never rebuild `system`, `tools`
+  or earlier messages of a running chat (preserved thinking, spec D1–D4, D10).
+- Browser protocol: `contracts/chat-events.json` → `src/lib/chat/events.ts` (unknown events ignored).
+- **No level selector.** Simpler/Deeper are message actions.
+- SDK `logLevel` stays at `warn` or quieter: `debug` logs request bodies.
+
 ## Rules
 
 - Never read, print or edit `.env` or `apps/web/.env.local`. Document variables in `.env.example`.
