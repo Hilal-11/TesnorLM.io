@@ -18,7 +18,7 @@ const base: Source = {
   original_filename: "attention.pdf",
   file_size: 1000,
   page_count: null,
-  stage: "parsing",
+  stage: "parsing_fast",
   progress: 20,
   stage_detail: "Reading page 4 of 12",
   error_code: null,
@@ -55,7 +55,9 @@ describe("live merge rules", () => {
 
   it("never moves backwards within a run", () => {
     const current = row({ stage: "indexing", progress: 70 });
-    expect(mergeSource(current, row({ stage: "parsing", progress: 30 })).stage).toBe("indexing");
+    expect(mergeSource(current, row({ stage: "parsing_deep", progress: 30 })).stage).toBe(
+      "indexing",
+    );
     const late = mergeSource(row({ progress: 40 }), row({ progress: 25 }));
     expect(late.progress).toBe(40);
     expect(
@@ -80,7 +82,7 @@ describe("live merge rules", () => {
 
   it("polling snapshots follow the same rules", () => {
     const list = [row({ stage: "indexing", progress: 80 })];
-    expect(applySnapshot(list, [row({ stage: "parsing", progress: 10 })])[0].stage).toBe(
+    expect(applySnapshot(list, [row({ stage: "parsing_deep", progress: 10 })])[0].stage).toBe(
       "indexing",
     );
     expect(applySnapshot(list, [row({ deleted_at: "x" })])).toEqual([]);
@@ -117,17 +119,36 @@ describe("what a card says", () => {
   });
 
   it("failed cards give the reason, the fix and the action", () => {
-    const s = sourceStatus(row({ stage: "failed", error_code: "encrypted_pdf" }));
+    const s = sourceStatus(row({ stage: "failed", error_code: "unreadable_after_repair" }));
     expect(s).toMatchObject({
-      word: "Failed",
-      line: "This PDF is password-protected.",
-      fix: "Remove the password and upload it again.",
+      word: "Couldn't read",
+      pill: "failed",
+      line: "We couldn't read this file, even after trying to repair it.",
+      fix: "Try again, or upload a different copy (re-download or re-export it).",
     });
+    expect(s.actions).toEqual([
+      { id: "retry", label: "Try again" },
+      { id: "upload_copy", label: "Upload a different copy" },
+    ]);
     const t = sourceStatus(row({ stage: "failed", error_code: "parse_timeout" }));
     expect(t.actions).toEqual([{ id: "retry", label: "Try again" }]);
     expect(sourceStatus(row({ stage: "failed", error_code: "made_up" })).line).toBe(
       "We couldn't finish reading this file.",
     );
+    // v1 codes on old rows read as internal; "Try again" re-reads them through v2.
+    expect(sourceStatus(row({ stage: "failed", error_code: "encrypted_pdf" })).fix).toBe(
+      "Try again in a moment.",
+    );
+  });
+
+  it("a password wait is a caution, not a failure", () => {
+    const s = sourceStatus(row({ stage: "needs_password", stage_detail: null }));
+    expect(s).toMatchObject({
+      word: "Needs password",
+      pill: "needs_password",
+      line: "Enter the password to open this PDF",
+    });
+    expect(s.fix).toBeUndefined();
   });
 
   it("background tab title counts busy sources", () => {
@@ -141,13 +162,13 @@ describe("what a card says", () => {
   it("stage timeline and durations", () => {
     const s = row({
       stage_timings: {
-        parsing: { started_at: "2026-11-20T10:00:02Z", duration_ms: 64000 },
+        parsing_deep: { started_at: "2026-11-20T10:00:02Z", duration_ms: 64000 },
         validating: { started_at: "2026-11-20T10:00:01Z", duration_ms: 1400 },
       },
     });
     expect(stageTimeline(s).map((t) => [t.stage, t.word, formatDuration(t.durationMs)])).toEqual([
       ["validating", "Reading", "1.4 s"],
-      ["parsing", "Reading", "1 min 04 s"],
+      ["parsing_deep", "Improving", "1 min 04 s"],
     ]);
     expect(formatDuration(null)).toBe("—");
   });

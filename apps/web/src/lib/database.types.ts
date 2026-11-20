@@ -754,7 +754,11 @@ export type Database = {
         | "uploading"
         | "queued"
         | "validating"
-        | "parsing"
+        | "repairing"
+        | "needs_password"
+        | "parsing_fast"
+        | "fast_ready"
+        | "parsing_deep"
         | "ocr"
         | "reading_figures"
         | "indexing"
@@ -894,7 +898,11 @@ export const Constants = {
         "uploading",
         "queued",
         "validating",
-        "parsing",
+        "repairing",
+        "needs_password",
+        "parsing_fast",
+        "fast_ready",
+        "parsing_deep",
         "ocr",
         "reading_figures",
         "indexing",

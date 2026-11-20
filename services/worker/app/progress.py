@@ -23,7 +23,9 @@ from app.store import Store
 BANDS: dict[str, tuple[int, int]] = {
     STAGE.queued: (0, 0),
     STAGE.validating: (0, 5),
-    STAGE.parsing: (5, 45),
+    STAGE.repairing: (0, 5),
+    STAGE.parsing_fast: (5, 45),
+    STAGE.parsing_deep: (5, 45),
     STAGE.ocr: (5, 45),
     STAGE.reading_figures: (45, 65),
     STAGE.indexing: (65, 99),

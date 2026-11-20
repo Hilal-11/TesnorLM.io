@@ -124,7 +124,7 @@ def test_figures_are_stored_with_positions_and_captions(basic):
 def test_stage_order_matches_the_contract(basic):
     store, doc, *_ = basic
     stages = store.stages(doc["id"])
-    assert stages == ["validating", "parsing", "reading_figures", "indexing", "ready"]
+    assert stages == ["validating", "parsing_deep", "reading_figures", "indexing", "ready"]
     full = ["queued", *stages]
     for a, b in zip(full, full[1:]):
         assert b == "ready" or can_transition(a, b)
@@ -136,7 +136,7 @@ def test_stage_order_matches_the_contract(basic):
 def test_detail_lines_were_honest(basic):
     store, doc, *_ = basic
     details = [d for doc_id, _, _, d in store.stage_log if doc_id == doc["id"] and d]
-    assert "Reading page 3 of 3" in details
+    assert "Reading tables and figures · page 3 of 3" in details
     assert any(d.startswith("Reading figures · ") and d.endswith(" of 2") for d in details)
     assert any(d.startswith("Indexing ") and d.endswith(" passages") for d in details)
 
@@ -224,30 +224,57 @@ def test_scanned_pdf_runs_ocr_and_is_searchable(pdf_bytes):
 
     store, doc, deps, run, result = ingest(pdf_bytes["scanned"])
     assert result == {"ready": True}
-    assert store.stages(doc["id"]) == ["validating", "parsing", "ocr", "indexing", "ready"]
+    assert store.stages(doc["id"]) == ["validating", "parsing_deep", "ocr", "indexing", "ready"]
     details = [d for _, s, _, d in store.stage_log if s == "ocr"]
     assert "Running OCR on page 1 of 1" in details
     assert store.documents[doc["id"]]["ocr_used"] is True
     assert any(KNOWN_SCANNED_WORD in c["content"].upper() for c in store.chunks_for(doc["id"]))
 
 
-def test_blank_scan_fails_with_no_text_found(pdf_bytes):
+def test_blank_scan_fails_with_no_text_after_ocr(pdf_bytes):
     store, doc, deps, run, result = ingest(pdf_bytes["blank_scan"])
-    assert result == {"stop": "failed", "code": "no_text_found"}
-    assert store.documents[doc["id"]]["error_code"] == "no_text_found"
+    assert result == {"stop": "failed", "code": "no_text_after_ocr"}
+    assert store.documents[doc["id"]]["error_code"] == "no_text_after_ocr"
     assert not store.chunks
 
 
 @pytest.mark.parametrize(
     ("name", "code"),
-    [("not_pdf", "not_pdf"), ("encrypted", "encrypted_pdf"), ("corrupt", "corrupt_pdf"), ("too_many_pages", "too_many_pages")],
+    [("not_pdf", "unsupported_type"), ("corrupt", "unreadable_after_repair")],
 )
-def test_bad_files_fail_cleanly(pdf_bytes, name, code):
+def test_unreadable_files_fail_cleanly(pdf_bytes, name, code):
     store, doc, deps, run, result = ingest(pdf_bytes[name])
     assert result == {"stop": "failed", "code": code}
     d = store.documents[doc["id"]]
     assert (d["stage"], d["error_code"]) == ("failed", code)
     assert store.stages(doc["id"]) == ["validating", "failed"]
+
+
+def test_a_password_locked_pdf_waits_instead_of_failing(pdf_bytes):
+    store, doc, deps, run, result = ingest(pdf_bytes["encrypted"])
+    assert result == {"stop": "needs_password"}
+    d = store.documents[doc["id"]]
+    assert (d["stage"], d["error_code"]) == ("needs_password", None)
+    assert store.stages(doc["id"]) == ["validating", "needs_password"]
+
+
+def test_a_long_pdf_is_read_up_to_max_pages(pdf_bytes):
+    store = FakeStore()
+    doc = store.add_document(pdf_bytes["too_many_pages"])
+    deps = make(store)
+    deps.settings = deps.settings.model_copy(update={"max_pages": 3})
+    run = Run(doc["id"], doc["ingest_run_id"])
+    validated = step_validate(deps, run)
+    assert (validated["pages"], validated["total_pages"]) == (3, 201)
+    assert store.documents[doc["id"]]["page_count"] == 3
+    seen = {}
+    deps.convert = lambda *a, **k: seen.update(k) or parse.convert(*a, **k)
+    step_parse(deps, run, validated["pages"], validated["scanned"])
+    assert seen["max_pages"] == 3
+    parsed = parse.from_json(
+        store.objects[(STORAGE.artifacts_bucket, f"{doc['user_id']}/{doc['id']}/{run.run_id}/doc.json")]
+    )
+    assert len(parsed.pages) == 3
 
 
 def test_repeated_logos_are_skipped(pdf_bytes):
@@ -278,7 +305,7 @@ def test_unexpected_errors_propagate_for_the_queue_to_retry(pdf_bytes):
     deps.convert = lambda *a, **k: (_ for _ in ()).throw(MemoryError())
     with pytest.raises(MemoryError):
         run_all(deps, Run(doc["id"], doc["ingest_run_id"]), plain_step)
-    assert store.documents[doc["id"]]["stage"] == "parsing"  # not failed: the queue retries
+    assert store.documents[doc["id"]]["stage"] == "parsing_deep"  # not failed: the queue retries
 
 
 def test_parallel_conversions_are_serialized(pdfs):

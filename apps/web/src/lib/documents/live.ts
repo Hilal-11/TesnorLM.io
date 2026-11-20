@@ -14,6 +14,7 @@ import {
   uiWord,
   type Stage,
 } from "@/lib/ingestion/contract";
+import type { DocumentStatus } from "@/components/ui/status-pill";
 import type { Source } from "./shared";
 
 const ORDER = new Map(STAGES.map((s, i) => [s, i]));
@@ -73,8 +74,8 @@ export function applySnapshot(list: SourceList, rows: Source[]): SourceList {
 }
 
 export type SourceStatus = {
-  /** StatusPill status: the learner word in lower case. */
-  pill: "uploading" | "queued" | "reading" | "indexing" | "ready" | "failed";
+  /** StatusPill status: the visual group of the stage (icon, colour, spinner). */
+  pill: DocumentStatus;
   word: string;
   /** The line under the name: a real count, the ready summary, or the error's reason. */
   line: string;
@@ -85,11 +86,28 @@ export type SourceStatus = {
   progress: number | null;
 };
 
+/** Which pill a stage shows. Working stages spin; a password wait is a caution, not a failure. */
+const PILLS: Record<Stage, DocumentStatus> = {
+  uploading: "uploading",
+  queued: "queued",
+  validating: "reading",
+  repairing: "reading",
+  needs_password: "needs_password",
+  parsing_fast: "reading",
+  fast_ready: "reading",
+  parsing_deep: "reading",
+  ocr: "reading",
+  reading_figures: "reading",
+  indexing: "indexing",
+  ready: "ready",
+  failed: "failed",
+};
+
 /** What a source card says. `uploadPercent` comes from this browser's upload, if it's ours. */
 export function sourceStatus(source: Source, uploadPercent?: number): SourceStatus {
   const stage = source.stage as Stage;
   const word = uiWord(stage);
-  const pill = word.toLowerCase() as SourceStatus["pill"];
+  const pill = PILLS[stage] ?? "reading";
   if (stage === "failed") {
     const copy = errorCopy(source.error_code, (source.error_vars ?? {}) as Record<string, unknown>);
     return { pill, word, line: copy.message, fix: copy.fix, actions: copy.actions, progress: null };
@@ -131,7 +149,7 @@ export function stageTimeline(source: Source) {
   return STAGES.filter((s) => timings[s])
     .map((stage) => ({
       stage,
-      word: stage === "failed" ? "Failed" : uiWord(stage),
+      word: uiWord(stage),
       startedAt: timings[stage].started_at ?? null,
       durationMs: timings[stage].duration_ms ?? null,
     }))

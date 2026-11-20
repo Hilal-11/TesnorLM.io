@@ -73,7 +73,7 @@ describe("stale uploads", () => {
 describe("stuck runs", () => {
   it("fails runs that haven't moved for 2 h as internal", async () => {
     const doc = await newDocument();
-    for (const stage of ["queued", "validating", "parsing"]) {
+    for (const stage of ["queued", "validating", "parsing_deep"]) {
       expect(
         must(
           await admin.rpc("set_document_stage", {

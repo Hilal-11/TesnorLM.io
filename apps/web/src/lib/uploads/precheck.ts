@@ -26,13 +26,16 @@ export const DEFAULT_LIMITS: Limits = {
 
 const PDF_TYPES = new Set(["application/pdf", "application/x-pdf", ""]);
 
-/** Checks that need only the file's name, type and size. */
+/**
+ * Checks that need only the file's name, type and size. Interim until P3.5v2: only PDFs upload
+ * (the storage bucket takes PDFs only); v2 then uploads every type and the worker routes it.
+ */
 export function checkFile(
   file: { name: string; size: number; type: string },
   limits: Limits = DEFAULT_LIMITS,
 ): PrecheckError | null {
-  if (!isPdfName(file.name) || !PDF_TYPES.has(file.type)) return { code: "not_pdf" };
-  if (file.size === 0) return { code: "not_pdf" };
+  if (!isPdfName(file.name) || !PDF_TYPES.has(file.type)) return { code: "unsupported_type" };
+  if (file.size === 0) return { code: "empty_file" };
   if (file.size > limits.maxUploadMb * MB) {
     return {
       code: "file_too_large",
@@ -42,13 +45,13 @@ export function checkFile(
   return null;
 }
 
-/** Checks on what the Web Worker found in the bytes. */
-export function checkScan(scan: ScanResult, limits: Limits = DEFAULT_LIMITS): PrecheckError | null {
-  if (!scan.isPdf) return { code: "not_pdf" };
-  if (scan.encrypted) return { code: "encrypted_pdf" };
-  if (scan.pages !== null && scan.pages > limits.maxPages) {
-    return { code: "too_many_pages", vars: { pages: scan.pages, limit: limits.maxPages } };
-  }
+/**
+ * Checks on what the Web Worker found in the bytes. Contract v2 never rejects a PDF for a
+ * password or its length: the worker asks for the password and reads up to MAX_PAGES pages.
+ */
+export function checkScan(scan: ScanResult): PrecheckError | null {
+  // Interim until P3.7v2 routes disguised files by their real type.
+  if (!scan.isPdf) return { code: "unsupported_type" };
   return null;
 }
 

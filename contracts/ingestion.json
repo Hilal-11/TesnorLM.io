@@ -1,10 +1,141 @@
 {
-  "version": 1,
+  "version": 2,
+  "sourceTypes": {
+    "pdf": {
+      "label": "PDF",
+      "origin": "file",
+      "unit": "page",
+      "extensions": [".pdf"],
+      "mimeTypes": ["application/pdf"]
+    },
+    "docx": {
+      "label": "Word",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".docx"],
+      "mimeTypes": [
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ]
+    },
+    "pptx": {
+      "label": "PowerPoint",
+      "origin": "file",
+      "unit": "slide",
+      "extensions": [".pptx"],
+      "mimeTypes": [
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      ]
+    },
+    "xlsx": {
+      "label": "Excel",
+      "origin": "file",
+      "unit": "sheet",
+      "extensions": [".xlsx", ".xlsm"],
+      "mimeTypes": [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel.sheet.macroenabled.12"
+      ]
+    },
+    "csv": {
+      "label": "CSV",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".csv", ".tsv"],
+      "mimeTypes": ["text/csv", "text/tab-separated-values"]
+    },
+    "json": {
+      "label": "JSON",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".json", ".jsonl", ".ndjson"],
+      "mimeTypes": ["application/json", "application/x-ndjson"]
+    },
+    "image": {
+      "label": "Image",
+      "origin": "file",
+      "unit": null,
+      "extensions": [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".gif",
+        ".heic",
+        ".heif",
+        ".tif",
+        ".tiff",
+        ".bmp"
+      ],
+      "mimeTypes": [
+        "image/png",
+        "image/jpeg",
+        "image/webp",
+        "image/gif",
+        "image/heic",
+        "image/heif",
+        "image/tiff",
+        "image/bmp"
+      ]
+    },
+    "text": {
+      "label": "Text",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".txt", ".text", ".adoc", ".asciidoc"],
+      "mimeTypes": ["text/plain", "text/asciidoc"]
+    },
+    "markdown": {
+      "label": "Markdown",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".md", ".markdown"],
+      "mimeTypes": ["text/markdown"]
+    },
+    "html": {
+      "label": "Web page file",
+      "origin": "file",
+      "unit": null,
+      "extensions": [".html", ".htm"],
+      "mimeTypes": ["text/html"]
+    },
+    "web": {
+      "label": "Website",
+      "origin": "link",
+      "unit": null,
+      "extensions": [],
+      "mimeTypes": []
+    },
+    "youtube": {
+      "label": "YouTube",
+      "origin": "link",
+      "unit": "time",
+      "extensions": [],
+      "mimeTypes": []
+    },
+    "gdrive": {
+      "label": "Google Drive",
+      "origin": "drive",
+      "unit": null,
+      "extensions": [],
+      "mimeTypes": []
+    },
+    "pasted_text": {
+      "label": "Copied text",
+      "origin": "text",
+      "unit": null,
+      "extensions": [],
+      "mimeTypes": []
+    }
+  },
   "stages": [
     "uploading",
     "queued",
     "validating",
-    "parsing",
+    "repairing",
+    "needs_password",
+    "parsing_fast",
+    "fast_ready",
+    "parsing_deep",
     "ocr",
     "reading_figures",
     "indexing",
@@ -14,9 +145,20 @@
   "transitions": {
     "uploading": ["queued", "failed"],
     "queued": ["validating", "failed"],
-    "validating": ["parsing", "failed"],
-    "parsing": ["ocr", "reading_figures", "indexing", "failed"],
-    "ocr": ["reading_figures", "indexing", "failed"],
+    "validating": [
+      "repairing",
+      "needs_password",
+      "parsing_fast",
+      "parsing_deep",
+      "ocr",
+      "failed"
+    ],
+    "repairing": ["parsing_fast", "parsing_deep", "ocr", "failed"],
+    "needs_password": ["validating", "failed"],
+    "parsing_fast": ["fast_ready", "ocr", "failed"],
+    "fast_ready": ["parsing_deep", "ocr", "reading_figures", "ready", "failed"],
+    "parsing_deep": ["ocr", "reading_figures", "indexing", "failed"],
+    "ocr": ["fast_ready", "reading_figures", "indexing", "failed"],
     "reading_figures": ["indexing", "failed"],
     "indexing": ["ready", "failed"],
     "ready": [],
@@ -26,12 +168,16 @@
     "uploading": "Uploading",
     "queued": "Queued",
     "validating": "Reading",
-    "parsing": "Reading",
-    "ocr": "Reading",
-    "reading_figures": "Reading",
+    "repairing": "Repairing file",
+    "needs_password": "Needs password",
+    "parsing_fast": "Reading",
+    "fast_ready": "Ready to ask",
+    "parsing_deep": "Improving",
+    "ocr": "Running OCR",
+    "reading_figures": "Reading figures",
     "indexing": "Indexing",
     "ready": "Ready",
-    "failed": "Failed"
+    "failed": "Couldn't read"
   },
   "details": {
     "uploading": {
@@ -39,11 +185,29 @@
       "fallback": "Uploading",
       "vars": ["percent"]
     },
-    "queued": { "template": "Waiting to start" },
-    "validating": { "template": "Checking the file" },
-    "parsing": {
+    "queued": {
+      "template": "Waiting to start"
+    },
+    "validating": {
+      "template": "Checking the file"
+    },
+    "repairing": {
+      "template": "Repairing the file"
+    },
+    "needs_password": {
+      "template": "Enter the password to open this PDF"
+    },
+    "parsing_fast": {
       "template": "Reading page {page} of {pages}",
-      "fallback": "Reading the pages",
+      "fallback": "Reading the text",
+      "vars": ["page", "pages"]
+    },
+    "fast_ready": {
+      "template": "Ready to ask · improving tables and figures"
+    },
+    "parsing_deep": {
+      "template": "Reading tables and figures · page {page} of {pages}",
+      "fallback": "Reading tables and figures",
       "vars": ["page", "pages"]
     },
     "ocr": {
@@ -67,51 +231,93 @@
       "vars": ["pages"]
     }
   },
+  "askable": {
+    "word": "Ready to ask",
+    "details": {
+      "parsing_deep": {
+        "template": "Ready to ask · improving page {page} of {pages}",
+        "fallback": "Ready to ask · improving tables and figures",
+        "vars": ["page", "pages"]
+      },
+      "ocr": {
+        "template": "Ready to ask · improving tables and figures"
+      },
+      "reading_figures": {
+        "template": "Ready to ask · reading figures {done} of {total}",
+        "fallback": "Ready to ask · reading figures",
+        "vars": ["done", "total"]
+      },
+      "indexing": {
+        "template": "Ready to ask · improving tables and figures"
+      }
+    }
+  },
   "actions": {
     "retry": "Try again",
     "resume_upload": "Resume upload",
     "open_existing": "Open it",
-    "add_anyway": "Add anyway"
+    "add_anyway": "Add anyway",
+    "unlock": "Unlock",
+    "upload_copy": "Upload a different copy",
+    "paste_text": "Paste the text",
+    "upgrade": "See plans"
   },
   "errors": {
-    "not_pdf": {
-      "message": "This file isn't a PDF.",
-      "fix": "Choose a PDF file instead.",
+    "password_wrong": {
+      "message": "That password didn't open this PDF.",
+      "fix": "Check it and try again.",
+      "actions": ["unlock"],
+      "autoRetry": false
+    },
+    "password_attempts": {
+      "message": "Too many wrong passwords. You can try again in {minutes} {minutes:minute|minutes}.",
+      "fallback": "Too many wrong passwords.",
+      "fix": "Wait a little, then enter the password again.",
+      "vars": ["minutes"],
+      "autoRetry": false
+    },
+    "unreadable_after_repair": {
+      "message": "We couldn't read this file, even after trying to repair it.",
+      "fix": "Try again, or upload a different copy (re-download or re-export it).",
+      "actions": ["retry", "upload_copy"],
+      "autoRetry": false
+    },
+    "no_text_after_ocr": {
+      "message": "We couldn't find readable text, even with OCR.",
+      "fix": "Upload a clearer scan, or paste the text instead.",
+      "actions": ["upload_copy", "paste_text"],
+      "autoRetry": false
+    },
+    "empty_file": {
+      "message": "This file is empty.",
+      "fix": "Choose the file again, or re-download it.",
+      "actions": ["upload_copy"],
+      "autoRetry": false
+    },
+    "unsupported_type": {
+      "message": "TensorLM can't read this type of file yet.",
+      "fix": "Save it as PDF, Word, text or Markdown, then add it again.",
+      "actions": ["upload_copy"],
+      "autoRetry": false
+    },
+    "source_unreachable": {
+      "message": "We couldn't open this page (it may need a login).",
+      "fix": "Paste the text instead.",
+      "actions": ["retry", "paste_text"],
+      "autoRetry": false
+    },
+    "transcript_unavailable": {
+      "message": "We couldn't get a transcript for this video.",
+      "fix": "Paste the transcript instead.",
+      "actions": ["paste_text"],
       "autoRetry": false
     },
     "file_too_large": {
-      "message": "This file is {sizeMb} MB. The limit is {limitMb} MB.",
-      "fallback": "This file is over the size limit.",
-      "fix": "Split the PDF or upload chapters separately.",
+      "message": "This file is {sizeMb} MB. Your plan allows {limitMb} MB per file.",
+      "fallback": "This file is over your plan's size limit.",
+      "fix": "Split it, or upgrade for larger files.",
       "vars": ["sizeMb", "limitMb"],
-      "autoRetry": false
-    },
-    "too_many_pages": {
-      "message": "This PDF has {pages} pages. The limit is {limit} {limit:page|pages}.",
-      "fallback": "This PDF has more pages than the limit.",
-      "fix": "Upload chapters separately.",
-      "vars": ["pages", "limit"],
-      "autoRetry": false
-    },
-    "encrypted_pdf": {
-      "message": "This PDF is password-protected.",
-      "fix": "Remove the password and upload it again.",
-      "autoRetry": false
-    },
-    "corrupt_pdf": {
-      "message": "This PDF looks damaged and can't be opened.",
-      "fix": "Re-download or re-export the PDF, then try again.",
-      "autoRetry": false
-    },
-    "no_text_found": {
-      "message": "We couldn't find readable text, even with OCR.",
-      "fix": "Upload a clearer scan.",
-      "autoRetry": false
-    },
-    "parse_timeout": {
-      "message": "This PDF took too long to read.",
-      "fix": "Try again, or upload it in smaller parts.",
-      "actions": ["retry"],
+      "actions": ["upgrade"],
       "autoRetry": false
     },
     "quota_exceeded": {
@@ -122,9 +328,15 @@
       "autoRetry": false
     },
     "duplicate_file": {
-      "message": "This paper is already in this notebook.",
+      "message": "This file is already in this notebook.",
       "fix": "Open the copy you added, or add it again anyway.",
       "actions": ["open_existing", "add_anyway"],
+      "autoRetry": false
+    },
+    "parse_timeout": {
+      "message": "This file took too long to read.",
+      "fix": "Try again, or split it into smaller parts.",
+      "actions": ["retry"],
       "autoRetry": false
     },
     "upload_interrupted": {
@@ -140,18 +352,51 @@
       "autoRetry": true
     }
   },
+  "notices": {
+    "repaired": {
+      "message": "This file was damaged. TensorLM repaired it before reading."
+    },
+    "pages_capped": {
+      "message": "TensorLM read the first {limit} of {pages} pages.",
+      "fallback": "TensorLM read only part of this file.",
+      "fix": "Split the file to read the rest.",
+      "vars": ["limit", "pages"]
+    },
+    "pages_skipped": {
+      "message": "{count} {count:page|pages} couldn't be read.",
+      "fallback": "Some pages couldn't be read.",
+      "fix": "Upload a different copy to read them.",
+      "vars": ["count"]
+    },
+    "deep_failed": {
+      "message": "Tables and figures couldn't be improved. Answers still use the text.",
+      "fix": "Try again to improve them."
+    }
+  },
   "events": {
     "uploaded": "document/uploaded",
     "reprocess": "document/reprocess",
     "deleted": "document/deleted",
-    "notebookDeleted": "notebook/deleted"
+    "notebookDeleted": "notebook/deleted",
+    "fastReady": "document/fast-ready",
+    "passwordProvided": "document/password-provided",
+    "sourcesChanged": "notebook/sources-changed"
   },
   "limits": {
     "maxUploadMb": 50,
-    "maxPages": 200,
-    "maxFilesPerBatch": 10,
+    "maxPages": 2000,
+    "fastPassPageBatch": 50,
+    "maxFilesPerBatch": 50,
     "maxParallelUploads": 3,
-    "maxSourcesFree": 20
+    "maxSourcesFree": 20,
+    "passwordAttempts": 5,
+    "passwordLockMinutes": 15,
+    "passwordTtlSeconds": 600,
+    "webMaxMb": 10,
+    "webTimeoutSeconds": 15,
+    "webMaxRedirects": 5,
+    "suggestedQuestions": 5,
+    "insightsDebounceSeconds": 20
   },
   "storage": {
     "bucket": "documents",

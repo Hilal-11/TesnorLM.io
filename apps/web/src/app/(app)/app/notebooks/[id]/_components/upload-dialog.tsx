@@ -25,7 +25,7 @@ import { StatusLines } from "./source-card";
 import { isBusy, uploadStatus } from "./upload-status";
 
 export const ACCEPT = "application/pdf,.pdf";
-export const HELPER = `PDF · up to ${LIMITS.maxUploadMb} MB and ${LIMITS.maxPages} pages · ${LIMITS.maxFilesPerBatch} files at a time`;
+export const HELPER = `PDF · up to ${LIMITS.maxUploadMb} MB · ${LIMITS.maxFilesPerBatch} files at a time`;
 
 /**
  * "Add sources": a drop zone with Browse files, the (coming soon) link field and one row per file.

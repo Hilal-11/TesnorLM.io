@@ -9,6 +9,8 @@ import {
   errorCopy,
   isStage,
   isTerminal,
+  noticeCopy,
+  sourceTypeFromName,
   storagePath,
   uiWord,
   validateContract,
@@ -29,15 +31,40 @@ describe("ingestion contract", () => {
     expect(validateContract(source)).toEqual([]);
   });
 
-  it("matches the database's document_stage enum (migration 0004)", () => {
+  it("matches the database's document_stage enum (migrations 0004 + 0006)", () => {
     expect([...Constants.public.Enums.document_stage]).toEqual([...STAGES]);
   });
 
-  it("gives every stage a learner word from the design skill's vocabulary", () => {
+  it("gives every stage a learner word (v2 vocabulary)", () => {
     const words = new Set(STAGES.map((stage) => uiWord(stage)));
     expect([...words].sort()).toEqual(
-      ["Failed", "Indexing", "Queued", "Reading", "Ready", "Uploading"].sort(),
+      [
+        "Couldn't read",
+        "Improving",
+        "Indexing",
+        "Needs password",
+        "Queued",
+        "Reading",
+        "Reading figures",
+        "Ready",
+        "Ready to ask",
+        "Repairing file",
+        "Running OCR",
+        "Uploading",
+      ].sort(),
     );
+  });
+
+  it("never rejects a PDF at upload: the v1 rejection codes are gone", () => {
+    for (const code of ["not_pdf", "encrypted_pdf", "corrupt_pdf", "too_many_pages"]) {
+      expect(code in CONTRACT.errors).toBe(false);
+    }
+  });
+
+  it("gives every notice a message", () => {
+    for (const code of Object.keys(CONTRACT.notices)) {
+      expect(noticeCopy(code)?.message.length).toBeGreaterThan(0);
+    }
   });
 
   it("only moves to known stages, and every unfinished stage can fail", () => {
@@ -57,16 +84,25 @@ describe("ingestion contract", () => {
   });
 
   it("keeps banned words out of the copy (design skill section 9)", () => {
-    const copy = JSON.stringify([CONTRACT.uiWords, CONTRACT.details, CONTRACT.errors]);
+    const copy = JSON.stringify([
+      CONTRACT.uiWords,
+      CONTRACT.details,
+      CONTRACT.askable,
+      CONTRACT.errors,
+      CONTRACT.notices,
+    ]);
     expect(copy).not.toMatch(/something went wrong|oops|seamless|magic|effortless|sorry/i);
   });
 
-  it("names the four queue events", () => {
+  it("names the queue events", () => {
     expect(EVENTS).toEqual({
       uploaded: "document/uploaded",
       reprocess: "document/reprocess",
       deleted: "document/deleted",
       notebookDeleted: "notebook/deleted",
+      fastReady: "document/fast-ready",
+      passwordProvided: "document/password-provided",
+      sourcesChanged: "notebook/sources-changed",
     });
   });
 });
@@ -76,14 +112,43 @@ describe("validateContract rejects", () => {
     ["a stage without a learner word", (c) => delete c.uiWords.ocr, 'uiWords: missing "ocr"'],
     [
       "a transition to an unknown stage",
-      (c) => c.transitions.parsing.push("summarising"),
-      'transitions.parsing: unknown stage "summarising"',
+      (c) => c.transitions.parsing_deep.push("summarising"),
+      'transitions.parsing_deep: unknown stage "summarising"',
     ],
-    ["an error without a fix", (c) => delete c.errors.not_pdf.fix, "errors.not_pdf.fix"],
+    [
+      "an error without a fix",
+      (c) => delete c.errors.unsupported_type.fix,
+      "errors.unsupported_type.fix",
+    ],
     [
       "a placeholder that isn't declared",
-      (c) => (c.errors.corrupt_pdf.message = "Page {page} is damaged."),
-      'errors.corrupt_pdf placeholders: unknown "page"',
+      (c) => (c.errors.unreadable_after_repair.message = "Page {page} is damaged."),
+      'errors.unreadable_after_repair placeholders: unknown "page"',
+    ],
+    [
+      "a notice placeholder that isn't declared",
+      (c) => (c.notices.repaired.message = "Repaired {count} pages."),
+      'notices.repaired placeholders: unknown "count"',
+    ],
+    [
+      "an askable line for a finished stage",
+      (c) => (c.askable.details.ready = { template: "Ready" }),
+      "askable.details.ready: not a working stage",
+    ],
+    [
+      "an extension claimed by two types",
+      (c) => c.sourceTypes.markdown.extensions.push(".txt"),
+      'sourceTypes.markdown: ".txt" is already text',
+    ],
+    [
+      "a file type without extensions",
+      (c) => (c.sourceTypes.docx.extensions = []),
+      "sourceTypes.docx: a file type needs extensions",
+    ],
+    [
+      "a link type with extensions",
+      (c) => (c.sourceTypes.web.extensions = [".url"]),
+      "sourceTypes.web: only file types have extensions",
     ],
     [
       "vars without a fallback",
@@ -128,22 +193,53 @@ describe("validateContract rejects", () => {
 
 describe("contract helpers", () => {
   it("maps stages to learner words", () => {
-    expect(uiWord("ocr")).toBe("Reading");
-    expect(uiWord("reading_figures")).toBe("Reading");
+    expect(uiWord("ocr")).toBe("Running OCR");
+    expect(uiWord("parsing_fast")).toBe("Reading");
+    expect(uiWord("fast_ready")).toBe("Ready to ask");
+    expect(uiWord("failed")).toBe("Couldn't read");
     expect(() => uiWord("summarising" as Stage)).toThrow(/Unknown ingestion stage/);
   });
 
-  it("allows only forward moves within a run", () => {
-    expect(canTransition("parsing", "ocr")).toBe(true);
-    expect(canTransition("parsing", "indexing")).toBe(true); // no figures to read
-    expect(canTransition("indexing", "parsing")).toBe(false);
+  it("says Ready to ask while a later stage improves an askable source", () => {
+    expect(uiWord("parsing_deep", { askable: true })).toBe("Ready to ask");
+    expect(uiWord("indexing", { askable: true })).toBe("Ready to ask");
+    expect(uiWord("parsing_deep")).toBe("Improving");
+    expect(uiWord("validating", { askable: true })).toBe("Reading"); // nothing askable yet
+    expect(detailLine("parsing_deep", { page: 3, pages: 30 }, { askable: true })).toBe(
+      "Ready to ask · improving page 3 of 30",
+    );
+    expect(detailLine("reading_figures", { done: 2, total: 8 }, { askable: true })).toBe(
+      "Ready to ask · reading figures 2 of 8",
+    );
+    expect(detailLine("indexing", { passages: 80 }, { askable: true })).toBe(
+      "Ready to ask · improving tables and figures",
+    );
+    expect(detailLine("queued", {}, { askable: true })).toBe("Waiting to start");
+  });
+
+  it("allows the v2 paths: password, repair, fast then deep pass, scans", () => {
+    expect(canTransition("validating", "needs_password")).toBe(true);
+    expect(canTransition("needs_password", "validating")).toBe(true); // after the password
+    expect(canTransition("validating", "repairing")).toBe(true);
+    expect(canTransition("repairing", "ocr")).toBe(true); // rendered pages, read as a scan
+    expect(canTransition("parsing_fast", "fast_ready")).toBe(true);
+    expect(canTransition("fast_ready", "parsing_deep")).toBe(true);
+    expect(canTransition("fast_ready", "ready")).toBe(true); // text formats: nothing to improve
+    expect(canTransition("validating", "ocr")).toBe(true); // scans skip the fast pass
+    expect(canTransition("parsing_deep", "indexing")).toBe(true); // no figures to read
+  });
+
+  it("refuses moves the contract doesn't list", () => {
+    expect(canTransition("indexing", "parsing_deep")).toBe(false);
     expect(canTransition("ready", "queued")).toBe(false); // a re-process is a new run
-    expect(canTransition("parsing", "parsing")).toBe(false); // progress, not a move
+    expect(canTransition("parsing_deep", "parsing_deep")).toBe(false); // progress, not a move
+    expect(canTransition("parsing_fast", "parsing_deep")).toBe(false); // publish the fast run first
+    expect(canTransition("needs_password", "parsing_fast")).toBe(false); // re-check after unlocking
     expect(canTransition("nope", "failed")).toBe(false);
   });
 
   it("writes honest detail lines, with plurals", () => {
-    expect(detailLine("parsing", { page: 18, pages: 42 })).toBe("Reading page 18 of 42");
+    expect(detailLine("parsing_fast", { page: 18, pages: 42 })).toBe("Reading page 18 of 42");
     expect(detailLine("ocr", { page: 4, pages: 12 })).toBe("Running OCR on page 4 of 12");
     expect(detailLine("uploading", { percent: 62 })).toBe("Uploading · 62%");
     expect(detailLine("ready", { pages: 42 })).toBe("42 pages · Ready");
@@ -152,7 +248,7 @@ describe("contract helpers", () => {
   });
 
   it("falls back to a line without numbers when a value is missing or unusable", () => {
-    expect(detailLine("parsing", { page: 18 })).toBe("Reading the pages");
+    expect(detailLine("parsing_fast", { page: 18 })).toBe("Reading the text");
     expect(detailLine("uploading", { percent: 62.5 })).toBe("Uploading");
     expect(detailLine("ready", { pages: true })).toBe("Ready");
     expect(detailLine("queued")).toBe("Waiting to start");
@@ -162,10 +258,30 @@ describe("contract helpers", () => {
   it("gives an error's reason and fix in the skill's words", () => {
     const copy = errorCopy("file_too_large", { sizeMb: "120", limitMb: 50 });
     expect(`${copy.message} ${copy.fix}`).toBe(
-      "This file is 120 MB. The limit is 50 MB. Split the PDF or upload chapters separately.",
+      "This file is 120 MB. Your plan allows 50 MB per file. Split it, or upgrade for larger files.",
     );
     expect(copy.autoRetry).toBe(false);
-    expect(errorCopy("file_too_large").message).toBe("This file is over the size limit.");
+    expect(copy.actions).toEqual([{ id: "upgrade", label: "See plans" }]);
+    expect(errorCopy("file_too_large").message).toBe("This file is over your plan's size limit.");
+  });
+
+  it("writes notices for sources that are usable but partial", () => {
+    expect(noticeCopy("pages_capped", { limit: 2000, pages: 2400 })).toEqual({
+      code: "pages_capped",
+      message: "TensorLM read the first 2000 of 2400 pages.",
+      fix: "Split the file to read the rest.",
+    });
+    expect(noticeCopy("pages_skipped", { count: 1 })?.message).toBe("1 page couldn't be read.");
+    expect(noticeCopy("repaired")?.fix).toBeNull();
+    expect(noticeCopy("made_up")).toBeNull();
+  });
+
+  it("guesses a source type from the file name (the worker sniffs the bytes)", () => {
+    expect(sourceTypeFromName("Attention.PDF")).toBe("pdf");
+    expect(sourceTypeFromName("deck.final.pptx")).toBe("pptx");
+    expect(sourceTypeFromName("folder/data.TSV")).toBe("csv");
+    expect(sourceTypeFromName("README")).toBeNull();
+    expect(sourceTypeFromName("slides.ppt")).toBeNull(); // uploaded anyway; worker explains
   });
 
   it("names the actions an error offers", () => {
@@ -173,7 +289,7 @@ describe("contract helpers", () => {
       { id: "open_existing", label: "Open it" },
       { id: "add_anyway", label: "Add anyway" },
     ]);
-    expect(errorCopy("not_pdf").actions).toEqual([]);
+    expect(errorCopy("quota_exceeded").actions).toEqual([]);
   });
 
   it("treats unknown codes as internal and only retries internal on its own", () => {
@@ -185,7 +301,7 @@ describe("contract helpers", () => {
 
   it("never re-reads placeholders inside values", () => {
     expect(errorCopy("file_too_large", { sizeMb: "{limitMb}", limitMb: 50 }).message).toBe(
-      "This file is {limitMb} MB. The limit is 50 MB.",
+      "This file is {limitMb} MB. Your plan allows 50 MB per file.",
     );
   });
 

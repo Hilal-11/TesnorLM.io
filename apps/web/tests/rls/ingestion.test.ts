@@ -175,41 +175,41 @@ describe("set_document_stage", () => {
 
   it("moves forward, records stage timings, and never lowers progress", async () => {
     const doc = await newDocument();
-    await walkTo(doc, ["queued", "validating", "parsing"]);
+    await walkTo(doc, ["queued", "validating", "parsing_deep"]);
     expect(
-      must(await stage(doc, "parsing", { p_progress: 30, p_detail: "Reading page 9 of 20" })),
+      must(await stage(doc, "parsing_deep", { p_progress: 30, p_detail: "Reading page 9 of 20" })),
     ).toBe(true);
-    expect(must(await stage(doc, "parsing", { p_progress: 10 }))).toBe(true);
+    expect(must(await stage(doc, "parsing_deep", { p_progress: 10 }))).toBe(true);
     const d = await row(doc.id);
     expect(d.progress).toBe(30);
     expect(d.stage_detail).toBe("Reading page 9 of 20");
     expect(d.started_at).not.toBeNull();
     expect(Object.keys(d.stage_timings)).toEqual(
-      expect.arrayContaining(["uploading", "queued", "validating", "parsing"]),
+      expect.arrayContaining(["uploading", "queued", "validating", "parsing_deep"]),
     );
     expect(d.stage_timings.validating.duration_ms).toBeGreaterThanOrEqual(0);
   });
 
   it("ignores stale runs, backward moves and 'ready'", async () => {
     const doc = await newDocument();
-    await walkTo(doc, ["queued", "validating", "parsing"]);
+    await walkTo(doc, ["queued", "validating", "parsing_deep"]);
     expect(must(await stage(doc, "indexing", {}, randomUUID()))).toBe(false); // stale run
     expect(must(await stage(doc, "validating"))).toBe(false); // backwards
     expect(must(await stage(doc, "ready"))).toBe(false); // only finalize_ingest
-    expect((await row(doc.id)).stage).toBe("parsing");
+    expect((await row(doc.id)).stage).toBe("parsing_deep");
   });
 
   it("records failures with a code and vars, and then stays failed", async () => {
     const doc = await newDocument();
     await walkTo(doc, ["queued", "validating"]);
-    const vars = { pages: 240, limit: 200 };
+    const vars = { sizeMb: "120", limitMb: "50" };
     expect(
-      must(await stage(doc, "failed", { p_error_code: "too_many_pages", p_error_vars: vars })),
+      must(await stage(doc, "failed", { p_error_code: "file_too_large", p_error_vars: vars })),
     ).toBe(true);
-    expect(must(await stage(doc, "parsing"))).toBe(false);
+    expect(must(await stage(doc, "parsing_deep"))).toBe(false);
     const d = await row(doc.id);
     expect(d.stage).toBe("failed");
-    expect(d.error_code).toBe("too_many_pages");
+    expect(d.error_code).toBe("file_too_large");
     expect(d.error_vars).toEqual(vars);
     expect(d.finished_at).not.toBeNull();
   });
@@ -218,7 +218,7 @@ describe("set_document_stage", () => {
 describe("finalize_ingest", () => {
   it("swaps the new run in atomically and refuses stale runs", async () => {
     const doc = await newDocument();
-    await walkTo(doc, ["queued", "validating", "parsing", "indexing"]);
+    await walkTo(doc, ["queued", "validating", "parsing_deep", "indexing"]);
     const oldRun = doc.ingest_run_id;
     await addChunk(doc, oldRun, 0, "old run passage");
     expect(
@@ -228,7 +228,7 @@ describe("finalize_ingest", () => {
     // Re-process: a new run starts; the old run's chunks stay until the swap.
     const newRun = must(await admin.rpc("start_ingest_run", { p_document_id: doc.id })) as string;
     const next = { id: doc.id, ingest_run_id: newRun };
-    await walkTo(next, ["validating", "parsing", "indexing"]);
+    await walkTo(next, ["validating", "parsing_deep", "indexing"]);
     await addChunk(doc, newRun, 0, "new run passage one");
     await addChunk(doc, newRun, 1, "new run passage two");
 
@@ -255,7 +255,7 @@ describe("finalize_ingest", () => {
 
   it("does nothing for a deleted document", async () => {
     const doc = await newDocument();
-    await walkTo(doc, ["queued", "validating", "parsing", "indexing"]);
+    await walkTo(doc, ["queued", "validating", "parsing_deep", "indexing"]);
     must(
       await A.client
         .from("documents")
@@ -274,7 +274,7 @@ describe("finalize_ingest", () => {
 describe("hybrid_search", () => {
   it("returns only the current run of Ready, live documents, with page fields", async () => {
     const ready = await newDocument("ready.pdf");
-    await walkTo(ready, ["queued", "validating", "parsing", "indexing"]);
+    await walkTo(ready, ["queued", "validating", "parsing_deep", "indexing"]);
     await addChunk(ready, ready.ingest_run_id, 0, "transformers use attention heads", 7);
     must(
       await admin.rpc("finalize_ingest", {
@@ -287,11 +287,11 @@ describe("hybrid_search", () => {
     await addChunk(ready, run2, 0, "attention draft from an unfinished run", 7);
 
     const indexing = await newDocument("indexing.pdf");
-    await walkTo(indexing, ["queued", "validating", "parsing", "indexing"]);
+    await walkTo(indexing, ["queued", "validating", "parsing_deep", "indexing"]);
     await addChunk(indexing, indexing.ingest_run_id, 0, "attention in a half-indexed paper", 7);
 
     const deleted = await newDocument("deleted.pdf");
-    await walkTo(deleted, ["queued", "validating", "parsing", "indexing"]);
+    await walkTo(deleted, ["queued", "validating", "parsing_deep", "indexing"]);
     await addChunk(deleted, deleted.ingest_run_id, 0, "attention in a deleted paper", 7);
     must(
       await admin.rpc("finalize_ingest", {

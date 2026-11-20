@@ -1,10 +1,11 @@
 """The ingestion contract shared with the web app.
 
-Stage names, allowed transitions, learner words, detail lines, error copy, events, limits and
-storage paths. Source of truth: contracts/ingestion.json at the repo root (spec:
+Source types, stage names, allowed transitions, learner words, detail lines, error and notice
+copy, events, limits and storage paths. Source of truth: contracts/ingestion.json at the repo root (spec:
 docs/specs/ingestion.md). apps/web/src/lib/ingestion/contract.ts loads the same file, and
 contracts/fixtures/ingestion-cases.json proves both give identical answers
-(tests/test_contract.py). Never hard-code a stage name, error code or their copy elsewhere.
+(tests/test_contract.py). Never hard-code a stage name, source type, error code or their
+copy elsewhere.
 
 The file is found by INGESTION_CONTRACT_PATH, else by walking up from this file to a
 `contracts/ingestion.json` (the repo in development; the worker image copies it to
@@ -30,6 +31,8 @@ STORAGE_VARS = frozenset({"userId", "documentId", "runId", "n"})
 SAFE_SEGMENT = re.compile(r"[A-Za-z0-9_-]+")
 NAME = re.compile(r"[a-z][a-z_]*")
 EVENT_NAME = re.compile(r"[a-z]+/[a-z-]+")
+EXTENSION = re.compile(r"\.[a-z0-9]+")
+MIME = re.compile(r"[a-z]+/[a-z0-9.+-]+")
 
 
 # ───────────── Templates ─────────────
@@ -97,19 +100,51 @@ class ErrorDef(_Model):
     auto_retry: bool = Field(alias="autoRetry")
 
 
+class NoticeDef(_Model):
+    message: str = Field(min_length=1)
+    fallback: str | None = Field(default=None, min_length=1)
+    fix: str | None = Field(default=None, min_length=1)
+    vars: list[str] = Field(default_factory=list)
+
+
+class SourceTypeDef(_Model):
+    label: str = Field(min_length=1)
+    origin: Literal["file", "link", "drive", "text"]
+    unit: Literal["page", "slide", "sheet", "time"] | None
+    extensions: list[str]
+    mime_types: list[str] = Field(alias="mimeTypes")
+
+
+class Askable(_Model):
+    word: str = Field(min_length=1)
+    details: dict[str, TemplateDef]
+
+
 class Events(_Model):
     uploaded: str
     reprocess: str
     deleted: str
     notebook_deleted: str = Field(alias="notebookDeleted")
+    fast_ready: str = Field(alias="fastReady")
+    password_provided: str = Field(alias="passwordProvided")
+    sources_changed: str = Field(alias="sourcesChanged")
 
 
 class Limits(_Model):
     max_upload_mb: int = Field(alias="maxUploadMb", gt=0)
     max_pages: int = Field(alias="maxPages", gt=0)
+    fast_pass_page_batch: int = Field(alias="fastPassPageBatch", gt=0)
     max_files_per_batch: int = Field(alias="maxFilesPerBatch", gt=0)
     max_parallel_uploads: int = Field(alias="maxParallelUploads", gt=0)
     max_sources_free: int = Field(alias="maxSourcesFree", gt=0)
+    password_attempts: int = Field(alias="passwordAttempts", gt=0)
+    password_lock_minutes: int = Field(alias="passwordLockMinutes", gt=0)
+    password_ttl_seconds: int = Field(alias="passwordTtlSeconds", gt=0)
+    web_max_mb: int = Field(alias="webMaxMb", gt=0)
+    web_timeout_seconds: int = Field(alias="webTimeoutSeconds", gt=0)
+    web_max_redirects: int = Field(alias="webMaxRedirects", gt=0)
+    suggested_questions: int = Field(alias="suggestedQuestions", gt=0)
+    insights_debounce_seconds: int = Field(alias="insightsDebounceSeconds", gt=0)
 
 
 class StoragePaths(_Model):
@@ -150,13 +185,16 @@ def _template_problems(
 
 
 class Contract(_Model):
-    version: Literal[1]
+    version: Literal[2]
+    source_types: dict[str, SourceTypeDef] = Field(alias="sourceTypes")
     stages: list[str] = Field(min_length=2)
     transitions: dict[str, list[str]]
     ui_words: dict[str, str] = Field(alias="uiWords")
     details: dict[str, TemplateDef]
+    askable: Askable
     actions: dict[str, str]
     errors: dict[str, ErrorDef]
+    notices: dict[str, NoticeDef]
     events: Events
     limits: Limits
     storage: Storage
@@ -172,6 +210,25 @@ class Contract(_Model):
         """Every cross-reference problem. Same rules as validateContract() in contract.ts."""
         stages = set(self.stages)
         problems: list[str] = []
+
+        owners: dict[str, str] = {}
+        for type_, t in self.source_types.items():
+            where = f"sourceTypes.{type_}"
+            if not NAME.fullmatch(type_):
+                problems.append(f'sourceTypes: bad name "{type_}"')
+            if t.origin == "file" and not t.extensions:
+                problems.append(f"{where}: a file type needs extensions")
+            if t.origin != "file" and (t.extensions or t.mime_types):
+                problems.append(f"{where}: only file types have extensions or MIME types")
+            for ext in t.extensions:
+                if not EXTENSION.fullmatch(ext):
+                    problems.append(f'{where}: bad extension "{ext}"')
+                if ext in owners:
+                    problems.append(f'{where}: "{ext}" is already {owners[ext]}')
+                owners[ext] = type_
+            for mime in t.mime_types:
+                if not MIME.fullmatch(mime):
+                    problems.append(f'{where}: bad MIME type "{mime}"')
 
         for stage in self.stages:
             if not NAME.fullmatch(stage):
@@ -207,6 +264,12 @@ class Contract(_Model):
         for stage, d in self.details.items():
             problems += _template_problems(f"details.{stage}", d.template, d.vars, d.fallback)
 
+        for stage, d in self.askable.details.items():
+            where = f"askable.details.{stage}"
+            if stage not in stages or stage in ("ready", "failed"):
+                problems.append(f"{where}: not a working stage")
+            problems += _template_problems(where, d.template, d.vars, d.fallback)
+
         for action_id, label in self.actions.items():
             if not NAME.fullmatch(action_id) or not label:
                 problems.append(f'actions: bad action "{action_id}"')
@@ -222,6 +285,13 @@ class Contract(_Model):
             for action_id in e.actions:
                 if action_id not in self.actions:
                     problems.append(f'errors.{code}: unknown action "{action_id}"')
+
+        for code, n in self.notices.items():
+            if not NAME.fullmatch(code):
+                problems.append(f'notices: bad code "{code}"')
+            problems += _template_problems(f"notices.{code}", n.message, n.vars, n.fallback)
+            if n.fix is not None and re.search(r"[{}]", n.fix):
+                problems.append(f"notices.{code}: fix can't use placeholders")
 
         for key, name in self.events.model_dump(by_alias=True).items():
             if not EVENT_NAME.fullmatch(name):
@@ -273,6 +343,7 @@ def get_contract() -> Contract:
 
 CONTRACT = get_contract()
 STAGES: tuple[str, ...] = tuple(CONTRACT.stages)
+SOURCE_TYPES = CONTRACT.source_types
 EVENTS = CONTRACT.events
 LIMITS = CONTRACT.limits  # defaults only: settings read MAX_UPLOAD_MB, MAX_PAGES from env
 STORAGE = CONTRACT.storage
@@ -299,6 +370,9 @@ class _Names:
 
 STAGE = _Names("stage", CONTRACT.stages)
 ERROR = _Names("error code", CONTRACT.errors)
+NOTICE = _Names("notice code", CONTRACT.notices)
+SOURCE_TYPE = _Names("source type", CONTRACT.source_types)
+_BY_EXTENSION = {ext: t for t, d in CONTRACT.source_types.items() for ext in d.extensions}
 
 
 @dataclass(frozen=True)
@@ -326,6 +400,16 @@ class ErrorCopy:
         }
 
 
+@dataclass(frozen=True)
+class NoticeCopy:
+    code: str
+    message: str
+    fix: str | None
+
+    def to_json(self) -> dict[str, Any]:
+        return {"code": self.code, "message": self.message, "fix": self.fix}
+
+
 def is_stage(value: object) -> bool:
     return isinstance(value, str) and value in CONTRACT.transitions
 
@@ -335,9 +419,17 @@ def _assert_stage(stage: str) -> None:
         raise ValueError(f'Unknown ingestion stage "{stage}"')
 
 
-def ui_word(stage: str) -> str:
-    """The learner word for a stage: Uploading, Queued, Reading, Indexing, Ready or Failed."""
+def is_source_type(value: object) -> bool:
+    return isinstance(value, str) and value in CONTRACT.source_types
+
+
+def ui_word(stage: str, *, askable: bool = False) -> str:
+    """The learner word for a stage ("Reading", "Ready to ask", "Couldn't read").
+
+    With `askable`, a stage that improves an already-askable source says "Ready to ask"."""
     _assert_stage(stage)
+    if askable and stage in CONTRACT.askable.details:
+        return CONTRACT.askable.word
     return CONTRACT.ui_words[stage]
 
 
@@ -356,10 +448,16 @@ def is_terminal(stage: str) -> bool:
     return not CONTRACT.transitions[stage]
 
 
-def detail_line(stage: str, values: Mapping[str, Any] | None = None) -> str:
-    """The status line under a source ("Reading page 18 of 42"). Failed has none: use error_copy."""
+def detail_line(
+    stage: str, values: Mapping[str, Any] | None = None, *, askable: bool = False
+) -> str:
+    """The status line under a source ("Reading page 18 of 42"). Failed has none: use error_copy.
+
+    With `askable`, stages that improve an askable source use their "Ready to ask · …" line."""
     _assert_stage(stage)
-    detail = CONTRACT.details.get(stage)
+    detail = (CONTRACT.askable.details.get(stage) if askable else None) or CONTRACT.details.get(
+        stage
+    )
     if detail is None:
         raise ValueError(f'Stage "{stage}" has no detail line; use error_copy()')
     filled = _fill(detail.template, values or {})
@@ -378,6 +476,28 @@ def error_copy(code: str | None, values: Mapping[str, Any] | None = None) -> Err
         actions=tuple(ErrorAction(a, CONTRACT.actions[a]) for a in d.actions),
         auto_retry=d.auto_retry,
     )
+
+
+def notice_copy(code: str | None, values: Mapping[str, Any] | None = None) -> NoticeCopy | None:
+    """A note on a usable source ("TensorLM read the first 2000 of 2400 pages."). Unknown: None."""
+    if code is None or code not in CONTRACT.notices:
+        return None
+    d = CONTRACT.notices[code]
+    filled = _fill(d.message, values or {})
+    return NoticeCopy(
+        code=code, message=filled if filled is not None else (d.fallback or d.message), fix=d.fix
+    )
+
+
+def source_type_from_name(filename: str) -> str | None:
+    """The source type a file name's extension suggests (case-insensitive), or None.
+
+    Only a hint: preflight sniffs the bytes and routes by the real type."""
+    base = filename[max(filename.rfind("/"), filename.rfind("\\")) + 1 :]
+    dot = base.rfind(".")
+    if dot < 0:
+        return None
+    return _BY_EXTENSION.get(base[dot:].lower())
 
 
 def storage_path(kind: Literal["source", "figure", "parsed"], values: Mapping[str, Any]) -> str:

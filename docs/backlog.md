@@ -70,7 +70,7 @@ v1 (done, extended by v2): P3.0–P3.13 — spec + contract, DB, notebooks CRUD/
 validation, OCR, page-aware chunks, figures + captions, resumable uploads, live progress, reprocess/delete,
 worker tests. v1 P3.14 (hardening, load test, deploy) folds into P3.15v2.
 
-- [ ] S0 — Product spec v2, contracts v2 and design-skill amendment (confirmations, action colours)
+- [ ] S0 — Product spec v2, contracts v2 and design-skill amendment (confirmations, action colours) — parts 1–2 done; part 3 waits for your OK on the skill diff
 - [ ] P3.1v2 — DB v2: source types, new stages, needs_password, datasets, notebook insights, notebook auto-title
 - [ ] P3.2v2 — Notebooks data layer + Library page (grid, list, board) with confirmation dialogs
 - [ ] P3.3v2 — Main shell: Home = lazy "Untitled notebook" workspace; sidebar notebooks; shallow URL change

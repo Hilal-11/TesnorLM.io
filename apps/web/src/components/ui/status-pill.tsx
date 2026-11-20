@@ -1,10 +1,11 @@
 "use client";
 
-import { CircleAlert, CircleCheck, Clock, Loader2, type LucideIcon } from "lucide-react";
+import { CircleAlert, CircleCheck, Clock, KeyRound, Loader2, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export type DocumentStatus = "queued" | "uploading" | "reading" | "indexing" | "ready" | "failed";
+export type DocumentStatus =
+  "queued" | "uploading" | "reading" | "indexing" | "needs_password" | "ready" | "failed";
 
 /** Learner words for the ingestion pipeline (skill 8.2, 9): never "Embedding chunks". */
 export const STATUS: Record<
@@ -15,8 +16,10 @@ export const STATUS: Record<
   uploading: { word: "Uploading", icon: Loader2, tone: "text-primary", spin: true },
   reading: { word: "Reading", icon: Loader2, tone: "text-primary", spin: true },
   indexing: { word: "Indexing", icon: Loader2, tone: "text-primary", spin: true },
+  // Caution, not failure: the source waits for its password (amber per the v2 action colours).
+  needs_password: { word: "Needs password", icon: KeyRound, tone: "text-warning-strong" },
   ready: { word: "Ready", icon: CircleCheck, tone: "text-success-strong" },
-  failed: { word: "Failed", icon: CircleAlert, tone: "text-danger-strong" },
+  failed: { word: "Couldn't read", icon: CircleAlert, tone: "text-danger-strong" },
 };
 
 type StatusPillProps = {

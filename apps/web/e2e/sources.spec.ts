@@ -135,14 +135,15 @@ test("a dropped connection shows Waiting for connection… and resumes", async (
   expect(attempts).toBeGreaterThanOrEqual(3);
 });
 
-test("bad files fail at once with the reason and the fix; nothing is stored", async ({ page }) => {
+// v2 never rejects a PDF for its password or length (the worker asks for the password and reads
+// up to MAX_PAGES; P3.7v2 adds those e2e paths). Until P3.5v2 only PDFs upload.
+test("a type TensorLM can't read yet stops at once with the reason and the fix", async ({
+  page,
+}) => {
   const { notebookId } = await notebookPage(page, "Bad files");
-  const dialog = await chooseFiles(page, ["not_pdf", "encrypted", "too_many_pages"]);
-  await expect(dialog).toContainText("This file isn't a PDF.");
-  await expect(dialog).toContainText("Choose a PDF file instead.");
-  await expect(dialog).toContainText("This PDF is password-protected.");
-  await expect(dialog).toContainText("Remove the password and upload it again.");
-  await expect(dialog).toContainText("This PDF has 201 pages. The limit is 200 pages.");
+  const dialog = await chooseFiles(page, ["not_pdf"]);
+  await expect(dialog).toContainText("TensorLM can't read this type of file yet.");
+  await expect(dialog).toContainText("Save it as PDF, Word, text or Markdown");
   await expectNoAxeViolations(page);
   const { count } = await admin()
     .from("documents")
@@ -161,9 +162,9 @@ test("a corrupt PDF passes the browser check and fails in the worker with a fix"
     timeout: 60_000,
   });
   await expect(card(page, "corrupt.pdf")).toContainText(
-    "This PDF looks damaged and can't be opened.",
+    "We couldn't read this file, even after trying to repair it.",
   );
-  await expect(card(page, "corrupt.pdf")).toContainText("Re-download or re-export the PDF");
+  await expect(card(page, "corrupt.pdf")).toContainText("upload a different copy");
 });
 
 test("duplicates offer Open it and Add anyway", async ({ page }) => {
@@ -175,7 +176,7 @@ test("duplicates offer Open it and Add anyway", async ({ page }) => {
     /queued|reading|indexing|ready/,
   );
   dialog = await chooseFiles(page, ["logo_repeat"]);
-  await expect(dialog).toContainText("This paper is already in this notebook.");
+  await expect(dialog).toContainText("This file is already in this notebook.");
   await dialog.getByRole("button", { name: "Add anyway" }).click();
   await dialog.getByRole("button", { name: "Done" }).click();
   await expect(page.locator("[data-slot=source-card]", { hasText: "logo_repeat.pdf" })).toHaveCount(
@@ -277,7 +278,9 @@ for (const theme of ["light", "dark"] as const) {
       await expectNoAxeViolations(page); // empty sources state
       await expectNoHorizontalOverflow(page);
       await chooseFiles(page, ["not_pdf"]);
-      await expect(page.getByRole("dialog")).toContainText("This file isn't a PDF.");
+      await expect(page.getByRole("dialog")).toContainText(
+        "TensorLM can't read this type of file yet.",
+      );
       await expectNoAxeViolations(page);
     });
   }

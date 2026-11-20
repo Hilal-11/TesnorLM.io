@@ -35,6 +35,10 @@ _lock = threading.Lock()
 _convert_lock = NATIVE_PDF_LOCK
 
 
+# Docling's default upper bound for page_range (sys.maxsize): read every page.
+MAX_PAGE_RANGE = 2**63 - 1
+
+
 def parser_version() -> str:
     return f"docling {version('docling')}"
 
@@ -92,8 +96,11 @@ def convert(
     timeout_s: int,
     on_page: PageCallback | None = None,
     clock: Callable[[], float] = time.monotonic,
+    max_pages: int | None = None,
 ) -> Any:
-    """Converts a PDF to a DoclingDocument. Raises IngestError for final problems."""
+    """Converts a PDF to a DoclingDocument (its first `max_pages` pages when given).
+
+    Raises IngestError for final problems."""
     from docling.datamodel.base_models import ConversionStatus
 
     converter = get_converter(ocr, timeout_s)
@@ -104,7 +111,12 @@ def convert(
 
     with _convert_lock:
         started = clock()  # the timeout counts conversion time, not time spent waiting
-        result = converter.convert(path, raises_on_error=True, progress_callback=progress)
+        result = converter.convert(
+            path,
+            raises_on_error=True,
+            progress_callback=progress,
+            page_range=(1, max_pages or MAX_PAGE_RANGE),
+        )
         elapsed = clock() - started
     if result.status == ConversionStatus.PARTIAL_SUCCESS and elapsed >= timeout_s * 0.95:
         raise IngestError(ERROR.parse_timeout)

@@ -1,44 +1,144 @@
 {
-  "version": 1,
+  "version": 2,
   "uiWord": [
     {
       "stage": "uploading",
+      "askable": false,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "askable": true,
       "out": "Uploading"
     },
     {
       "stage": "queued",
+      "askable": false,
+      "out": "Queued"
+    },
+    {
+      "stage": "queued",
+      "askable": true,
       "out": "Queued"
     },
     {
       "stage": "validating",
+      "askable": false,
       "out": "Reading"
     },
     {
-      "stage": "parsing",
+      "stage": "validating",
+      "askable": true,
       "out": "Reading"
+    },
+    {
+      "stage": "repairing",
+      "askable": false,
+      "out": "Repairing file"
+    },
+    {
+      "stage": "repairing",
+      "askable": true,
+      "out": "Repairing file"
+    },
+    {
+      "stage": "needs_password",
+      "askable": false,
+      "out": "Needs password"
+    },
+    {
+      "stage": "needs_password",
+      "askable": true,
+      "out": "Needs password"
+    },
+    {
+      "stage": "parsing_fast",
+      "askable": false,
+      "out": "Reading"
+    },
+    {
+      "stage": "parsing_fast",
+      "askable": true,
+      "out": "Reading"
+    },
+    {
+      "stage": "fast_ready",
+      "askable": false,
+      "out": "Ready to ask"
+    },
+    {
+      "stage": "fast_ready",
+      "askable": true,
+      "out": "Ready to ask"
+    },
+    {
+      "stage": "parsing_deep",
+      "askable": false,
+      "out": "Improving"
+    },
+    {
+      "stage": "parsing_deep",
+      "askable": true,
+      "out": "Ready to ask"
     },
     {
       "stage": "ocr",
-      "out": "Reading"
+      "askable": false,
+      "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "askable": true,
+      "out": "Ready to ask"
     },
     {
       "stage": "reading_figures",
-      "out": "Reading"
+      "askable": false,
+      "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "askable": true,
+      "out": "Ready to ask"
     },
     {
       "stage": "indexing",
+      "askable": false,
       "out": "Indexing"
     },
     {
+      "stage": "indexing",
+      "askable": true,
+      "out": "Ready to ask"
+    },
+    {
       "stage": "ready",
+      "askable": false,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "askable": true,
       "out": "Ready"
     },
     {
       "stage": "failed",
-      "out": "Failed"
+      "askable": false,
+      "out": "Couldn't read"
+    },
+    {
+      "stage": "failed",
+      "askable": true,
+      "out": "Couldn't read"
     },
     {
       "stage": "nope",
+      "askable": false,
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "askable": true,
       "throws": true
     }
   ],
@@ -60,7 +160,27 @@
     },
     {
       "from": "uploading",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "uploading",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -110,7 +230,27 @@
     },
     {
       "from": "queued",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "queued",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -160,13 +300,33 @@
     },
     {
       "from": "validating",
-      "to": "parsing",
+      "to": "repairing",
+      "out": true
+    },
+    {
+      "from": "validating",
+      "to": "needs_password",
+      "out": true
+    },
+    {
+      "from": "validating",
+      "to": "parsing_fast",
+      "out": true
+    },
+    {
+      "from": "validating",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "validating",
+      "to": "parsing_deep",
       "out": true
     },
     {
       "from": "validating",
       "to": "ocr",
-      "out": false
+      "out": true
     },
     {
       "from": "validating",
@@ -194,52 +354,352 @@
       "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "uploading",
       "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "queued",
       "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "validating",
       "out": false
     },
     {
-      "from": "parsing",
-      "to": "parsing",
+      "from": "repairing",
+      "to": "repairing",
       "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "repairing",
+      "to": "parsing_fast",
+      "out": true
+    },
+    {
+      "from": "repairing",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "repairing",
+      "to": "parsing_deep",
+      "out": true
+    },
+    {
+      "from": "repairing",
       "to": "ocr",
       "out": true
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "reading_figures",
-      "out": true
+      "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "indexing",
-      "out": true
+      "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "ready",
       "out": false
     },
     {
-      "from": "parsing",
+      "from": "repairing",
       "to": "failed",
       "out": true
     },
     {
-      "from": "parsing",
+      "from": "repairing",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "validating",
+      "out": true
+    },
+    {
+      "from": "needs_password",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "parsing_deep",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "ocr",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "needs_password",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "needs_password",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "fast_ready",
+      "out": true
+    },
+    {
+      "from": "parsing_fast",
+      "to": "parsing_deep",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "ocr",
+      "out": true
+    },
+    {
+      "from": "parsing_fast",
+      "to": "reading_figures",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "parsing_fast",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "parsing_fast",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "parsing_deep",
+      "out": true
+    },
+    {
+      "from": "fast_ready",
+      "to": "ocr",
+      "out": true
+    },
+    {
+      "from": "fast_ready",
+      "to": "reading_figures",
+      "out": true
+    },
+    {
+      "from": "fast_ready",
+      "to": "indexing",
+      "out": false
+    },
+    {
+      "from": "fast_ready",
+      "to": "ready",
+      "out": true
+    },
+    {
+      "from": "fast_ready",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "fast_ready",
+      "to": "nope",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "uploading",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "queued",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "validating",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "parsing_deep",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "ocr",
+      "out": true
+    },
+    {
+      "from": "parsing_deep",
+      "to": "reading_figures",
+      "out": true
+    },
+    {
+      "from": "parsing_deep",
+      "to": "indexing",
+      "out": true
+    },
+    {
+      "from": "parsing_deep",
+      "to": "ready",
+      "out": false
+    },
+    {
+      "from": "parsing_deep",
+      "to": "failed",
+      "out": true
+    },
+    {
+      "from": "parsing_deep",
       "to": "nope",
       "out": false
     },
@@ -260,7 +720,27 @@
     },
     {
       "from": "ocr",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "ocr",
+      "to": "fast_ready",
+      "out": true
+    },
+    {
+      "from": "ocr",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -310,7 +790,27 @@
     },
     {
       "from": "reading_figures",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "reading_figures",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -360,7 +860,27 @@
     },
     {
       "from": "indexing",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "indexing",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -410,7 +930,27 @@
     },
     {
       "from": "ready",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "ready",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -460,7 +1000,27 @@
     },
     {
       "from": "failed",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "failed",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -510,7 +1070,27 @@
     },
     {
       "from": "nope",
-      "to": "parsing",
+      "to": "repairing",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "needs_password",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "parsing_fast",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "fast_ready",
+      "out": false
+    },
+    {
+      "from": "nope",
+      "to": "parsing_deep",
       "out": false
     },
     {
@@ -558,7 +1138,23 @@
       "out": false
     },
     {
-      "stage": "parsing",
+      "stage": "repairing",
+      "out": false
+    },
+    {
+      "stage": "needs_password",
+      "out": false
+    },
+    {
+      "stage": "parsing_fast",
+      "out": false
+    },
+    {
+      "stage": "fast_ready",
+      "out": false
+    },
+    {
+      "stage": "parsing_deep",
       "out": false
     },
     {
@@ -590,6 +1186,7 @@
     {
       "stage": "uploading",
       "vars": {},
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -597,6 +1194,7 @@
       "vars": {
         "percent": 62
       },
+      "askable": false,
       "out": "Uploading · 62%"
     },
     {
@@ -605,6 +1203,7 @@
         "percent": 62,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Uploading · 62%"
     },
     {
@@ -612,6 +1211,7 @@
       "vars": {
         "percent": 1
       },
+      "askable": false,
       "out": "Uploading · 1%"
     },
     {
@@ -619,6 +1219,7 @@
       "vars": {
         "percent": "{page}"
       },
+      "askable": false,
       "out": "Uploading · {page}%"
     },
     {
@@ -626,6 +1227,7 @@
       "vars": {
         "percent": 0
       },
+      "askable": false,
       "out": "Uploading · 0%"
     },
     {
@@ -633,6 +1235,7 @@
       "vars": {
         "percent": 62.5
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -640,6 +1243,7 @@
       "vars": {
         "percent": true
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -647,6 +1251,7 @@
       "vars": {
         "percent": null
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -656,6 +1261,7 @@
           "n": 1
         }
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -665,6 +1271,7 @@
           1
         ]
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -672,6 +1279,7 @@
       "vars": {
         "percent": 9007199254740992
       },
+      "askable": false,
       "out": "Uploading"
     },
     {
@@ -679,16 +1287,126 @@
       "vars": {
         "percent": -9007199254740992
       },
+      "askable": false,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {},
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62
+      },
+      "askable": true,
+      "out": "Uploading · 62%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Uploading · 62%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 1
+      },
+      "askable": true,
+      "out": "Uploading · 1%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": "{page}"
+      },
+      "askable": true,
+      "out": "Uploading · {page}%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 0
+      },
+      "askable": true,
+      "out": "Uploading · 0%"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 62.5
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": true
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": null
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": {
+          "n": 1
+        }
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": [
+          1
+        ]
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": 9007199254740992
+      },
+      "askable": true,
+      "out": "Uploading"
+    },
+    {
+      "stage": "uploading",
+      "vars": {
+        "percent": -9007199254740992
+      },
+      "askable": true,
       "out": "Uploading"
     },
     {
       "stage": "queued",
       "vars": {},
+      "askable": false,
       "out": "Waiting to start"
     },
     {
       "stage": "queued",
       "vars": {},
+      "askable": false,
       "out": "Waiting to start"
     },
     {
@@ -696,16 +1414,39 @@
       "vars": {
         "unrelated": "ignored"
       },
+      "askable": false,
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "queued",
+      "vars": {},
+      "askable": true,
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "queued",
+      "vars": {},
+      "askable": true,
+      "out": "Waiting to start"
+    },
+    {
+      "stage": "queued",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
       "out": "Waiting to start"
     },
     {
       "stage": "validating",
       "vars": {},
+      "askable": false,
       "out": "Checking the file"
     },
     {
       "stage": "validating",
       "vars": {},
+      "askable": false,
       "out": "Checking the file"
     },
     {
@@ -713,141 +1454,737 @@
       "vars": {
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Checking the file"
     },
     {
-      "stage": "parsing",
+      "stage": "validating",
       "vars": {},
-      "out": "Reading the pages"
+      "askable": true,
+      "out": "Checking the file"
     },
     {
-      "stage": "parsing",
+      "stage": "validating",
+      "vars": {},
+      "askable": true,
+      "out": "Checking the file"
+    },
+    {
+      "stage": "validating",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Checking the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {},
+      "askable": false,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {},
+      "askable": false,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": false,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {},
+      "askable": true,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {},
+      "askable": true,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "repairing",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Repairing the file"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {},
+      "askable": false,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {},
+      "askable": false,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": false,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {},
+      "askable": true,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {},
+      "askable": true,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "needs_password",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Enter the password to open this PDF"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {},
+      "askable": false,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
       "vars": {
         "page": 4,
         "pages": 12
       },
+      "askable": false,
       "out": "Reading page 4 of 12"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 4,
         "pages": 12,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Reading page 4 of 12"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 1,
         "pages": 12
       },
+      "askable": false,
       "out": "Reading page 1 of 12"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": "{page}",
         "pages": 12
       },
+      "askable": false,
       "out": "Reading page {page} of 12"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 0,
         "pages": 12
       },
+      "askable": false,
       "out": "Reading page 0 of 12"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 4,
         "pages": 1
       },
+      "askable": false,
       "out": "Reading page 4 of 1"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 4,
         "pages": "{page}"
       },
+      "askable": false,
       "out": "Reading page 4 of {page}"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 4,
         "pages": 0
       },
+      "askable": false,
       "out": "Reading page 4 of 0"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 62.5,
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": true,
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": null,
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": {
           "n": 1
         },
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": [
           1
         ],
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": 9007199254740992,
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
     },
     {
-      "stage": "parsing",
+      "stage": "parsing_fast",
       "vars": {
         "page": -9007199254740992,
         "pages": 12
       },
-      "out": "Reading the pages"
+      "askable": false,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {},
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading page 4 of 12"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Reading page 4 of 12"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading page 1 of 12"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading page {page} of 12"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading page 0 of 12"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "askable": true,
+      "out": "Reading page 4 of 1"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "askable": true,
+      "out": "Reading page 4 of {page}"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "askable": true,
+      "out": "Reading page 4 of 0"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "parsing_fast",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Reading the text"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {},
+      "askable": false,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {},
+      "askable": false,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": false,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "fast_ready",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {},
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 4 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 4 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 1 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page {page} of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 0 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 4 of 1"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 4 of {page}"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "askable": false,
+      "out": "Reading tables and figures · page 4 of 0"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "askable": false,
+      "out": "Reading tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 4 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 4 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 1 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page {page} of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 0 of 12"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 4 of 1"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 4 of {page}"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "askable": true,
+      "out": "Ready to ask · improving page 4 of 0"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "parsing_deep",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
     },
     {
       "stage": "ocr",
       "vars": {},
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -856,6 +2193,7 @@
         "page": 4,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR on page 4 of 12"
     },
     {
@@ -865,6 +2203,7 @@
         "pages": 12,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Running OCR on page 4 of 12"
     },
     {
@@ -873,6 +2212,7 @@
         "page": 1,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR on page 1 of 12"
     },
     {
@@ -881,6 +2221,7 @@
         "page": "{page}",
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR on page {page} of 12"
     },
     {
@@ -889,6 +2230,7 @@
         "page": 0,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR on page 0 of 12"
     },
     {
@@ -897,6 +2239,7 @@
         "page": 4,
         "pages": 1
       },
+      "askable": false,
       "out": "Running OCR on page 4 of 1"
     },
     {
@@ -905,6 +2248,7 @@
         "page": 4,
         "pages": "{page}"
       },
+      "askable": false,
       "out": "Running OCR on page 4 of {page}"
     },
     {
@@ -913,6 +2257,7 @@
         "page": 4,
         "pages": 0
       },
+      "askable": false,
       "out": "Running OCR on page 4 of 0"
     },
     {
@@ -921,6 +2266,7 @@
         "page": 62.5,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -929,6 +2275,7 @@
         "page": true,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -937,6 +2284,7 @@
         "page": null,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -947,6 +2295,7 @@
         },
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -957,6 +2306,7 @@
         ],
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -965,6 +2315,7 @@
         "page": 9007199254740992,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
     },
     {
@@ -973,11 +2324,159 @@
         "page": -9007199254740992,
         "pages": 12
       },
+      "askable": false,
       "out": "Running OCR"
+    },
+    {
+      "stage": "ocr",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 1,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": "{page}",
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 0,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 1
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": "{page}"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 4,
+        "pages": 0
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 62.5,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": true,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": null,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": [
+          1
+        ],
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": 9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "ocr",
+      "vars": {
+        "page": -9007199254740992,
+        "pages": 12
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
     },
     {
       "stage": "reading_figures",
       "vars": {},
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -986,6 +2485,7 @@
         "done": 3,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures · 3 of 9"
     },
     {
@@ -995,6 +2495,7 @@
         "total": 9,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Reading figures · 3 of 9"
     },
     {
@@ -1003,6 +2504,7 @@
         "done": 1,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures · 1 of 9"
     },
     {
@@ -1011,6 +2513,7 @@
         "done": "{page}",
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures · {page} of 9"
     },
     {
@@ -1019,6 +2522,7 @@
         "done": 0,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures · 0 of 9"
     },
     {
@@ -1027,6 +2531,7 @@
         "done": 3,
         "total": 1
       },
+      "askable": false,
       "out": "Reading figures · 3 of 1"
     },
     {
@@ -1035,6 +2540,7 @@
         "done": 3,
         "total": "{page}"
       },
+      "askable": false,
       "out": "Reading figures · 3 of {page}"
     },
     {
@@ -1043,6 +2549,7 @@
         "done": 3,
         "total": 0
       },
+      "askable": false,
       "out": "Reading figures · 3 of 0"
     },
     {
@@ -1051,6 +2558,7 @@
         "done": 62.5,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1059,6 +2567,7 @@
         "done": true,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1067,6 +2576,7 @@
         "done": null,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1077,6 +2587,7 @@
         },
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1087,6 +2598,7 @@
         ],
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1095,6 +2607,7 @@
         "done": 9007199254740992,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
     },
     {
@@ -1103,11 +2616,159 @@
         "done": -9007199254740992,
         "total": 9
       },
+      "askable": false,
       "out": "Reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 3 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 9,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 3 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 1,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 1 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": "{page}",
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures {page} of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 0,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 0 of 9"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 1
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 3 of 1"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": "{page}"
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 3 of {page}"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 3,
+        "total": 0
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures 3 of 0"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 62.5,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": true,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": null,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": {
+          "n": 1
+        },
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": [
+          1
+        ],
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": 9007199254740992,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
+    },
+    {
+      "stage": "reading_figures",
+      "vars": {
+        "done": -9007199254740992,
+        "total": 9
+      },
+      "askable": true,
+      "out": "Ready to ask · reading figures"
     },
     {
       "stage": "indexing",
       "vars": {},
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1115,6 +2776,7 @@
       "vars": {
         "passages": 128
       },
+      "askable": false,
       "out": "Indexing 128 passages"
     },
     {
@@ -1123,6 +2785,7 @@
         "passages": 128,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "Indexing 128 passages"
     },
     {
@@ -1130,6 +2793,7 @@
       "vars": {
         "passages": 1
       },
+      "askable": false,
       "out": "Indexing 1 passage"
     },
     {
@@ -1137,6 +2801,7 @@
       "vars": {
         "passages": "{page}"
       },
+      "askable": false,
       "out": "Indexing {page} passages"
     },
     {
@@ -1144,6 +2809,7 @@
       "vars": {
         "passages": 0
       },
+      "askable": false,
       "out": "Indexing 0 passages"
     },
     {
@@ -1151,6 +2817,7 @@
       "vars": {
         "passages": 62.5
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1158,6 +2825,7 @@
       "vars": {
         "passages": true
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1165,6 +2833,7 @@
       "vars": {
         "passages": null
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1174,6 +2843,7 @@
           "n": 1
         }
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1183,6 +2853,7 @@
           1
         ]
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1190,6 +2861,7 @@
       "vars": {
         "passages": 9007199254740992
       },
+      "askable": false,
       "out": "Indexing passages"
     },
     {
@@ -1197,11 +2869,120 @@
       "vars": {
         "passages": -9007199254740992
       },
+      "askable": false,
       "out": "Indexing passages"
+    },
+    {
+      "stage": "indexing",
+      "vars": {},
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 128
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 128,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 1
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": "{page}"
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 0
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 62.5
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": true
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": null
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": {
+          "n": 1
+        }
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": [
+          1
+        ]
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": 9007199254740992
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
+    },
+    {
+      "stage": "indexing",
+      "vars": {
+        "passages": -9007199254740992
+      },
+      "askable": true,
+      "out": "Ready to ask · improving tables and figures"
     },
     {
       "stage": "ready",
       "vars": {},
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1209,6 +2990,7 @@
       "vars": {
         "pages": 12
       },
+      "askable": false,
       "out": "12 pages · Ready"
     },
     {
@@ -1217,6 +2999,7 @@
         "pages": 12,
         "unrelated": "ignored"
       },
+      "askable": false,
       "out": "12 pages · Ready"
     },
     {
@@ -1224,6 +3007,7 @@
       "vars": {
         "pages": 1
       },
+      "askable": false,
       "out": "1 page · Ready"
     },
     {
@@ -1231,6 +3015,7 @@
       "vars": {
         "pages": "{page}"
       },
+      "askable": false,
       "out": "{page} pages · Ready"
     },
     {
@@ -1238,6 +3023,7 @@
       "vars": {
         "pages": 0
       },
+      "askable": false,
       "out": "0 pages · Ready"
     },
     {
@@ -1245,6 +3031,7 @@
       "vars": {
         "pages": 62.5
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1252,6 +3039,7 @@
       "vars": {
         "pages": true
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1259,6 +3047,7 @@
       "vars": {
         "pages": null
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1268,6 +3057,7 @@
           "n": 1
         }
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1277,6 +3067,7 @@
           1
         ]
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1284,6 +3075,7 @@
       "vars": {
         "pages": 9007199254740992
       },
+      "askable": false,
       "out": "Ready"
     },
     {
@@ -1291,16 +3083,126 @@
       "vars": {
         "pages": -9007199254740992
       },
+      "askable": false,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {},
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 12
+      },
+      "askable": true,
+      "out": "12 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "askable": true,
+      "out": "12 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 1
+      },
+      "askable": true,
+      "out": "1 page · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": "{page}"
+      },
+      "askable": true,
+      "out": "{page} pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 0
+      },
+      "askable": true,
+      "out": "0 pages · Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 62.5
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": true
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": null
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": {
+          "n": 1
+        }
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": [
+          1
+        ]
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": 9007199254740992
+      },
+      "askable": true,
+      "out": "Ready"
+    },
+    {
+      "stage": "ready",
+      "vars": {
+        "pages": -9007199254740992
+      },
+      "askable": true,
       "out": "Ready"
     },
     {
       "stage": "failed",
       "vars": {},
+      "askable": false,
       "throws": true
     },
     {
       "stage": "failed",
       "vars": {},
+      "askable": false,
       "throws": true
     },
     {
@@ -1308,16 +3210,39 @@
       "vars": {
         "unrelated": "ignored"
       },
+      "askable": false,
+      "throws": true
+    },
+    {
+      "stage": "failed",
+      "vars": {},
+      "askable": true,
+      "throws": true
+    },
+    {
+      "stage": "failed",
+      "vars": {},
+      "askable": true,
+      "throws": true
+    },
+    {
+      "stage": "failed",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
       "throws": true
     },
     {
       "stage": "nope",
       "vars": {},
+      "askable": false,
       "throws": true
     },
     {
       "stage": "nope",
       "vars": {},
+      "askable": false,
       "throws": true
     },
     {
@@ -1325,42 +3250,586 @@
       "vars": {
         "unrelated": "ignored"
       },
+      "askable": false,
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {},
+      "askable": true,
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {},
+      "askable": true,
+      "throws": true
+    },
+    {
+      "stage": "nope",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "askable": true,
       "throws": true
     }
   ],
   "errorCopy": [
     {
-      "code": "not_pdf",
+      "code": "password_wrong",
       "vars": {},
       "out": {
-        "code": "not_pdf",
-        "message": "This file isn't a PDF.",
-        "fix": "Choose a PDF file instead.",
-        "actions": [],
+        "code": "password_wrong",
+        "message": "That password didn't open this PDF.",
+        "fix": "Check it and try again.",
+        "actions": [
+          {
+            "id": "unlock",
+            "label": "Unlock"
+          }
+        ],
         "autoRetry": false
       }
     },
     {
-      "code": "not_pdf",
+      "code": "password_wrong",
       "vars": {},
       "out": {
-        "code": "not_pdf",
-        "message": "This file isn't a PDF.",
-        "fix": "Choose a PDF file instead.",
-        "actions": [],
+        "code": "password_wrong",
+        "message": "That password didn't open this PDF.",
+        "fix": "Check it and try again.",
+        "actions": [
+          {
+            "id": "unlock",
+            "label": "Unlock"
+          }
+        ],
         "autoRetry": false
       }
     },
     {
-      "code": "not_pdf",
+      "code": "password_wrong",
       "vars": {
         "unrelated": "ignored"
       },
       "out": {
-        "code": "not_pdf",
-        "message": "This file isn't a PDF.",
-        "fix": "Choose a PDF file instead.",
+        "code": "password_wrong",
+        "message": "That password didn't open this PDF.",
+        "fix": "Check it and try again.",
+        "actions": [
+          {
+            "id": "unlock",
+            "label": "Unlock"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {},
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
         "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 15
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords. You can try again in 15 minutes.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 15,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords. You can try again in 15 minutes.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 1
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords. You can try again in 1 minute.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": "{page}"
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords. You can try again in {page} minutes.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 0
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords. You can try again in 0 minutes.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 62.5
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": true
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": null
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": {
+          "n": 1
+        }
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": [
+          1
+        ]
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": 9007199254740992
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "password_attempts",
+      "vars": {
+        "minutes": -9007199254740992
+      },
+      "out": {
+        "code": "password_attempts",
+        "message": "Too many wrong passwords.",
+        "fix": "Wait a little, then enter the password again.",
+        "actions": [],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unreadable_after_repair",
+      "vars": {},
+      "out": {
+        "code": "unreadable_after_repair",
+        "message": "We couldn't read this file, even after trying to repair it.",
+        "fix": "Try again, or upload a different copy (re-download or re-export it).",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unreadable_after_repair",
+      "vars": {},
+      "out": {
+        "code": "unreadable_after_repair",
+        "message": "We couldn't read this file, even after trying to repair it.",
+        "fix": "Try again, or upload a different copy (re-download or re-export it).",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unreadable_after_repair",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "unreadable_after_repair",
+        "message": "We couldn't read this file, even after trying to repair it.",
+        "fix": "Try again, or upload a different copy (re-download or re-export it).",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_after_ocr",
+      "vars": {},
+      "out": {
+        "code": "no_text_after_ocr",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan, or paste the text instead.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_after_ocr",
+      "vars": {},
+      "out": {
+        "code": "no_text_after_ocr",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan, or paste the text instead.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "no_text_after_ocr",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "no_text_after_ocr",
+        "message": "We couldn't find readable text, even with OCR.",
+        "fix": "Upload a clearer scan, or paste the text instead.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "empty_file",
+      "vars": {},
+      "out": {
+        "code": "empty_file",
+        "message": "This file is empty.",
+        "fix": "Choose the file again, or re-download it.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "empty_file",
+      "vars": {},
+      "out": {
+        "code": "empty_file",
+        "message": "This file is empty.",
+        "fix": "Choose the file again, or re-download it.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "empty_file",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "empty_file",
+        "message": "This file is empty.",
+        "fix": "Choose the file again, or re-download it.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unsupported_type",
+      "vars": {},
+      "out": {
+        "code": "unsupported_type",
+        "message": "TensorLM can't read this type of file yet.",
+        "fix": "Save it as PDF, Word, text or Markdown, then add it again.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unsupported_type",
+      "vars": {},
+      "out": {
+        "code": "unsupported_type",
+        "message": "TensorLM can't read this type of file yet.",
+        "fix": "Save it as PDF, Word, text or Markdown, then add it again.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "unsupported_type",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "unsupported_type",
+        "message": "TensorLM can't read this type of file yet.",
+        "fix": "Save it as PDF, Word, text or Markdown, then add it again.",
+        "actions": [
+          {
+            "id": "upload_copy",
+            "label": "Upload a different copy"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "source_unreachable",
+      "vars": {},
+      "out": {
+        "code": "source_unreachable",
+        "message": "We couldn't open this page (it may need a login).",
+        "fix": "Paste the text instead.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "source_unreachable",
+      "vars": {},
+      "out": {
+        "code": "source_unreachable",
+        "message": "We couldn't open this page (it may need a login).",
+        "fix": "Paste the text instead.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "source_unreachable",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "source_unreachable",
+        "message": "We couldn't open this page (it may need a login).",
+        "fix": "Paste the text instead.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          },
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "transcript_unavailable",
+      "vars": {},
+      "out": {
+        "code": "transcript_unavailable",
+        "message": "We couldn't get a transcript for this video.",
+        "fix": "Paste the transcript instead.",
+        "actions": [
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "transcript_unavailable",
+      "vars": {},
+      "out": {
+        "code": "transcript_unavailable",
+        "message": "We couldn't get a transcript for this video.",
+        "fix": "Paste the transcript instead.",
+        "actions": [
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "transcript_unavailable",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "transcript_unavailable",
+        "message": "We couldn't get a transcript for this video.",
+        "fix": "Paste the transcript instead.",
+        "actions": [
+          {
+            "id": "paste_text",
+            "label": "Paste the text"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1369,9 +3838,14 @@
       "vars": {},
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1383,9 +3857,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 63.4 MB. The limit is 50 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 63.4 MB. Your plan allows 50 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1398,9 +3877,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 63.4 MB. The limit is 50 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 63.4 MB. Your plan allows 50 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1412,9 +3896,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 1 MB. The limit is 50 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 1 MB. Your plan allows 50 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1426,9 +3915,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is {page} MB. The limit is 50 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is {page} MB. Your plan allows 50 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1440,9 +3934,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 0 MB. The limit is 50 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 0 MB. Your plan allows 50 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1454,9 +3953,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 63.4 MB. The limit is 1 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 63.4 MB. Your plan allows 1 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1468,9 +3972,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 63.4 MB. The limit is {page} MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 63.4 MB. Your plan allows {page} MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1482,9 +3991,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is 63.4 MB. The limit is 0 MB.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is 63.4 MB. Your plan allows 0 MB per file.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1496,9 +4010,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1510,9 +4029,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1524,9 +4048,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1540,9 +4069,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1556,9 +4090,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1570,9 +4109,14 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
+        "actions": [
+          {
+            "id": "upgrade",
+            "label": "See plans"
+          }
+        ],
         "autoRetry": false
       }
     },
@@ -1584,388 +4128,12 @@
       },
       "out": {
         "code": "file_too_large",
-        "message": "This file is over the size limit.",
-        "fix": "Split the PDF or upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {},
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 12,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 12 pages. The limit is 200 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 12,
-        "limit": 200,
-        "unrelated": "ignored"
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 12 pages. The limit is 200 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 1,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 1 pages. The limit is 200 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": "{page}",
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has {page} pages. The limit is 200 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 0,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 0 pages. The limit is 200 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 12,
-        "limit": 1
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 12 pages. The limit is 1 page.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 12,
-        "limit": "{page}"
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 12 pages. The limit is {page} pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 12,
-        "limit": 0
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has 12 pages. The limit is 0 pages.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 62.5,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": true,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": null,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": {
-          "n": 1
-        },
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": [
-          1
-        ],
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": 9007199254740992,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "too_many_pages",
-      "vars": {
-        "pages": -9007199254740992,
-        "limit": 200
-      },
-      "out": {
-        "code": "too_many_pages",
-        "message": "This PDF has more pages than the limit.",
-        "fix": "Upload chapters separately.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "encrypted_pdf",
-      "vars": {},
-      "out": {
-        "code": "encrypted_pdf",
-        "message": "This PDF is password-protected.",
-        "fix": "Remove the password and upload it again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "encrypted_pdf",
-      "vars": {},
-      "out": {
-        "code": "encrypted_pdf",
-        "message": "This PDF is password-protected.",
-        "fix": "Remove the password and upload it again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "encrypted_pdf",
-      "vars": {
-        "unrelated": "ignored"
-      },
-      "out": {
-        "code": "encrypted_pdf",
-        "message": "This PDF is password-protected.",
-        "fix": "Remove the password and upload it again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "corrupt_pdf",
-      "vars": {},
-      "out": {
-        "code": "corrupt_pdf",
-        "message": "This PDF looks damaged and can't be opened.",
-        "fix": "Re-download or re-export the PDF, then try again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "corrupt_pdf",
-      "vars": {},
-      "out": {
-        "code": "corrupt_pdf",
-        "message": "This PDF looks damaged and can't be opened.",
-        "fix": "Re-download or re-export the PDF, then try again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "corrupt_pdf",
-      "vars": {
-        "unrelated": "ignored"
-      },
-      "out": {
-        "code": "corrupt_pdf",
-        "message": "This PDF looks damaged and can't be opened.",
-        "fix": "Re-download or re-export the PDF, then try again.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "no_text_found",
-      "vars": {},
-      "out": {
-        "code": "no_text_found",
-        "message": "We couldn't find readable text, even with OCR.",
-        "fix": "Upload a clearer scan.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "no_text_found",
-      "vars": {},
-      "out": {
-        "code": "no_text_found",
-        "message": "We couldn't find readable text, even with OCR.",
-        "fix": "Upload a clearer scan.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "no_text_found",
-      "vars": {
-        "unrelated": "ignored"
-      },
-      "out": {
-        "code": "no_text_found",
-        "message": "We couldn't find readable text, even with OCR.",
-        "fix": "Upload a clearer scan.",
-        "actions": [],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "parse_timeout",
-      "vars": {},
-      "out": {
-        "code": "parse_timeout",
-        "message": "This PDF took too long to read.",
-        "fix": "Try again, or upload it in smaller parts.",
+        "message": "This file is over your plan's size limit.",
+        "fix": "Split it, or upgrade for larger files.",
         "actions": [
           {
-            "id": "retry",
-            "label": "Try again"
-          }
-        ],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "parse_timeout",
-      "vars": {},
-      "out": {
-        "code": "parse_timeout",
-        "message": "This PDF took too long to read.",
-        "fix": "Try again, or upload it in smaller parts.",
-        "actions": [
-          {
-            "id": "retry",
-            "label": "Try again"
-          }
-        ],
-        "autoRetry": false
-      }
-    },
-    {
-      "code": "parse_timeout",
-      "vars": {
-        "unrelated": "ignored"
-      },
-      "out": {
-        "code": "parse_timeout",
-        "message": "This PDF took too long to read.",
-        "fix": "Try again, or upload it in smaller parts.",
-        "actions": [
-          {
-            "id": "retry",
-            "label": "Try again"
+            "id": "upgrade",
+            "label": "See plans"
           }
         ],
         "autoRetry": false
@@ -2148,7 +4316,7 @@
       "vars": {},
       "out": {
         "code": "duplicate_file",
-        "message": "This paper is already in this notebook.",
+        "message": "This file is already in this notebook.",
         "fix": "Open the copy you added, or add it again anyway.",
         "actions": [
           {
@@ -2168,7 +4336,7 @@
       "vars": {},
       "out": {
         "code": "duplicate_file",
-        "message": "This paper is already in this notebook.",
+        "message": "This file is already in this notebook.",
         "fix": "Open the copy you added, or add it again anyway.",
         "actions": [
           {
@@ -2190,7 +4358,7 @@
       },
       "out": {
         "code": "duplicate_file",
-        "message": "This paper is already in this notebook.",
+        "message": "This file is already in this notebook.",
         "fix": "Open the copy you added, or add it again anyway.",
         "actions": [
           {
@@ -2206,6 +4374,56 @@
       }
     },
     {
+      "code": "parse_timeout",
+      "vars": {},
+      "out": {
+        "code": "parse_timeout",
+        "message": "This file took too long to read.",
+        "fix": "Try again, or split it into smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "parse_timeout",
+      "vars": {},
+      "out": {
+        "code": "parse_timeout",
+        "message": "This file took too long to read.",
+        "fix": "Try again, or split it into smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
+      "code": "parse_timeout",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "parse_timeout",
+        "message": "This file took too long to read.",
+        "fix": "Try again, or split it into smaller parts.",
+        "actions": [
+          {
+            "id": "retry",
+            "label": "Try again"
+          }
+        ],
+        "autoRetry": false
+      }
+    },
+    {
       "code": "upload_interrupted",
       "vars": {},
       "out": {
@@ -2404,6 +4622,490 @@
         ],
         "autoRetry": true
       }
+    }
+  ],
+  "noticeCopy": [
+    {
+      "code": "repaired",
+      "vars": {},
+      "out": {
+        "code": "repaired",
+        "message": "This file was damaged. TensorLM repaired it before reading.",
+        "fix": null
+      }
+    },
+    {
+      "code": "repaired",
+      "vars": {},
+      "out": {
+        "code": "repaired",
+        "message": "This file was damaged. TensorLM repaired it before reading.",
+        "fix": null
+      }
+    },
+    {
+      "code": "repaired",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "repaired",
+        "message": "This file was damaged. TensorLM repaired it before reading.",
+        "fix": null
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {},
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 200,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 200 of 12 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 200,
+        "pages": 12,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 200 of 12 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 1,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 1 of 12 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": "{page}",
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first {page} of 12 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 0,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 0 of 12 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 200,
+        "pages": 1
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 200 of 1 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 200,
+        "pages": "{page}"
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 200 of {page} pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 200,
+        "pages": 0
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read the first 200 of 0 pages.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 62.5,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": true,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": null,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": {
+          "n": 1
+        },
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": [
+          1
+        ],
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": 9007199254740992,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_capped",
+      "vars": {
+        "limit": -9007199254740992,
+        "pages": 12
+      },
+      "out": {
+        "code": "pages_capped",
+        "message": "TensorLM read only part of this file.",
+        "fix": "Split the file to read the rest."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {},
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 3
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "3 pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 3,
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "3 pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 1
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "1 page couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": "{page}"
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "{page} pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 0
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "0 pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 62.5
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": true
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": null
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": {
+          "n": 1
+        }
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": [
+          1
+        ]
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": 9007199254740992
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "pages_skipped",
+      "vars": {
+        "count": -9007199254740992
+      },
+      "out": {
+        "code": "pages_skipped",
+        "message": "Some pages couldn't be read.",
+        "fix": "Upload a different copy to read them."
+      }
+    },
+    {
+      "code": "deep_failed",
+      "vars": {},
+      "out": {
+        "code": "deep_failed",
+        "message": "Tables and figures couldn't be improved. Answers still use the text.",
+        "fix": "Try again to improve them."
+      }
+    },
+    {
+      "code": "deep_failed",
+      "vars": {},
+      "out": {
+        "code": "deep_failed",
+        "message": "Tables and figures couldn't be improved. Answers still use the text.",
+        "fix": "Try again to improve them."
+      }
+    },
+    {
+      "code": "deep_failed",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": {
+        "code": "deep_failed",
+        "message": "Tables and figures couldn't be improved. Answers still use the text.",
+        "fix": "Try again to improve them."
+      }
+    },
+    {
+      "code": "nope",
+      "vars": {},
+      "out": null
+    },
+    {
+      "code": "nope",
+      "vars": {},
+      "out": null
+    },
+    {
+      "code": "nope",
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": null
+    },
+    {
+      "code": null,
+      "vars": {},
+      "out": null
+    },
+    {
+      "code": null,
+      "vars": {},
+      "out": null
+    },
+    {
+      "code": null,
+      "vars": {
+        "unrelated": "ignored"
+      },
+      "out": null
+    }
+  ],
+  "sourceTypeFromName": [
+    {
+      "name": "attention.pdf",
+      "out": "pdf"
+    },
+    {
+      "name": "Attention.PDF",
+      "out": "pdf"
+    },
+    {
+      "name": "deck.final.pptx",
+      "out": "pptx"
+    },
+    {
+      "name": "C:\\Users\\me\\notes.md",
+      "out": "markdown"
+    },
+    {
+      "name": "folder/data.TSV",
+      "out": "csv"
+    },
+    {
+      "name": "photo.HEIC",
+      "out": "image"
+    },
+    {
+      "name": ".pdf",
+      "out": "pdf"
+    },
+    {
+      "name": "README",
+      "out": null
+    },
+    {
+      "name": "archive.tar.gz",
+      "out": null
+    },
+    {
+      "name": "slides.ppt",
+      "out": null
+    },
+    {
+      "name": "trailing.",
+      "out": null
+    },
+    {
+      "name": "dir.pdf/file",
+      "out": null
     }
   ],
   "storagePath": [

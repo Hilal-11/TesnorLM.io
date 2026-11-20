@@ -54,27 +54,28 @@ async function flush(settle: () => Promise<unknown>, times = 5) {
 }
 
 describe("pre-checks use the contract's codes", () => {
-  it("rejects non-PDFs and oversized files at once", () => {
-    expect(checkFile({ name: "notes.docx", size: 10, type: "" })).toEqual({ code: "not_pdf" });
-    expect(checkFile({ name: "x.pdf", size: 10, type: "image/png" })).toEqual({ code: "not_pdf" });
+  it("stops other types (until P3.5v2), empty and oversized files at once", () => {
+    const unsupported = { code: "unsupported_type" };
+    expect(checkFile({ name: "notes.docx", size: 10, type: "" })).toEqual(unsupported);
+    expect(checkFile({ name: "x.pdf", size: 10, type: "image/png" })).toEqual(unsupported);
+    expect(checkFile({ name: "x.pdf", size: 0, type: "application/pdf" })).toEqual({
+      code: "empty_file",
+    });
     const big = checkFile({ name: "big.pdf", size: 120 * 1024 * 1024, type: "application/pdf" });
     expect(big).toEqual({ code: "file_too_large", vars: { sizeMb: "120", limitMb: "50" } });
     const copy = errorCopy(big!.code, big!.vars);
     expect(`${copy.message} ${copy.fix}`).toBe(
-      "This file is 120 MB. The limit is 50 MB. Split the PDF or upload chapters separately.",
+      "This file is 120 MB. Your plan allows 50 MB per file. Split it, or upgrade for larger files.",
     );
     expect(checkFile({ name: "ok.PDF", size: 10, type: "application/pdf" })).toBeNull();
   });
 
-  it("uses what the worker found in the bytes", () => {
+  it("never rejects a PDF for its password or length (the worker handles both)", () => {
     const base = { sha256: "a".repeat(64), isPdf: true, pages: 3, encrypted: false };
-    expect(checkScan({ ...base, isPdf: false })).toEqual({ code: "not_pdf" });
-    expect(checkScan({ ...base, encrypted: true })).toEqual({ code: "encrypted_pdf" });
-    expect(checkScan({ ...base, pages: 201 })).toEqual({
-      code: "too_many_pages",
-      vars: { pages: 201, limit: 200 },
-    });
-    expect(checkScan({ ...base, pages: null })).toBeNull(); // unknown: the worker decides
+    expect(checkScan({ ...base, isPdf: false })).toEqual({ code: "unsupported_type" });
+    expect(checkScan({ ...base, encrypted: true })).toBeNull(); // asks for the password later
+    expect(checkScan({ ...base, pages: 5000 })).toBeNull(); // reads the first MAX_PAGES
+    expect(checkScan({ ...base, pages: null })).toBeNull();
   });
 });
 
@@ -97,15 +98,15 @@ describe("upload manager", () => {
     expect(m.getSnapshot().announcement).toBe("p0.pdf uploaded");
   });
 
-  it("refuses more than 10 files in one drop", () => {
+  it("refuses more than 50 files in one drop", () => {
     const { m } = setup();
     expect(
       m.add(
         "nb",
-        Array.from({ length: 12 }, (_, i) => pdf(`p${i}.pdf`)),
+        Array.from({ length: 52 }, (_, i) => pdf(`p${i}.pdf`)),
       ),
     ).toEqual({
-      added: 10,
+      added: 50,
       refused: 2,
     });
   });
@@ -122,7 +123,10 @@ describe("upload manager", () => {
     const { m, calls, settle } = setup();
     m.add("nb", [new File(["x"], "image.png", { type: "image/png" })]);
     await flush(settle);
-    expect(m.getSnapshot().items[0]).toMatchObject({ phase: "failed", error: { code: "not_pdf" } });
+    expect(m.getSnapshot().items[0]).toMatchObject({
+      phase: "failed",
+      error: { code: "unsupported_type" },
+    });
     expect(calls).toHaveLength(0);
   });
 

@@ -9,6 +9,8 @@ import {
   detailLine,
   errorCopy,
   isTerminal,
+  noticeCopy,
+  sourceTypeFromName,
   storagePath,
   uiWord,
   type Stage,
@@ -38,6 +40,8 @@ const SAMPLE: Vars = {
   sizeMb: "63.4",
   limitMb: 50,
   limit: 200,
+  minutes: 15,
+  count: 3,
 };
 // Must count as missing in both languages (2 ** 53 is past the safe-integer range).
 const UNUSABLE: unknown[] = [62.5, true, null, { n: 1 }, [1], 2 ** 53, -(2 ** 53)];
@@ -55,8 +59,27 @@ function variants(vars: readonly string[]): Vars[] {
 
 const details: Readonly<Record<string, { template: string; vars?: readonly string[] }>> =
   CONTRACT.details;
+const askableDetails: Readonly<Record<string, { template: string; vars?: readonly string[] }>> =
+  CONTRACT.askable.details;
 const errors: Readonly<Record<string, { message: string; vars?: readonly string[] }>> =
   CONTRACT.errors;
+const notices: Readonly<Record<string, { message: string; vars?: readonly string[] }>> =
+  CONTRACT.notices;
+
+const FILENAMES = [
+  "attention.pdf",
+  "Attention.PDF",
+  "deck.final.pptx",
+  "C:\\Users\\me\\notes.md",
+  "folder/data.TSV",
+  "photo.HEIC",
+  ".pdf",
+  "README",
+  "archive.tar.gz",
+  "slides.ppt",
+  "trailing.",
+  "dir.pdf/file",
+];
 
 function buildCases() {
   const stages: string[] = [...STAGES, "nope"];
@@ -64,18 +87,31 @@ function buildCases() {
 
   return {
     version: CONTRACT.version,
-    uiWord: stages.map((stage) => ({ stage, ...run(() => uiWord(stage as Stage)) })),
+    uiWord: stages.flatMap((stage) =>
+      [false, true].map((askable) => ({
+        stage,
+        askable,
+        ...run(() => uiWord(stage as Stage, { askable })),
+      })),
+    ),
     canTransition: stages.flatMap((from) =>
       stages.map((to) => ({ from, to, out: canTransition(from, to) })),
     ),
     isTerminal: stages.map((stage) => ({ stage, ...run(() => isTerminal(stage as Stage)) })),
-    detailLine: stages.flatMap((stage) =>
-      variants(details[stage]?.vars ?? []).map((vars) => ({
+    detailLine: stages.flatMap((stage) => [
+      ...variants(details[stage]?.vars ?? []).map((vars) => ({
         stage,
         vars,
+        askable: false,
         ...run(() => detailLine(stage as Stage, vars)),
       })),
-    ),
+      ...variants(askableDetails[stage]?.vars ?? details[stage]?.vars ?? []).map((vars) => ({
+        stage,
+        vars,
+        askable: true,
+        ...run(() => detailLine(stage as Stage, vars, { askable: true })),
+      })),
+    ]),
     errorCopy: [...Object.keys(CONTRACT.errors), "nope", null].flatMap((code) =>
       variants((code && errors[code]?.vars) || []).map((vars) => ({
         code,
@@ -83,6 +119,14 @@ function buildCases() {
         out: errorCopy(code, vars),
       })),
     ),
+    noticeCopy: [...Object.keys(CONTRACT.notices), "nope", null].flatMap((code) =>
+      variants((code && notices[code]?.vars) || []).map((vars) => ({
+        code,
+        vars,
+        out: noticeCopy(code, vars),
+      })),
+    ),
+    sourceTypeFromName: FILENAMES.map((name) => ({ name, out: sourceTypeFromName(name) })),
     storagePath: (Object.keys(CONTRACT.storage.paths) as StoragePathKind[]).flatMap((kind) =>
       [
         { ...ids, n: 3 },

@@ -1,45 +1,90 @@
-# Ingestion spec (Phase 3)
+# Ingestion spec (Phase 3, v2)
 
-How a PDF becomes a **Ready** source: page-aware chunks, figures and captions in the database,
+How any source becomes **Ready to ask** within seconds and **Ready** minutes later: page-aware chunks, figures and captions in the database,
 with honest live progress and errors that say what happened and how to fix it. Every later feature
 (cited answers, marker highlights, lessons, quizzes) reads what this pipeline writes.
 
-- **Contract:** [`contracts/ingestion.json`](../../contracts/ingestion.json) is the only place stage
-  names, transitions, learner words, detail lines, error copy, events, limits and storage paths are
-  defined. TypeScript: `apps/web/src/lib/ingestion/contract.ts`. Python:
+- **Contract (version 2):** [`contracts/ingestion.json`](../../contracts/ingestion.json) is the only
+  place source types, stage names, transitions, learner words, detail lines, error and notice copy,
+  events, limits and storage paths are defined. TypeScript: `apps/web/src/lib/ingestion/contract.ts`. Python:
   `services/worker/app/contract.py`. See [Changing the contract](#15-changing-the-contract).
+- **Product flow:** [`product-flow.md`](product-flow.md). **Plan:**
+  `docs/plans/TensorLM-v2-Part-A-Phases-3-4.md` (task ids P3.xv2 below).
 - **UI rules:** `.claude/skills/tensorlm-design/SKILL.md` (sections 8.2, 8.4, 9, 10.1) overrides
   anything here about how things look or read.
 
+> **v2 status.** This spec describes the target. Until a task lands, the v1 code runs on the v2
+> contract with these interim behaviours: one Docling pass reported as `parsing_deep` (no fast pass
+> until P3.8v2); only PDFs upload and anything else ends as `unsupported_type` (P3.5v2, P3.7v2);
+> damaged PDFs end as `unreadable_after_repair` without a repair attempt (P3.7v2); password-locked
+> PDFs wait in `needs_password` with no way to unlock yet (P3.7v2); PDFs over `MAX_PAGES` are read
+> up to the limit, logged but without the `pages_capped` notice (P3.1v2 adds `documents.notices`).
+
 ## 1. Goals and non-goals
 
-**Milestone.** A person creates a notebook, uploads up to 10 PDFs at once on a patchy connection,
-watches each one move through honest live stages, and sees it Ready with page-aware chunks, figures
-and captions in the database. Failures explain the reason and the fix. Five uploads at once all
+**Milestone (v2).** From Home, a person adds any supported source (files, web, YouTube, Drive, copied
+text, web search); every PDF is accepted; text is askable within seconds (fast pass) and fully
+enriched later (deep pass); an overview and 5 suggested questions appear; 5 uploads at once all
 finish.
 
 Goals:
 
-1. Reliable: no lost jobs, no duplicated chunks, no orphaned files, no zombie runs.
-2. Honest: progress shows real counts ("Reading page 18 of 42"), never a fake percentage.
-3. Citable: every chunk keeps its pages and positions (bounding boxes) for Phase 4 citations and
-   marker highlights.
-4. Safe: malicious, huge or broken PDFs fail cleanly and can't take the worker down.
-5. Private: each person sees only their own documents; logs never contain document content.
+1. Accepting: nothing is rejected at upload except by the storage plan's size limit. The worker
+   tries every path (route by real type, open permission locks, ask for the password, repair, OCR,
+   batch huge files) before a source ends in **Couldn't read**, and then it says why and what to do.
+2. Fast: a 30-page text PDF is **Ready to ask** in ≤ 10 s on the production worker; the deep pass
+   improves it in the background and swaps in atomically.
+3. Reliable: no lost jobs, no duplicated chunks, no orphaned files, no zombie runs.
+4. Honest: progress shows real counts ("Reading page 18 of 42"), never a fake percentage; partial
+   results carry a notice ("TensorLM read the first 2000 of 2400 pages.").
+5. Citable: every chunk keeps its position (pages and bounding boxes, slide numbers, sheet/column, or
+   video timestamps); citations made during the fast pass still resolve after the deep swap.
+6. Safe and private: malicious, huge or broken files fail cleanly and can't take the worker down;
+   each person sees only their own sources; passwords, tokens and content never reach logs.
 
-Non-goals (Phase 3): DOCX, images, CSV or links as sources (the upload modal shows links as "Coming
-soon"); per-plan limits (Phase 8: one free limit for now); answering questions (Phase 4);
-collaboration or sharing; languages other than English for OCR by default (configurable).
+Non-goals (Phase 3): answering questions (Phase 4); notes (Phase 5); per-plan limits beyond the size
+limit (Phase 8: one free limit for now); collaboration or sharing; OCR languages other than English
+by default (configurable).
 
 ## 2. Words used here
 
 | Term | Meaning |
 | --- | --- |
-| Document | One uploaded file (`documents` row). Shown to people as a **source**. |
-| Ingest run | One attempt to process a document, identified by `ingest_run_id` (uuid). A new upload or a re-process starts a new run. All worker output is keyed by `document_id` + `run_id`. |
+| Source | One thing a person added: a file, a link, a Drive file or copied text (`documents` row). |
+| Source type | What the source is, from the contract's `sourceTypes` (section 2.1). |
+| Ingest run | One attempt to process a source, identified by `ingest_run_id` (uuid). A new source or a re-process starts a new run. All worker output is keyed by `document_id` + `run_id`. |
+| Fast pass / deep pass | The two passes of one run (section 9). The fast pass publishes text first (`finalize_fast_pass`); the deep pass replaces it (`finalize_ingest`). |
+| Askable | The source answers questions: its fast pass (or a previous run) is published. |
 | Stage | Where a run is in the stage machine (section 4). Stored in `documents.stage`. |
-| Step | A unit of work in the queue function (validate, parse, …). Retried independently. |
+| Notice | A note on a usable source that is partial or was repaired (section 6.1). |
 | Current run | The run whose id is in `documents.ingest_run_id`. Output of any other run is stale. |
+
+### 2.1 Source types
+
+From the contract's `sourceTypes`: a label, an origin, the unit citations use, and (for files) the
+extensions and MIME types that suggest the type. Extensions are only a hint: preflight sniffs the
+bytes and routes by the real type (a PNG renamed `.pdf` is read as an image).
+
+| Type | Label | Origin | Citation unit | Extensions |
+| --- | --- | --- | --- | --- |
+| pdf | PDF | file | page | .pdf |
+| docx | Word | file | heading | .docx |
+| pptx | PowerPoint | file | slide | .pptx |
+| xlsx | Excel | file | sheet (+ column) | .xlsx, .xlsm |
+| csv | CSV | file | column | .csv, .tsv |
+| json | JSON | file | path | .json, .jsonl, .ndjson |
+| image | Image | file | — | .png, .jpg, .jpeg, .webp, .gif, .heic, .heif, .tif, .tiff, .bmp |
+| text | Text | file | heading | .txt, .text, .adoc, .asciidoc |
+| markdown | Markdown | file | heading | .md, .markdown |
+| html | Web page file | file | heading | .html, .htm |
+| web | Website | link | section | — |
+| youtube | YouTube | link | time (12:34) | — |
+| gdrive | Google Drive | drive | that of the exported file | — |
+| pasted_text | Copied text | text | heading | — |
+
+A file whose type TensorLM can't read (say `.ppt` or `.doc`) is still uploaded and kept, and ends as
+`unsupported_type` with a suggestion. A Drive file records the exported format in `origin_meta`
+and is read with that format's pipeline.
 
 ## 3. Flow
 
@@ -89,10 +134,13 @@ Cancel during upload: `POST /api/documents/[id]/cancel` deletes the partial obje
 ## 4. Stage machine
 
 ```text
-uploading ─▶ queued ─▶ validating ─▶ parsing ─┬─▶ ocr ─┬─▶ reading_figures ─▶ indexing ─▶ ready
-                                              │        └──────────────────────▲
-                                              ├─▶ reading_figures             │
-                                              └───────────────────────────────┘
+                       ┌──────────── needs_password ◀─┐ (password given: validate again)
+                       ▼                              │
+uploading ─▶ queued ─▶ validating ─┬─▶ parsing_fast ─▶ fast_ready ─┬─▶ parsing_deep ─┐
+                                   ├─▶ repairing ─▶ (fast, deep     ├─▶ ready (text)  ├─▶ ocr ─┐
+                                   │                 or ocr)        └─▶ ocr           │        ▼
+                                   ├─▶ ocr (scans) ─▶ fast_ready                       └──▶ reading_figures ─▶ indexing ─▶ ready
+                                   └─▶ parsing_deep (no fast pass)
 every stage except ready ─────────────────────────────────────────────────────────────▶ failed
 ```
 
@@ -100,94 +148,153 @@ every stage except ready ──────────────────�
 | --- | --- |
 | uploading | queued, failed |
 | queued | validating, failed |
-| validating | parsing, failed |
-| parsing | ocr, reading_figures, indexing, failed |
-| ocr | reading_figures, indexing, failed |
+| validating | repairing, needs_password, parsing_fast, parsing_deep, ocr, failed |
+| repairing | parsing_fast, parsing_deep, ocr, failed |
+| needs_password | validating, failed |
+| parsing_fast | fast_ready, ocr, failed |
+| fast_ready | parsing_deep, ocr, reading_figures, ready, failed |
+| parsing_deep | ocr, reading_figures, indexing, failed |
+| ocr | fast_ready, reading_figures, indexing, failed |
 | reading_figures | indexing, failed |
 | indexing | ready, failed |
 | ready | — (terminal) |
 | failed | — (terminal) |
 
+Paths:
+
+- **Text PDF:** validating → parsing_fast → fast_ready → parsing_deep → (ocr for a few scanned
+  pages) → reading_figures → indexing → ready.
+- **Scanned PDF or image:** validating → ocr → fast_ready (OCR text published) → reading_figures →
+  indexing → ready. Scans skip the fast pass because there's no text layer.
+- **Text formats** (TXT, Markdown, HTML, DOCX, copied text, web snapshots, transcripts): their single
+  pass is the fast pass: validating → parsing_fast → fast_ready → ready.
+- **Password:** validating → needs_password → (password given) → validating → …
+- **Damaged:** validating → repairing → parsing_fast / parsing_deep / ocr (rendered pages).
+- **No fast pass** (fast pass disabled or not possible): validating → parsing_deep → … → ready.
+
 Rules:
 
-1. **Transitions apply within one run.** A new upload starts its run at `uploading`; a re-process
-   starts a new run at `queued`. Starting a run is done by the API (it sets the new
-   `ingest_run_id`), never by `set_document_stage()`.
+1. **Transitions apply within one run.** A new source starts its run at `uploading` (files) or
+   `queued` (links, Drive, copied text); a re-process starts a new run at `queued`. Starting a run is
+   done by the API (it sets the new `ingest_run_id`), never by `set_document_stage()`.
 2. **Same stage = progress update.** Reporting the current stage again only updates progress and
-   detail. Progress never goes backwards within a run (the database and the UI both ignore it).
+   detail. Progress never goes backwards within a run.
 3. **Stale runs are ignored.** `set_document_stage()` does nothing when `p_run_id` isn't the current
-   run, and when the move isn't in the table above (no backwards moves, no leaving a terminal stage).
-   The SQL function mirrors this table; a test in P3.1 checks it against the contract.
-4. **OCR is a stage, not a step.** It happens inside the parse step and is shown only when scanned
-   pages are being read. Documents with no figures go straight from parsing (or OCR) to indexing.
+   run, and when the move isn't in the table above. The SQL function mirrors this table
+   (`ingest_transition_allowed`, migration 0006); `tests/rls` checks it against the contract.
+4. **Publishing is a function, not a move.** `fast_ready` is entered only by `finalize_fast_pass()`
+   and `ready` only by `finalize_ingest()` (P3.1v2), so a source is never askable half-written.
+5. **A deep pass never takes an askable source away.** When the deep pass fails after `fast_ready`,
+   the fast run is finalized as Ready with the `deep_failed` notice instead of failing the source.
+6. **needs_password waits.** It isn't a failure: the run stops until `document/password-provided`
+   arrives, then validates again. A wrong password keeps the stage and sets `error_code =
+   password_wrong` (or `password_attempts` after 5 tries in 15 minutes) for the inline message.
+7. **Enum order.** Postgres can't reorder enum values, so the contract keeps the database's order
+   (`parsing_deep` before `ocr`). The worker's "never move backwards" check uses this order; P3.8v2
+   replaces it with the transition table, because `ocr → fast_ready` goes back in order.
 
 ## 5. Stages in the interface
 
-People see one of six learner words (design skill 8.2) and a detail line with real counts. Detail
-lines come from the contract's `details` templates; when a count is missing the fallback is shown.
+People see a learner word and a detail line with real counts. Detail lines come from the contract's
+`details` templates; when a count is missing the fallback is shown. When the source is already
+**askable** (its fast pass or a previous run is published), the stages that improve it use the
+contract's `askable` word and lines instead ("Ready to ask · improving page 3 of 30").
 
-| Stage | Word | Detail line (template) | Fallback | DB progress band |
-| --- | --- | --- | --- | --- |
-| uploading | Uploading | Uploading · {percent}% | Uploading | 0 (bytes progress is local to the uploading browser) |
-| queued | Queued | Waiting to start | — | 0 |
-| validating | Reading | Checking the file | — | 0–5 |
-| parsing | Reading | Reading page {page} of {pages} | Reading the pages | 5–45 by pages |
-| ocr | Reading | Running OCR on page {page} of {pages} ({pages} = scanned pages) | Running OCR | 5–45 (shares the parsing band) |
-| reading_figures | Reading | Reading figures · {done} of {total} | Reading figures | 45–65 by figures |
-| indexing | Indexing | Indexing {passages} passages | Indexing passages | 65–99 by passages written |
-| ready | Ready | {pages} pages · Ready | Ready | 100 |
-| failed | Failed | (the error's message and fix, section 6) | — | unchanged |
+| Stage | Word | Detail line (template) | Fallback | When askable | DB progress band |
+| --- | --- | --- | --- | --- | --- |
+| uploading | Uploading | Uploading · {percent}% | Uploading | — | 0 (bytes progress is local to the uploading browser) |
+| queued | Queued | Waiting to start | — | — | 0 |
+| validating | Reading | Checking the file | — | — | 0–5 |
+| repairing | Repairing file | Repairing the file | — | — | 0–5 |
+| needs_password | Needs password | Enter the password to open this PDF | — | — | unchanged |
+| parsing_fast | Reading | Reading page {page} of {pages} | Reading the text | — | 5–45 by pages |
+| fast_ready | Ready to ask | Ready to ask · improving tables and figures | — | — | 45 |
+| parsing_deep | Improving | Reading tables and figures · page {page} of {pages} | Reading tables and figures | Ready to ask · improving page {page} of {pages} | 5–45 (after a fast pass: P3.8v2) |
+| ocr | Running OCR | Running OCR on page {page} of {pages} ({pages} = scanned pages) | Running OCR | Ready to ask · improving tables and figures | 5–45 |
+| reading_figures | Reading figures | Reading figures · {done} of {total} | Reading figures | Ready to ask · reading figures {done} of {total} | 45–65 by figures |
+| indexing | Indexing | Indexing {passages} passages | Indexing passages | Ready to ask · improving tables and figures | 65–99 by passages written |
+| ready | Ready | {pages} pages · Ready | Ready | — | 100 |
+| failed | Couldn't read | (the error's message and fix, section 6) | — | — | unchanged |
 
 Templates support `{name}` and a count-based word, `{pages:page|pages}` ("1 page · Ready"). Values
 are strings or whole numbers; anything else counts as missing, so the fallback shows. Producers
-format decimals themselves (`sizeMb: "63.4"`).
+format decimals themselves (`sizeMb: "63.4"`). Loaders: `uiWord(stage, {askable})`,
+`detailLine(stage, vars, {askable})` (TS) and `ui_word(stage, askable=…)`, `detail_line(stage,
+values, askable=…)` (Python). Slide and sheet wording for Ready ("12 slides · Ready") is decided in
+P3.10v2.
 
 The worker writes the rendered line into `documents.stage_detail` (≤ 1 write per second per
-document; stage changes are written at once). The browser renders `uploading` lines itself.
+document; stage changes are written at once). The browser renders `uploading` lines itself and
+chooses the askable line from `documents.fast_ready_at` / `ready_run_id` (P3.1v2).
 
 ## 6. Errors
 
-Every failure has a code from the contract. The interface shows the **message** (what happened),
-the **fix** (what to do) and, where there is one, an **action** button. Never "Something went
-wrong". `autoRetry` says whether the queue retries the step by itself.
+An error is the end of every path, not the first answer: the v1 rejections `not_pdf`,
+`encrypted_pdf`, `corrupt_pdf` and `too_many_pages` are gone (they became routing, the password
+prompt, repair and batching). Every failure has a code from the contract. The interface shows the
+**message** (what happened), the **fix** (what to do) and, where there is one, an **action** button.
+Never "Something went wrong". `autoRetry` says whether the queue retries the step by itself.
 
-| Code | Message | Fix | Action | Raised by | Auto-retry |
+| Code | Message | Fix | Actions | Raised by | Auto-retry |
 | --- | --- | --- | --- | --- | --- |
-| not_pdf | This file isn't a PDF. | Choose a PDF file instead. | — | browser, API, worker (magic bytes) | no |
-| file_too_large | This file is {sizeMb} MB. The limit is {limitMb} MB. | Split the PDF or upload chapters separately. | — | browser, API, worker | no |
-| too_many_pages | This PDF has {pages} pages. The limit is {limit} pages. | Upload chapters separately. | — | browser (optional), worker | no |
-| encrypted_pdf | This PDF is password-protected. | Remove the password and upload it again. | — | browser (optional), worker | no |
-| corrupt_pdf | This PDF looks damaged and can't be opened. | Re-download or re-export the PDF, then try again. | — | worker | no |
-| no_text_found | We couldn't find readable text, even with OCR. | Upload a clearer scan. | — | worker | no |
-| parse_timeout | This PDF took too long to read. | Try again, or upload it in smaller parts. | Try again | worker | no |
+| password_wrong | That password didn't open this PDF. | Check it and try again. | Unlock | password route / worker (stage stays `needs_password`) | no |
+| password_attempts | Too many wrong passwords. You can try again in {minutes} minutes. | Wait a little, then enter the password again. | — | password route (5 tries, 15 min lock) | no |
+| unreadable_after_repair | We couldn't read this file, even after trying to repair it. | Try again, or upload a different copy (re-download or re-export it). | Try again · Upload a different copy | worker | no |
+| no_text_after_ocr | We couldn't find readable text, even with OCR. | Upload a clearer scan, or paste the text instead. | Upload a different copy · Paste the text | worker | no |
+| empty_file | This file is empty. | Choose the file again, or re-download it. | Upload a different copy | browser, worker | no |
+| unsupported_type | TensorLM can't read this type of file yet. | Save it as PDF, Word, text or Markdown, then add it again. | Upload a different copy | worker (browser and API until P3.5v2) | no |
+| source_unreachable | We couldn't open this page (it may need a login). | Paste the text instead. | Try again · Paste the text | worker (web, Drive) | no |
+| transcript_unavailable | We couldn't get a transcript for this video. | Paste the transcript instead. | Paste the text | worker (YouTube) | no |
+| file_too_large | This file is {sizeMb} MB. Your plan allows {limitMb} MB per file. | Split it, or upgrade for larger files. | See plans | browser, API, worker | no |
 | quota_exceeded | This notebook has reached its limit of {limit} sources. | Remove a source, then add this one. | — | API | no |
-| duplicate_file | This paper is already in this notebook. | Open the copy you added, or add it again anyway. | Open it · Add anyway | API | no |
+| duplicate_file | This file is already in this notebook. | Open the copy you added, or add it again anyway. | Open it · Add anyway | API | no |
+| parse_timeout | This file took too long to read. | Try again, or split it into smaller parts. | Try again | worker (only when nothing is askable) | no |
 | upload_interrupted | The upload stopped. | Check your connection, then resume the upload. | Resume upload | browser, stale-upload sweeper | no |
 | internal | We couldn't finish reading this file. | Try again in a moment. | Try again | anything unexpected (logged) | yes |
 
-- The skill's example reads as message + fix: "This file is 120 MB. The limit is 50 MB. Split the
-  PDF or upload chapters separately." (a test asserts it).
+- The skill's size example reads as message + fix: "This file is 120 MB. Your plan allows 50 MB per
+  file. Split it, or upgrade for larger files." (a test asserts it). "See plans" links to a
+  placeholder until Phase 8.
 - Values for an error are stored in `documents.error_vars` (jsonb) next to `error_code`, so the
   copy can change without touching stored rows.
-- Unknown codes render as `internal`. Raw exception text never reaches people or the database.
-- "Try again" on a failed source is a re-process (section 11).
+- Unknown codes render as `internal`, including v1 codes still stored on old rows; their "Try again"
+  re-processes the source through the v2 paths, which is the right outcome.
+- Raw exception text never reaches people or the database. "Try again" is a re-process (section 11).
+
+### 6.1 Notices
+
+A notice sits on a source that works but is partial or was changed to be read. Stored in
+`documents.notices` (jsonb list of `{code, vars}`, P3.1v2); copy from the contract's `notices`
+(`noticeCopy()` / `notice_copy()`; unknown codes are dropped).
+
+| Code | Message | Fix |
+| --- | --- | --- |
+| repaired | This file was damaged. TensorLM repaired it before reading. | — |
+| pages_capped | TensorLM read the first {limit} of {pages} pages. | Split the file to read the rest. |
+| pages_skipped | {count} pages couldn't be read. | Upload a different copy to read them. |
+| deep_failed | Tables and figures couldn't be improved. Answers still use the text. | Try again to improve them. |
 
 ## 7. Limits
 
 Defaults live in the contract's `limits`; environment variables override them where listed. The
 server and worker enforce them; the browser only gives early feedback.
 
-| Limit | Default | Env | Browser | API | Worker |
-| --- | --- | --- | --- | --- | --- |
-| File size | 50 MB | `MAX_UPLOAD_MB` | instant check | declared size, then the stored object's size | downloaded bytes |
-| Pages | 200 | `MAX_PAGES` | optional pdf.js check | — | authoritative |
-| Files per drop | 10 | — | yes | — | — |
-| Parallel uploads per browser | 3 | — | yes (the rest wait as Queued locally) | — | — |
-| Sources per notebook (free) | 20 | `MAX_SOURCES_FREE` | — | yes | — |
-| Parse time (incl. OCR) | 10 min | `PARSE_TIMEOUT_S` | — | — | yes → `parse_timeout` |
-| Figures per document | 40 (largest by area) | — | — | — | yes (skipped count logged) |
+| Limit | Default | Env | Enforced by |
+| --- | --- | --- | --- |
+| File size (the only upload rejection) | 50 MB (Supabase free plan) | `MAX_UPLOAD_MB` | browser (instant), API (declared and stored size), worker |
+| Pages read per file | 2000 (beyond it: read the first 2000, `pages_capped` notice) | `MAX_PAGES` | worker |
+| Fast-pass page batch | 50 pages | `FAST_PASS_PAGE_BATCH` | worker |
+| Files per drop | 50 (3 upload in parallel, the rest wait as Queued) | — | browser |
+| Sources per notebook (free) | 20 | `MAX_SOURCES_FREE` | API |
+| Password attempts | 5, then a 15 min lock | — | password route |
+| Password lifetime in Redis | 600 s, deleted on first read | — | password route, worker |
+| Web page fetch | 10 MB, 15 s, 5 redirects (each re-checked) | — | worker |
+| Suggested questions | 5 | — | insights function |
+| Insights debounce | 20 s | — | insights function |
+| Parse time (incl. OCR) | 10 min | `PARSE_TIMEOUT_S` | worker → `parse_timeout` (or `deep_failed` when askable) |
+| Figures per document | 40 (largest by area) | — | worker |
 
-The source quota counts a notebook's documents that are not deleted and not failed.
+The source quota counts a notebook's sources that are not deleted and not failed.
 
 ## 8. Storage layout
 
@@ -281,14 +388,26 @@ than 2 h with no running queue run become `failed` with `internal` and are logge
 ## 12. Events
 
 Payload keys are snake_case. Event ids make sends idempotent (a double-clicked confirm starts one
-run).
+run). **No event ever carries a password, a token or content.**
 
 | Event (contract key) | Name | Payload | Event id | Sent by | Consumed by |
 | --- | --- | --- | --- | --- | --- |
-| `uploaded` | `document/uploaded` | `document_id`, `notebook_id`, `user_id`, `run_id` | `uploaded-{run_id}` | `/uploaded`, `/reprocess`, Undo of an interrupted run | worker `ingest-document` |
+| `uploaded` | `document/uploaded` | `document_id`, `notebook_id`, `user_id`, `run_id` | `uploaded-{run_id}` | `/uploaded`, `/reprocess`, link/Drive/text creation (P3.6v2 may split per source type) | worker ingest functions |
 | `reprocess` | `document/reprocess` | `document_id`, `notebook_id`, `user_id`, `run_id` (new) | `reprocess-{run_id}` | `/reprocess` | `cancelOn` of older runs |
-| `deleted` | `document/deleted` | `document_id`, `notebook_id`, `user_id` | — | delete action | `cancelOn`; web cleanup function |
+| `deleted` | `document/deleted` | `document_id`, `notebook_id`, `user_id` | — | remove action | `cancelOn`; web cleanup function |
 | `notebookDeleted` | `notebook/deleted` | `notebook_id`, `user_id` | — | notebook delete action | `cancelOn`; web cleanup function |
+| `fastReady` | `document/fast-ready` | `document_id`, `notebook_id`, `user_id`, `run_id` | `fast-ready-{run_id}` | `finalize_fast_pass` caller | deep pass; notebook insights |
+| `passwordProvided` | `document/password-provided` | `document_id`, `user_id`, `run_id` (the password stays in Redis) | — | `POST /api/documents/[id]/password` | the waiting run |
+| `sourcesChanged` | `notebook/sources-changed` | `notebook_id`, `user_id` | — | add, remove, ready | `generate-notebook-insights` (debounced 20 s) |
+
+### 12.1 Passwords
+
+`POST /api/documents/[id]/password {password}` (requireUser, ownership, zod, rate limit): stores the
+password in Redis under the document id with a 600 s TTL, counts attempts (5 per 15 min →
+`password_attempts`), sends `document/password-provided`. The worker reads the key once, deletes it
+at once, and opens the file in memory; a wrong password sets `password_wrong`. Never in the
+database, logs, Inngest payloads, error messages or traces. Without Redis configured, the password
+prompt is disabled and the source stays in Needs password with a clear line (P3.7v2).
 
 ## 13. Database (P3.1 owns the exact DDL)
 
@@ -346,31 +465,38 @@ the copy drifts. The worker reads the JSON directly; its image must include it a
 `/app/contracts/ingestion.json` or set `INGESTION_CONTRACT_PATH` (P3.14 builds the image from the
 repo root).
 
-## 16. Acceptance criteria (Phase 3)
+## 16. Acceptance criteria (Phase 3 v2)
 
-1. A signed-in person creates a notebook and drops 10 PDFs at once; at most 3 upload in parallel,
-   each with real byte progress; all reach Ready.
-2. Turning the network off mid-upload and back on resumes the upload ("Waiting for connection…").
-3. A source card moves Uploading → Reading → Indexing → Ready live, without a reload, including
-   after a Realtime reconnect (polling fallback).
-4. A scanned PDF shows "Running OCR on page i of n" and becomes Ready with searchable text.
-5. Encrypted, corrupt, non-PDF, oversized and too-long files fail with the contract's message and
-   fix; nothing crashes; nothing is retried that can't succeed.
-6. Every chunk of a Ready document has `page_start`/`page_end` within `1..page_count` and bboxes;
-   tables are `table` chunks; each stored figure has a caption chunk with `figure_id`.
-7. Re-processing while a run is active leaves only the new run's chunks; search never sees a
-   half-indexed document.
-8. Deleting a source hides it from search at once; Undo restores it; otherwise, after the cleanup
-   job, its storage prefixes are empty and its rows are gone.
-9. A load test with 5, then 10, concurrent uploads finishes every document, none lost.
-10. Web (lint, typecheck, test, build, e2e), worker (pytest) and `test:rls` pass, with zero serious
-    axe issues on Phase 3 screens.
+1. From `/app`, adding a source creates the notebook and changes the URL without a reload.
+2. Every origin works: files (all listed types), website, YouTube, Drive, copied text, web search.
+3. PDF fixtures: owner-locked → Ready; password (correct) → Ready; wrong password → retry; repairable
+   → Ready (`repaired` notice); renamed PNG → image source; scanned → OCR → Ready; 300+ pages →
+   batched; over `MAX_PAGES` → first pages read with `pages_capped`; unrepairable → Couldn't read +
+   fix.
+4. Passwords never appear in the database, logs or event payloads (grep + payload inspection).
+5. A 30-page text PDF reaches Ready to ask in ≤ 10 s; the deep pass swaps to Ready without breaking
+   citations made in between.
+6. Overview + 5 suggested questions appear after `fast_ready` and refresh when sources change.
+7. SSRF tests pass (private IPs, redirects to private IPs, other schemes).
+8. CSV, multi-sheet XLSX and nested JSON produce correct dataset schemas and dataset chunks.
+9. Remove and delete confirm in dialogs with red actions; deleting a notebook with sources asks for
+   its name.
+10. 5 and 10 mixed sources at once all finish; web, worker, `test:rls` and CI are green with zero
+    serious axe issues.
 
 ## 17. Open decisions
 
 | Decision | Owner | Status |
 | --- | --- | --- |
-| Source quota is per notebook (20 on the free plan), not per account | product (you) | chosen here; confirm |
-| Parse progress: Docling page progress vs page-range batches | P3.6 | Docling page progress (section 9) |
-| OCR engine (EasyOCR, Tesseract or RapidOCR) | P3.7 | RapidOCR on ONNX Runtime (section 9) |
-| Worker image build context includes `contracts/` | P3.14 | yes: built from the repo root, `.dockerignore` sends only the contract and the worker |
+| Source quota is per notebook (20 on the free plan), not per account | product (you) | chosen; confirm |
+| Parse progress: Docling page progress vs page-range batches | P3.6 | Docling page progress; v2 batches huge files by `FAST_PASS_PAGE_BATCH` (P3.7v2) |
+| OCR engine | P3.7 | RapidOCR on ONNX Runtime (section 9) |
+| Worker image build context includes `contracts/` | P3.14 | yes |
+| Contract stage order: `parsing_deep` before `ocr` (database enum order) | S0 | decided (section 4, rule 7) |
+| `empty_file` error added to the plan's v2 list (a 0-byte file isn't damaged) | S0 | decided |
+| `documents` keeps its name vs rename to `sources` + compatibility view | P3.1v2 | open |
+| Storage path for any type: `{userId}/{documentId}/source` (no extension) | P3.1v2 | open (contract path stays `source.pdf` until the trigger changes with it) |
+| Fast-run citations after the deep swap: soft-retire vs map by page + overlap | P3.8v2 | open |
+| YouTube transcripts: free library vs paid API | you | open |
+| Web search provider (Tavily, Exa, Brave) | you | open |
+

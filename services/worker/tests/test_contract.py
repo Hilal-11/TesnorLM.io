@@ -22,7 +22,9 @@ from app.contract import (
     error_copy,
     is_stage,
     is_terminal,
+    notice_copy,
     parse_contract,
+    source_type_from_name,
     storage_path,
     ui_word,
 )
@@ -37,7 +39,7 @@ RAW: dict[str, Any] = json.loads(SOURCE.read_text(encoding="utf-8"))
 
 def test_loads_the_repo_contract() -> None:
     assert SOURCE.parts[-2:] == ("contracts", "ingestion.json")
-    assert CONTRACT.version == 1
+    assert CONTRACT.version == 2
     assert Contract.model_validate(RAW).problems() == []
 
 
@@ -46,10 +48,21 @@ def test_every_stage_has_a_learner_word() -> None:
         "Uploading",
         "Queued",
         "Reading",
+        "Repairing file",
+        "Needs password",
+        "Ready to ask",
+        "Running OCR",
+        "Improving",
+        "Reading figures",
         "Indexing",
         "Ready",
-        "Failed",
+        "Couldn't read",
     }
+
+
+def test_v1_rejection_codes_are_gone() -> None:
+    for code in ("not_pdf", "encrypted_pdf", "corrupt_pdf", "too_many_pages"):
+        assert code not in CONTRACT.errors
 
 
 def test_every_transition_target_is_a_stage() -> None:
@@ -78,13 +91,33 @@ def _mutated(mutate: Callable[[dict[str, Any]], object]) -> str:
     [
         (lambda c: c["uiWords"].pop("ocr"), 'uiWords: missing "ocr"'),
         (
-            lambda c: c["transitions"]["parsing"].append("summarising"),
-            'transitions.parsing: unknown stage "summarising"',
+            lambda c: c["transitions"]["parsing_deep"].append("summarising"),
+            'transitions.parsing_deep: unknown stage "summarising"',
         ),
-        (lambda c: c["errors"]["not_pdf"].pop("fix"), "fix"),
+        (lambda c: c["errors"]["unsupported_type"].pop("fix"), "fix"),
         (
-            lambda c: c["errors"]["corrupt_pdf"].update(message="Page {page} is damaged."),
-            'errors.corrupt_pdf placeholders: unknown "page"',
+            lambda c: c["errors"]["unreadable_after_repair"].update(message="Page {page} is damaged."),
+            'errors.unreadable_after_repair placeholders: unknown "page"',
+        ),
+        (
+            lambda c: c["notices"]["repaired"].update(message="Repaired {count} pages."),
+            'notices.repaired placeholders: unknown "count"',
+        ),
+        (
+            lambda c: c["askable"]["details"].update(ready={"template": "Ready"}),
+            "askable.details.ready: not a working stage",
+        ),
+        (
+            lambda c: c["sourceTypes"]["markdown"]["extensions"].append(".txt"),
+            'sourceTypes.markdown: ".txt" is already text',
+        ),
+        (
+            lambda c: c["sourceTypes"]["docx"].update(extensions=[]),
+            "sourceTypes.docx: a file type needs extensions",
+        ),
+        (
+            lambda c: c["sourceTypes"]["web"].update(extensions=[".url"]),
+            "sourceTypes.web: only file types have extensions",
         ),
         (
             lambda c: c["errors"]["file_too_large"].pop("fallback"),
@@ -130,8 +163,8 @@ def test_finds_the_contract_from_an_env_override(monkeypatch: pytest.MonkeyPatch
 
 def test_integral_floats_render_like_integers() -> None:
     # JSON (and JavaScript) can't tell 4.0 from 4, so neither do we.
-    assert detail_line("parsing", {"page": 4.0, "pages": 12}) == "Reading page 4 of 12"
-    assert detail_line("parsing", {"page": 4.5, "pages": 12}) == "Reading the pages"
+    assert detail_line("parsing_fast", {"page": 4.0, "pages": 12}) == "Reading page 4 of 12"
+    assert detail_line("parsing_fast", {"page": 4.5, "pages": 12}) == "Reading the text"
 
 
 def test_booleans_are_not_numbers() -> None:
@@ -141,7 +174,7 @@ def test_booleans_are_not_numbers() -> None:
 def test_error_copy_and_storage_paths() -> None:
     copy_ = error_copy("file_too_large", {"sizeMb": "120", "limitMb": 50})
     assert f"{copy_.message} {copy_.fix}" == (
-        "This file is 120 MB. The limit is 50 MB. Split the PDF or upload chapters separately."
+        "This file is 120 MB. Your plan allows 50 MB per file. Split it, or upgrade for larger files."
     )
     assert error_copy("made_up").code == "internal"
     assert [c for c in CONTRACT.errors if error_copy(c).auto_retry] == ["internal"]
@@ -171,9 +204,9 @@ def test_fixture_matches_this_contract_version() -> None:
     assert CASES["version"] == CONTRACT.version
 
 
-@pytest.mark.parametrize("case", CASES["uiWord"], ids=lambda c: c["stage"])
+@pytest.mark.parametrize("case", CASES["uiWord"], ids=lambda c: f"{c['stage']}-{c['askable']}")
 def test_parity_ui_word(case: dict[str, Any]) -> None:
-    assert _run(lambda: ui_word(case["stage"])) == _expected(case)
+    assert _run(lambda: ui_word(case["stage"], askable=case["askable"])) == _expected(case)
 
 
 @pytest.mark.parametrize("case", CASES["canTransition"], ids=lambda c: f"{c['from']}->{c['to']}")
@@ -188,12 +221,24 @@ def test_parity_is_terminal(case: dict[str, Any]) -> None:
 
 @pytest.mark.parametrize("case", CASES["detailLine"])
 def test_parity_detail_line(case: dict[str, Any]) -> None:
-    assert _run(lambda: detail_line(case["stage"], case["vars"])) == _expected(case)
+    run = lambda: detail_line(case["stage"], case["vars"], askable=case["askable"])  # noqa: E731
+    assert _run(run) == _expected(case)
 
 
 @pytest.mark.parametrize("case", CASES["errorCopy"])
 def test_parity_error_copy(case: dict[str, Any]) -> None:
     assert error_copy(case["code"], case["vars"]).to_json() == case["out"]
+
+
+@pytest.mark.parametrize("case", CASES["noticeCopy"])
+def test_parity_notice_copy(case: dict[str, Any]) -> None:
+    copy_ = notice_copy(case["code"], case["vars"])
+    assert (copy_.to_json() if copy_ else None) == case["out"]
+
+
+@pytest.mark.parametrize("case", CASES["sourceTypeFromName"], ids=lambda c: c["name"])
+def test_parity_source_type_from_name(case: dict[str, Any]) -> None:
+    assert source_type_from_name(case["name"]) == case["out"]
 
 
 @pytest.mark.parametrize("case", CASES["storagePath"])

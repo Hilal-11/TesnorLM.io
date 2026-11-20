@@ -21,5 +21,11 @@ class IngestError(Exception):
         self.values = values or {}
 
 
+class NeedsPassword(Exception):
+    """The PDF opens only with its user password: the document waits in `needs_password`.
+
+    Not a failure. The person types the password (P3.7v2) and the run validates again."""
+
+
 class StaleRun(Exception):
     """The document was deleted or re-processed: this run must stop without writing anything."""

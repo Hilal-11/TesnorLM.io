@@ -116,13 +116,16 @@ describe("the owner's lifecycle", () => {
     ).toBe(0);
   });
 
-  it("rejects non-PDF names and oversized files with contract copy", async () => {
+  it("stops other types (until P3.5v2) and oversized files with contract copy", async () => {
     const notPdf = await createDocument(A.client, A.user, notebook, {
       filename: "notes.docx",
       size: 5,
       sha256: sha,
     }).catch((e: unknown) => e);
-    expect(notPdf).toMatchObject({ code: "not_pdf", message: "This file isn't a PDF." });
+    expect(notPdf).toMatchObject({
+      code: "unsupported_type",
+      message: "TensorLM can't read this type of file yet.",
+    });
     const big = await createDocument(A.client, A.user, notebook, {
       filename: "big.pdf",
       size: 120 * 1024 * 1024,

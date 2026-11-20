@@ -262,7 +262,7 @@ export class UploadManager {
     try {
       const scan = await this.deps.scan(item.file);
       if (item.cancelled) return;
-      const problem = checkScan(scan, this.deps.limits);
+      const problem = checkScan(scan);
       if (problem) return this.fail(item, problem);
       item.sha256 = scan.sha256;
       this.patch(item, { phase: "waiting" });

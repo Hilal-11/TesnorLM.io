@@ -2,7 +2,7 @@
 //
 //   node scripts/with-local-supabase.mjs --test node scripts/load-test.mjs
 //
-// Round 1: 5 papers + 1 scanned + 1 corrupt at once → expect 6 Ready and 1 corrupt_pdf.
+// Round 1: 5 papers + 1 scanned + 1 corrupt at once → expect 6 Ready and 1 unreadable_after_repair.
 // Round 2: 10 papers at once → every document reaches a terminal stage, none lost.
 // Each document goes the same way the app sends it: a row created as the person (RLS), the file
 // uploaded with their session, then `queued` + `document/uploaded`. Prints p50/p95 per stage.
@@ -132,7 +132,14 @@ async function round(label, plan, timeoutMs) {
   const lost = docs.length - rows.filter((r) => TERMINAL.has(r.stage)).length;
   console.log(`\n${label}: ${docs.length} documents, wall ${secs(wall)}, lost ${lost}`);
   console.log("  outcome:", JSON.stringify(outcome));
-  for (const stage of ["queued", "validating", "parsing", "ocr", "reading_figures", "indexing"]) {
+  for (const stage of [
+    "queued",
+    "validating",
+    "parsing_deep",
+    "ocr",
+    "reading_figures",
+    "indexing",
+  ]) {
     if (byStage[stage])
       console.log(
         `  ${stage.padEnd(16)} p50 ${secs(pct(byStage[stage], 50)).padStart(8)}   p95 ${secs(pct(byStage[stage], 95)).padStart(8)}   n=${byStage[stage].length}`,
@@ -171,7 +178,9 @@ const r2 = !rounds.includes("2")
 
 const ok =
   (r1.outcome === null ||
-    (r1.lost === 0 && r1.outcome.ready === 6 && r1.outcome["failed:corrupt_pdf"] === 1)) &&
+    (r1.lost === 0 &&
+      r1.outcome.ready === 6 &&
+      r1.outcome["failed:unreadable_after_repair"] === 1)) &&
   (r2.outcome === null || (r2.lost === 0 && r2.outcome.ready === 10));
 console.log(`\nResult: ${ok ? "PASS" : "FAIL"}`);
 process.exit(ok ? 0 : 1);

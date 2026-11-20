@@ -21,7 +21,7 @@ from app import chunking, figures, parse
 from app.captions import Captioner, caption_all
 from app.contract import ERROR, STAGE, STORAGE, storage_path
 from app.embed import Embedder, check_token_budget
-from app.errors import IngestError, StaleRun
+from app.errors import IngestError, NeedsPassword, StaleRun
 from app.log import get_log
 from app.progress import StageReporter
 from app.settings import Settings
@@ -49,7 +49,7 @@ class Run:
     run_id: str
 
 
-# ───────────── guard and helpers ─────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ guard and helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def current(store: Store, run: Run) -> dict[str, Any]:
@@ -97,6 +97,12 @@ def guarded(step: str, deps: Deps, run: Run, fn: Callable[[], StepResult]) -> St
     except StaleRun:
         log.info("run is stale, stopping", **fields)
         return {"stop": "stale"}
+    except NeedsPassword:
+        waiting = deps.store.set_stage(
+            run.document_id, run.run_id, STAGE.needs_password, None, None, None, None
+        )
+        log.info("ingest needs a password", recorded=waiting, **fields)
+        return {"stop": STAGE.needs_password}
     except IngestError as exc:
         failed = deps.store.set_stage(
             run.document_id, run.run_id, STAGE.failed, None, None, exc.code, exc.values or None
@@ -109,7 +115,7 @@ def guarded(step: str, deps: Deps, run: Run, fn: Callable[[], StepResult]) -> St
     return result
 
 
-# ───────────── steps ─────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ steps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def step_validate(deps: Deps, run: Run) -> StepResult:
@@ -125,7 +131,7 @@ def step_validate(deps: Deps, run: Run) -> StepResult:
         run.document_id,
         run.run_id,
         {
-            "page_count": info.pages,
+            "page_count": info.pages,  # pages read; v2 notices (P3.1v2) record the cap
             "file_size": info.size,
             "sha256": info.sha256,
             "parser_version": parse.parser_version(),
@@ -135,7 +141,15 @@ def step_validate(deps: Deps, run: Run) -> StepResult:
         raise StaleRun()
     stages.update(1, 1)
     stages.flush()
-    return {"pages": info.pages, "scanned": info.scanned_pages}
+    if info.capped:
+        log.info(
+            "reading the first pages only",
+            document_id=run.document_id,
+            run_id=run.run_id,
+            pages=info.pages,
+            total_pages=info.total_pages,
+        )
+    return {"pages": info.pages, "scanned": info.scanned_pages, "total_pages": info.total_pages}
 
 
 def step_parse(deps: Deps, run: Run, pages: int, scanned: list[int]) -> StepResult:
@@ -146,7 +160,8 @@ def step_parse(deps: Deps, run: Run, pages: int, scanned: list[int]) -> StepResu
 
     stages = reporter(deps, run, doc)
     ocr = bool(scanned)
-    stages.enter(STAGE.parsing)
+    # Until the fast pass exists (P3.8v2), this single Docling pass is the deep pass.
+    stages.enter(STAGE.parsing_deep)
     if ocr:
         stages.enter(STAGE.ocr)
     scanned_set = set(scanned)
@@ -165,9 +180,15 @@ def step_parse(deps: Deps, run: Run, pages: int, scanned: list[int]) -> StepResu
 
     with tempfile.TemporaryDirectory(prefix="tensorlm-") as tmp:
         path = download_source(deps, doc, Path(tmp))
-        parsed = deps.convert(path, ocr=ocr, timeout_s=deps.settings.parse_timeout_s, on_page=on_page)
+        parsed = deps.convert(
+            path,
+            ocr=ocr,
+            timeout_s=deps.settings.parse_timeout_s,
+            on_page=on_page,
+            max_pages=pages,
+        )
     if not parse.has_text(parsed):
-        raise IngestError(ERROR.no_text_found)
+        raise IngestError(ERROR.no_text_after_ocr)
     deps.store.upload(STORAGE.artifacts_bucket, artifact, parse.to_json(parsed), "application/json")
     if not deps.store.update_document(run.document_id, run.run_id, {"ocr_used": ocr}):
         raise StaleRun()
@@ -265,7 +286,7 @@ def step_index(deps: Deps, run: Run) -> StepResult:
     title = doc.get("title") or "Untitled"
     rows = chunking.build_chunks(parsed, title, page_count, figure_rows)
     if not rows:
-        raise IngestError(ERROR.no_text_found)
+        raise IngestError(ERROR.no_text_after_ocr)
     check_token_budget([r.token_count for r in rows], deps.settings.max_document_tokens)
 
     stages = reporter(deps, run, doc)
@@ -319,7 +340,7 @@ def step_finalize(deps: Deps, run: Run) -> StepResult:
         run.document_id, run.run_id, markdown, chunking.count_tokens(markdown)
     )
     if not ok:
-        current(deps.store, run)  # stale → StaleRun; otherwise something's wrong: retry
+        current(deps.store, run)  # stale â†’ StaleRun; otherwise something's wrong: retry
         raise RuntimeError("finalize_ingest refused the current run")
     return {"ready": True}
 

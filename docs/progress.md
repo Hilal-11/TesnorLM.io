@@ -242,3 +242,9 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 ## 2026-11-20 — P4.15 — Quality gate (partial)
 
 - `docs/reports/phase-4-verification.md`: 310 unit/component + 121 database tests pass, lint/types/build clean. Added `npm run eval:smoke` (4 real-model cases); blocked: the Anthropic account has no credit. Found and fixed a log leak (the AI SDK printed request bodies, sources included, on model errors). Pending: credits, cloud migration 0005 (needs approval), manual browser pass.
+
+## 2026-11-20 — S0 (parts 1–2) — Product flow spec, ingestion contract v2
+
+- `docs/plans/TensorLM-v2-Part-A-Phases-3-4.md` (the v2 plan) and v2 Phase 3/4 backlog. `docs/specs/product-flow.md` (main shell, lazy notebook, Add sources, two passes, guide, chat modes, notes, confirmations and action colours). `docs/specs/ingestion.md` rewritten for v2 (source types, stage machine, askable lines, errors after every fallback, notices, limits, events, password handling).
+- `contracts/ingestion.json` v2: 14 source types, 13 stages (order kept compatible with the Postgres enum: `parsing_deep` before `ocr`), `askable` words/lines, v1 rejections removed, new errors (+ `empty_file`), notices, 3 new events, v2 limits. TS + Python loaders gained `noticeCopy`, `sourceTypeFromName`, askable `uiWord`/`detailLine`; parity fixture extended. Migration 0006 renames `parsing` → `parsing_deep` and adds the new stages + transition table (written, not yet applied: Docker was off, so `test:rls` didn't run).
+- Interim code on the v2 contract until later tasks: one Docling pass reported as `parsing_deep`; password-locked PDFs wait in `needs_password`; long PDFs read up to `MAX_PAGES`; non-PDFs `unsupported_type`; damaged `unreadable_after_repair`. Checks: web lint, typecheck, 323 tests, build; worker 780 passed (3 need a Supabase stack). Not run: e2e, test:rls. S0 part 3 (design-skill amendment) waits for approval.

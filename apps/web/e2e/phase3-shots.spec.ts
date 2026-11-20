@@ -46,7 +46,7 @@ async function seed(userId: string) {
     },
     {
       name: "bert-pretraining.pdf",
-      stage: "parsing",
+      stage: "parsing_deep",
       progress: 22,
       stage_detail: "Reading page 7 of 16",
     },
@@ -63,13 +63,8 @@ async function seed(userId: string) {
       progress: 80,
       stage_detail: "Indexing 128 passages",
     },
-    { name: "locked-handout.pdf", stage: "failed", error_code: "encrypted_pdf" },
-    {
-      name: "huge-thesis.pdf",
-      stage: "failed",
-      error_code: "too_many_pages",
-      error_vars: { pages: 312, limit: 200 },
-    },
+    { name: "locked-handout.pdf", stage: "needs_password" },
+    { name: "damaged-thesis.pdf", stage: "failed", error_code: "unreadable_after_repair" },
   ];
   for (const [i, r] of rows.entries()) {
     const ins = await db

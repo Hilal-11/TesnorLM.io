@@ -40,7 +40,7 @@ def test_no_stage_or_error_literals(path):
 
 
 def test_names_reject_unknowns():
-    assert STAGE.parsing == "parsing" and ERROR.corrupt_pdf == "corrupt_pdf"
+    assert STAGE.parsing_deep == "parsing_deep" and ERROR.unsupported_type == "unsupported_type"
     with pytest.raises(AttributeError):
         _ = STAGE.thinking
     with pytest.raises(AttributeError):

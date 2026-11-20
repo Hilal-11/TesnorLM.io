@@ -82,7 +82,8 @@ export async function createDocument(
   const notebook = await getNotebook(db, notebookId);
   if (!notebook) throw notFound("We couldn't find that notebook.");
 
-  if (!isPdfName(input.filename)) throw ingestionError("not_pdf", 415);
+  // Interim until P3.5v2 accepts every type (the storage bucket still takes PDFs only).
+  if (!isPdfName(input.filename)) throw ingestionError("unsupported_type", 415);
   const limit = maxUploadBytes();
   if (input.size > limit) {
     throw ingestionError("file_too_large", 413, {

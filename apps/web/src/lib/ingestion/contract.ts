@@ -1,23 +1,36 @@
 /**
- * The ingestion contract shared with the Python worker: stage names, allowed transitions, learner
- * words, detail lines, error copy, events, limits and storage paths.
+ * The ingestion contract shared with the Python worker: source types, stage names, allowed
+ * transitions, learner words, detail lines, error and notice copy, events, limits and storage
+ * paths.
  *
  * Source of truth: contracts/ingestion.json (spec: docs/specs/ingestion.md). The worker loads the
  * same file in services/worker/app/contract.py, and contracts/fixtures/ingestion-cases.json proves
- * both give identical answers. Never hard-code a stage name, error code or their copy elsewhere.
+ * both give identical answers. Never hard-code a stage name, source type, error code or their copy
+ * elsewhere.
  */
 import { z } from "zod";
 import { CONTRACT } from "./contract.generated";
 
 type Contract = typeof CONTRACT;
 export type Stage = Contract["stages"][number];
-export type UiWord = Contract["uiWords"][Stage];
+export type UiWord = Contract["uiWords"][Stage] | Contract["askable"]["word"];
+export type SourceType = keyof Contract["sourceTypes"];
+export type SourceOrigin = Contract["sourceTypes"][SourceType]["origin"];
 export type ErrorCode = keyof Contract["errors"];
+export type NoticeCode = keyof Contract["notices"];
 export type ActionId = keyof Contract["actions"];
 export type StoragePathKind = keyof Contract["storage"]["paths"];
 
 /** Template values: strings, or whole numbers (safe integers). Anything else counts as missing. */
 export type TemplateVars = Readonly<Record<string, unknown>>;
+
+/**
+ * `askable`: the source already answers questions (its fast pass is published) while a later
+ * stage improves it, so the interface says "Ready to ask" instead of the stage's own word.
+ */
+export interface StatusOptions {
+  askable?: boolean;
+}
 
 export interface ErrorCopy {
   code: ErrorCode;
@@ -28,11 +41,19 @@ export interface ErrorCopy {
   autoRetry: boolean;
 }
 
+export interface NoticeCopy {
+  code: NoticeCode;
+  message: string;
+  fix: string | null;
+}
+
 // ───────────── Templates ─────────────
 
 // `{name}` inserts a value; `{name:one|other}` picks a word by count ("1 page", "2 pages").
 const PLACEHOLDER = /\{([A-Za-z][A-Za-z0-9]*)(?::([^{}|]*)\|([^{}]*))?\}/g;
 const STORAGE_VARS = new Set(["userId", "documentId", "runId", "n"]);
+const ORIGINS = ["file", "link", "drive", "text"] as const;
+const UNITS = ["page", "slide", "sheet", "time"] as const;
 
 function placeholderNames(template: string): string[] {
   return [...template.matchAll(PLACEHOLDER)].map((m) => m[1]);
@@ -84,26 +105,59 @@ const ErrorDef = z.strictObject({
   autoRetry: z.boolean(),
 });
 
+const NoticeDef = z.strictObject({
+  message: z.string().min(1),
+  fallback: z.string().min(1).optional(),
+  fix: z.string().min(1).optional(),
+  vars: z.array(z.string()).optional(),
+});
+
+const SourceTypeDef = z.strictObject({
+  label: z.string().min(1),
+  origin: z.enum(ORIGINS),
+  unit: z.enum(UNITS).nullable(),
+  extensions: z.array(z.string()),
+  mimeTypes: z.array(z.string()),
+});
+
 const ContractSchema = z.strictObject({
-  version: z.literal(1),
+  version: z.literal(2),
+  sourceTypes: z.record(Name, SourceTypeDef),
   stages: z.array(Name).min(2),
   transitions: z.record(z.string(), z.array(z.string())),
   uiWords: z.record(z.string(), z.string().min(1)),
   details: z.record(z.string(), TemplateDef),
+  askable: z.strictObject({
+    word: z.string().min(1),
+    details: z.record(z.string(), TemplateDef),
+  }),
   actions: z.record(Name, z.string().min(1)),
   errors: z.record(Name, ErrorDef),
+  notices: z.record(Name, NoticeDef),
   events: z.strictObject({
     uploaded: EventName,
     reprocess: EventName,
     deleted: EventName,
     notebookDeleted: EventName,
+    fastReady: EventName,
+    passwordProvided: EventName,
+    sourcesChanged: EventName,
   }),
   limits: z.strictObject({
     maxUploadMb: Count,
     maxPages: Count,
+    fastPassPageBatch: Count,
     maxFilesPerBatch: Count,
     maxParallelUploads: Count,
     maxSourcesFree: Count,
+    passwordAttempts: Count,
+    passwordLockMinutes: Count,
+    passwordTtlSeconds: Count,
+    webMaxMb: Count,
+    webTimeoutSeconds: Count,
+    webMaxRedirects: Count,
+    suggestedQuestions: Count,
+    insightsDebounceSeconds: Count,
   }),
   storage: z.strictObject({
     bucket: z.string().min(1),
@@ -139,6 +193,9 @@ function templateProblems(
   return problems;
 }
 
+const EXTENSION = /^\.[a-z0-9]+$/;
+const MIME = /^[a-z]+\/[a-z0-9.+-]+$/;
+
 /** Every reason the contract is invalid (empty when valid). Same rules as the worker's. */
 export function validateContract(raw: unknown): string[] {
   const parsed = ContractSchema.safeParse(raw);
@@ -148,6 +205,26 @@ export function validateContract(raw: unknown): string[] {
   const c = parsed.data;
   const stages = new Set(c.stages);
   const problems: string[] = [];
+
+  const owners = new Map<string, string>();
+  for (const [type, t] of Object.entries(c.sourceTypes)) {
+    const where = `sourceTypes.${type}`;
+    if (t.origin === "file" && t.extensions.length === 0) {
+      problems.push(`${where}: a file type needs extensions`);
+    }
+    if (t.origin !== "file" && (t.extensions.length > 0 || t.mimeTypes.length > 0)) {
+      problems.push(`${where}: only file types have extensions or MIME types`);
+    }
+    for (const ext of t.extensions) {
+      if (!EXTENSION.test(ext)) problems.push(`${where}: bad extension "${ext}"`);
+      const owner = owners.get(ext);
+      if (owner !== undefined) problems.push(`${where}: "${ext}" is already ${owner}`);
+      owners.set(ext, type);
+    }
+    for (const mime of t.mimeTypes) {
+      if (!MIME.test(mime)) problems.push(`${where}: bad MIME type "${mime}"`);
+    }
+  }
 
   if (stages.size !== c.stages.length) problems.push("stages: repeated stage");
   for (const required of ["ready", "failed"]) {
@@ -176,12 +253,27 @@ export function validateContract(raw: unknown): string[] {
     problems.push(...templateProblems(`details.${stage}`, d.template, d.vars, d.fallback));
   }
 
+  for (const [stage, d] of Object.entries(c.askable.details)) {
+    const where = `askable.details.${stage}`;
+    if (!stages.has(stage) || stage === "ready" || stage === "failed") {
+      problems.push(`${where}: not a working stage`);
+    }
+    problems.push(...templateProblems(where, d.template, d.vars, d.fallback));
+  }
+
   if (!("internal" in c.errors)) problems.push('errors: missing "internal"');
   for (const [code, e] of Object.entries(c.errors)) {
     problems.push(...templateProblems(`errors.${code}`, e.message, e.vars, e.fallback));
     if (/[{}]/.test(e.fix)) problems.push(`errors.${code}: fix can't use placeholders`);
     for (const id of e.actions ?? []) {
       if (!(id in c.actions)) problems.push(`errors.${code}: unknown action "${id}"`);
+    }
+  }
+
+  for (const [code, n] of Object.entries(c.notices)) {
+    problems.push(...templateProblems(`notices.${code}`, n.message, n.vars, n.fallback));
+    if (n.fix !== undefined && /[{}]/.test(n.fix)) {
+      problems.push(`notices.${code}: fix can't use placeholders`);
     }
   }
 
@@ -204,10 +296,11 @@ if (problems.length > 0) {
 
 // ───────────── API ─────────────
 
+type Template = { template: string; fallback?: string; vars?: readonly string[] };
+
 const TRANSITIONS: Readonly<Record<string, readonly string[]>> = CONTRACT.transitions;
-const DETAILS: Readonly<
-  Record<string, { template: string; fallback?: string; vars?: readonly string[] }>
-> = CONTRACT.details;
+const DETAILS: Readonly<Record<string, Template>> = CONTRACT.details;
+const ASKABLE_DETAILS: Readonly<Record<string, Template>> = CONTRACT.askable.details;
 const ERRORS: Readonly<
   Record<
     string,
@@ -220,10 +313,20 @@ const ERRORS: Readonly<
     }
   >
 > = CONTRACT.errors;
+const NOTICES: Readonly<Record<string, { message: string; fallback?: string; fix?: string }>> =
+  CONTRACT.notices;
 const ACTIONS: Readonly<Record<string, string>> = CONTRACT.actions;
+const SOURCE_TYPE_DEFS: Readonly<Record<string, { extensions: readonly string[] }>> =
+  CONTRACT.sourceTypes;
+const BY_EXTENSION: ReadonlyMap<string, SourceType> = new Map(
+  Object.entries(SOURCE_TYPE_DEFS).flatMap(([type, t]) =>
+    t.extensions.map((ext) => [ext, type as SourceType] as const),
+  ),
+);
 
 export const CONTRACT_VERSION = CONTRACT.version;
 export const STAGES: readonly Stage[] = CONTRACT.stages;
+export const SOURCE_TYPES = CONTRACT.sourceTypes;
 export const EVENTS = CONTRACT.events;
 /** Defaults only: server code reads MAX_UPLOAD_MB, MAX_PAGES and MAX_SOURCES_FREE from env. */
 export const LIMITS = CONTRACT.limits;
@@ -233,13 +336,21 @@ export function isStage(value: unknown): value is Stage {
   return typeof value === "string" && Object.hasOwn(TRANSITIONS, value);
 }
 
+export function isSourceType(value: unknown): value is SourceType {
+  return typeof value === "string" && Object.hasOwn(SOURCE_TYPE_DEFS, value);
+}
+
 function assertStage(stage: string): asserts stage is Stage {
   if (!isStage(stage)) throw new Error(`Unknown ingestion stage "${stage}"`);
 }
 
-/** The learner word for a stage: Uploading, Queued, Reading, Indexing, Ready or Failed. */
-export function uiWord(stage: Stage): UiWord {
+/**
+ * The learner word for a stage ("Reading", "Ready to ask", "Couldn't read"). With `askable`, a
+ * stage that improves an already-askable source says "Ready to ask".
+ */
+export function uiWord(stage: Stage, options: StatusOptions = {}): UiWord {
   assertStage(stage);
+  if (options.askable && Object.hasOwn(ASKABLE_DETAILS, stage)) return CONTRACT.askable.word;
   return CONTRACT.uiWords[stage];
 }
 
@@ -254,10 +365,19 @@ export function isTerminal(stage: Stage): boolean {
   return TRANSITIONS[stage].length === 0;
 }
 
-/** The status line under a source ("Reading page 18 of 42"). Failed has none: use errorCopy. */
-export function detailLine(stage: Stage, vars: TemplateVars = {}): string {
+/**
+ * The status line under a source ("Reading page 18 of 42"). Failed has none: use errorCopy. With
+ * `askable`, stages that improve an askable source use their "Ready to ask · …" line.
+ */
+export function detailLine(
+  stage: Stage,
+  vars: TemplateVars = {},
+  options: StatusOptions = {},
+): string {
   assertStage(stage);
-  const detail = DETAILS[stage];
+  const detail =
+    (options.askable && Object.hasOwn(ASKABLE_DETAILS, stage) ? ASKABLE_DETAILS[stage] : null) ??
+    DETAILS[stage];
   if (!detail) throw new Error(`Stage "${stage}" has no detail line; use errorCopy()`);
   return fill(detail.template, vars) ?? detail.fallback ?? detail.template;
 }
@@ -273,6 +393,31 @@ export function errorCopy(code: string | null | undefined, vars: TemplateVars = 
     actions: (def.actions ?? []).map((id) => ({ id: id as ActionId, label: ACTIONS[id] })),
     autoRetry: def.autoRetry,
   };
+}
+
+/** A note on a usable source ("TensorLM read the first 2000 of 2400 pages."). Unknown → null. */
+export function noticeCopy(
+  code: string | null | undefined,
+  vars: TemplateVars = {},
+): NoticeCopy | null {
+  if (code == null || !Object.hasOwn(NOTICES, code)) return null;
+  const def = NOTICES[code];
+  return {
+    code: code as NoticeCode,
+    message: fill(def.message, vars) ?? def.fallback ?? def.message,
+    fix: def.fix ?? null,
+  };
+}
+
+/**
+ * The source type a file name's extension suggests (case-insensitive), or null. Only a hint: the
+ * worker sniffs the bytes and routes by the real type.
+ */
+export function sourceTypeFromName(filename: string): SourceType | null {
+  const base = filename.slice(Math.max(filename.lastIndexOf("/"), filename.lastIndexOf("\\")) + 1);
+  const dot = base.lastIndexOf(".");
+  if (dot < 0) return null;
+  return BY_EXTENSION.get(base.slice(dot).toLowerCase()) ?? null;
 }
 
 const SAFE_SEGMENT = /^[A-Za-z0-9_-]+$/;
