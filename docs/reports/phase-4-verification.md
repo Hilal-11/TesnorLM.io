@@ -74,7 +74,7 @@ Totals: **27 unit/component files, 310 tests passed**; **8 database files, 121 t
 2. **Approve migration 0005 on the cloud project**, then regenerate types (`npm run db:types`).
    I'll run it only after you say yes.
 3. **Optional keys** (names only, in `.env.example`): `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`,
-   `LANGFUSE_HOST` for traces; `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` for rate limits
+   `LANGFUSE_BASEURL` (optional, defaults to Langfuse cloud) for traces; `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` for rate limits
    (without them the database fallback is used).
 4. **Manual check**: upload "Attention Is All You Need", ask "Why are dot products scaled?",
    click a citation (the PDF should open at page 4 with the passage highlighted), select a
