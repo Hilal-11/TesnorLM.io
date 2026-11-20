@@ -36,15 +36,13 @@ export async function selectedSources(db: Db, notebookId: string, onlyIds?: stri
   if (onlyIds && onlyIds.length > 0) query = query.in("id", onlyIds);
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []).map(
-    (d): ReadySource => ({
-      id: d.id,
-      title: (d.title || d.original_filename).replace(/\.pdf$/i, ""),
-      readyRunId: d.ready_run_id!,
-      // documents.token_count is the whole text; chunks add a little context on top.
-      tokens: Math.ceil((d.token_count ?? d.chunk_count * 400) * 1.1),
-    }),
-  );
+  return (data ?? []).map((d): ReadySource => ({
+    id: d.id,
+    title: (d.title || d.original_filename).replace(/\.pdf$/i, ""),
+    readyRunId: d.ready_run_id!,
+    // documents.token_count is the whole text; chunks add a little context on top.
+    tokens: Math.ceil((d.token_count ?? d.chunk_count * 400) * 1.1),
+  }));
 }
 
 type ChunkRow = {
@@ -97,7 +95,10 @@ export async function allChunks(db: Db, sources: ReadySource[]) {
       if (!data || data.length < 1000) break;
     }
   }
-  return readingOrder(out, sources.map((s) => s.id));
+  return readingOrder(
+    out,
+    sources.map((s) => s.id),
+  );
 }
 
 export type Embed = (text: string) => Promise<number[]>;
@@ -154,7 +155,10 @@ export async function retrieveChunks(
       .select(CHUNK_FIELDS)
       .eq("document_id", docId)
       .eq("ingest_run_id", run)
-      .in("chunk_index", indexes.filter((i) => i >= 0));
+      .in(
+        "chunk_index",
+        indexes.filter((i) => i >= 0),
+      );
     neighbours.push(...((data ?? []) as ChunkRow[]).map((r) => toChunk(r, titles)));
   }
 

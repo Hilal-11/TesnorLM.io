@@ -33,7 +33,10 @@ export type Usage = {
 export function costUsd(model: string, usage: Usage) {
   const price = PRICES[model];
   if (!price) return 0;
-  const uncached = Math.max(0, usage.input_tokens - usage.cache_read_tokens - usage.cache_write_tokens);
+  const uncached = Math.max(
+    0,
+    usage.input_tokens - usage.cache_read_tokens - usage.cache_write_tokens,
+  );
   const usd =
     (uncached * price.input +
       usage.cache_read_tokens * price.cacheRead +

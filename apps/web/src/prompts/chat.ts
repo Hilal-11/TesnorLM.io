@@ -55,10 +55,14 @@ export function userTurn(input: {
   continueFrom?: string;
 }) {
   const focus = input.focus
-    .map((f) => `<focus document="${f.document.replace(/"/g, "'")}" page="${f.page}">\n${f.text}\n</focus>`)
+    .map(
+      (f) =>
+        `<focus document="${f.document.replace(/"/g, "'")}" page="${f.page}">\n${f.text}\n</focus>`,
+    )
     .join("\n");
   const parts = [
-    focus && `The person selected this passage. Focus your answer on it and cite the sources it comes from:\n${focus}`,
+    focus &&
+      `The person selected this passage. Focus your answer on it and cite the sources it comes from:\n${focus}`,
     `Question: ${input.question}`,
     commandInstruction(input.command),
     input.continueFrom &&

@@ -59,7 +59,13 @@ describe("chart specs", () => {
     ["missing xKey in rows", JSON.stringify({ ...ok, data: [{ loss: 1 }] })],
     ["series without numbers", JSON.stringify({ ...ok, series: ["acc"] })],
     ["extra keys", JSON.stringify({ ...ok, script: "alert(1)" })],
-    ["too many points", JSON.stringify({ ...ok, data: Array.from({ length: 1001 }, (_, i) => ({ step: i, loss: i })) })],
+    [
+      "too many points",
+      JSON.stringify({
+        ...ok,
+        data: Array.from({ length: 1001 }, (_, i) => ({ step: i, loss: i })),
+      }),
+    ],
   ])("rejects %s", (_, text) => {
     expect(parseChartSpec(text)).toBeNull();
   });

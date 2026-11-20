@@ -93,7 +93,8 @@ export function expandWithNeighbours(
 const escapeAttr = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 /** Document text can't close our tags or open new ones. */
-const escapeText = (value: string) => value.replace(/<\/?(source|sources|focus)\b/gi, (m) => m.replace("<", "&lt;"));
+const escapeText = (value: string) =>
+  value.replace(/<\/?(source|sources|focus)\b/gi, (m) => m.replace("<", "&lt;"));
 
 export function pageLabel(start: number | null, end: number | null) {
   if (!start) return "";
@@ -136,7 +137,10 @@ export function buildContext(chunks: SourceChunk[], quoteChars = 300) {
 }
 
 /** History as plain text, without citation markup, trimmed oldest-first to the budget. */
-export function formatHistory(turns: { role: "user" | "assistant"; text: string }[], budgetTokens: number) {
+export function formatHistory(
+  turns: { role: "user" | "assistant"; text: string }[],
+  budgetTokens: number,
+) {
   const cleaned = turns.map((t) => ({
     role: t.role,
     text: t.text.replace(/\s?\[\d+(?:\s*[,–-]\s*\d+)*\]/g, "").trim(),

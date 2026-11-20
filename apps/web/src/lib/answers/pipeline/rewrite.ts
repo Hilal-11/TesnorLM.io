@@ -10,12 +10,23 @@ import { REWRITER } from "@/prompts/helpers";
 export const rewriteSchema = z.object({
   standalone: z.string().min(1).max(1000),
   queries: z.array(z.string().min(1).max(300)).min(1).max(3),
-  intent: z.enum(["explain", "diagram", "example", "quiz", "summarize", "compare", "define", "chitchat", "other"]),
+  intent: z.enum([
+    "explain",
+    "diagram",
+    "example",
+    "quiz",
+    "summarize",
+    "compare",
+    "define",
+    "chitchat",
+    "other",
+  ]),
   mentions_figure: z.boolean(),
 });
 export type Rewrite = z.infer<typeof rewriteSchema>;
 
-const REFERENCES = /\b(it|its|this|that|these|those|they|them|he|she|above|previous|earlier|again|same|the figure|the table|more)\b/i;
+const REFERENCES =
+  /\b(it|its|this|that|these|those|they|them|he|she|above|previous|earlier|again|same|the figure|the table|more)\b/i;
 const FIGURE = /\b(fig(ure)?|table|chart|plot|diagram|graph)\b/i;
 
 /** Without history or references, the question already stands alone. */
@@ -27,7 +38,14 @@ export function plainRewrite(question: string, command: string | null): Rewrite 
   return {
     standalone: question,
     queries: [question.slice(0, 300)],
-    intent: command === "diagram" ? "diagram" : command === "example" ? "example" : command === "summarize" ? "summarize" : "explain",
+    intent:
+      command === "diagram"
+        ? "diagram"
+        : command === "example"
+          ? "example"
+          : command === "summarize"
+            ? "summarize"
+            : "explain",
     mentions_figure: FIGURE.test(question),
   };
 }

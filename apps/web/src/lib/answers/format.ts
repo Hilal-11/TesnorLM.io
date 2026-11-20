@@ -10,7 +10,10 @@ const contractSchema = z.object({
   version: z.literal(1),
   promptVersion: z.string().min(1),
   levels: z.record(z.string(), z.object({ label: z.string().min(1), style: z.string().min(1) })),
-  directives: z.record(z.string(), z.object({ label: z.string().min(1), max: z.number().int().min(1) })),
+  directives: z.record(
+    z.string(),
+    z.object({ label: z.string().min(1), max: z.number().int().min(1) }),
+  ),
   mermaid: z.object({ allowed: z.array(z.string()).min(1), maxNodes: z.number().int().positive() }),
   chart: z.object({
     types: z.array(z.string()).min(1),

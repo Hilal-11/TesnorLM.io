@@ -28,7 +28,12 @@ export function expandGroup(group: string): number[] {
   const nums: number[] = [];
   for (const piece of group.split(",")) {
     const range = piece.split(/[–\-—]/).map((s) => Number.parseInt(s.trim(), 10));
-    if (range.length === 2 && range.every(Number.isFinite) && range[1] >= range[0] && range[1] - range[0] < 20) {
+    if (
+      range.length === 2 &&
+      range.every(Number.isFinite) &&
+      range[1] >= range[0] &&
+      range[1] - range[0] < 20
+    ) {
       for (let n = range[0]; n <= range[1]; n += 1) nums.push(n);
     } else if (range.length === 1 && Number.isFinite(range[0])) nums.push(range[0]);
   }
