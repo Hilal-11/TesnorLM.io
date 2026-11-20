@@ -247,6 +247,9 @@ export async function respond(deps: RespondDeps, body: ChatRequest, signal: Abor
         messages: prompt.messages,
         maxOutputTokens: 4000,
         abortSignal: signal,
+        // The SDK's default handler prints the whole error, request body (sources, question)
+        // included. Errors are handled below from the stream; log nothing here.
+        onError: () => {},
       });
 
       try {

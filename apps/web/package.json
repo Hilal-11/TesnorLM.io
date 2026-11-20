@@ -25,7 +25,8 @@
     "contract:sync": "node scripts/sync-contract.mjs",
     "predev": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs && node scripts/sync-pdfjs.mjs",
     "prebuild": "node scripts/sync-env.mjs && node scripts/sync-contract.mjs && node scripts/sync-pdfjs.mjs",
-    "pdfjs:sync": "node scripts/sync-pdfjs.mjs"
+    "pdfjs:sync": "node scripts/sync-pdfjs.mjs",
+    "eval:smoke": "node scripts/with-local-supabase.mjs --test node scripts/vitest.mjs run --config vitest.eval.config.mts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.106",
