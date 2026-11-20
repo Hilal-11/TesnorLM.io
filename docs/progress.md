@@ -234,3 +234,7 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `canvas/pdf-viewer.tsx` + `src/lib/pdf/pdfjs.ts`: pdf.js loaded at runtime from `/vendor/pdfjs` (not bundled), signed link from `/api/documents/[id]/download?json=1`, fit-to-width pages rendered as they near the viewport (HiDPI canvas + selectable text layer), zoom steps, page n of N, download; a citation scrolls to its page and draws its bboxes (PDF points, top-left) as highlights; load failure → Try again / Download.
 - Selecting text shows a toolbar: Ask about this (quote chip in the composer, up to 3), Explain (asks at once with the quote), Save note (`notes` row with page + quote), Copy. Needs a manual check in the browser with a real PDF.
+
+## 2026-11-20 — P4.2 — Notebook workspace layout
+
+- The notebook page is a full-height workspace: Sources (288px, resizable 220–440, collapsible) · Chat · Canvas (Source / Diagram tabs, opens on a citation, a source or "Open in canvas", closable) with `react-resizable-panels`; under 1024px one pane at a time with Sources / Chat / Source tabs. The page loads chats, the `?chat=` or latest chat's messages and the profile level on the server. Build passes.

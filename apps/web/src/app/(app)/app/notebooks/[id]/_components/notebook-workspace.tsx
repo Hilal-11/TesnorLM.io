@@ -1,20 +1,25 @@
 "use client";
 
-import { FileSearch } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { EmptyState } from "@/components/ui/empty-state";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { toast } from "@/components/ui/toast";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { apiFetch } from "@/lib/api-client";
+import type { Level } from "@/lib/answers/format";
+import type { Attachment, Chat, ChatMessage, Citation } from "@/lib/chats/shared";
 import { backgroundTitle } from "@/lib/documents/live";
 import { isPdfName, type Source } from "@/lib/documents/shared";
 import type { Notebook } from "@/lib/notebooks/shared";
 import { getUploadManager, useUploads } from "@/lib/uploads/browser";
+import { cn } from "@/lib/utils";
 import { MAX_FILES } from "@/lib/uploads/manager";
-import { PageHeader } from "../../../_components/page-header";
 import { touchNotebook } from "../../actions";
 import { ColorDot, StatusWord, formatExamDate } from "../../_components/notebook-visuals";
-import { SourceDetail } from "./source-detail";
+import { createNote, setSourceIncluded } from "../chat-actions";
+import { Canvas, type CanvasTab } from "./canvas/canvas";
+import type { PdfFocus, PdfSelection } from "./canvas/pdf-viewer";
+import { ChatPanel, type ChatPanelHandle } from "./chat/chat-panel";
 import { SourcesPanel } from "./sources-panel";
 import { UploadDialog } from "./upload-dialog";
 import { useLiveSources } from "./use-live-sources";
@@ -32,13 +37,24 @@ async function errorText(res: Response) {
   return body.error ?? "Try again in a moment.";
 }
 
-/** A notebook: the Sources panel (272px) and the selected source. Phase 4 adds the conversation. */
+/**
+ * A notebook workspace: Sources · Chat · Canvas (the cited PDF or a diagram) in resizable panes
+ * on wide screens; one pane at a time with tabs on narrow ones.
+ */
 export function NotebookWorkspace({
   notebook,
   initialSources,
+  initialChats,
+  initialChatId,
+  initialMessages,
+  defaultLevel,
 }: {
   notebook: Notebook;
   initialSources: Source[];
+  initialChats: Chat[];
+  initialChatId: string | null;
+  initialMessages: ChatMessage[];
+  defaultLevel: Level;
 }) {
   const { sources, setSources, connection } = useLiveSources(notebook.id, initialSources);
   const { items } = useUploads();
@@ -46,7 +62,6 @@ export function NotebookWorkspace({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const params = useSearchParams();
   const [uploadOpen, setUploadOpen] = useState(() => params.get("add") === "1");
-  const selected = sources.find((s) => s.id === selectedId) ?? null;
 
   // Counts as "opened" only when someone actually looks at it (not on link prefetch).
   useEffect(() => {
@@ -177,46 +192,223 @@ export function NotebookWorkspace({
     },
   };
 
-  return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title={
-          <span className="flex items-center gap-2.5">
-            <ColorDot color={notebook.color} className="size-3" />
-            {notebook.title}
-          </span>
-        }
-        description={notebook.description ?? undefined}
-      />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-small text-graphite">
-        <StatusWord status={notebook.status} />
-        {notebook.subject && <span>{notebook.subject}</span>}
-        {notebook.exam_date && <span>Exam {formatExamDate(notebook.exam_date)}</span>}
-      </div>
+  // ── Chat · canvas wiring ──
+  const isWide = useMediaQuery("(min-width: 1024px)", true);
+  const [mobilePane, setMobilePane] = useState<"sources" | "chat" | "canvas">("chat");
+  const [canvasOpen, setCanvasOpen] = useState(false);
+  const [canvasTab, setCanvasTab] = useState<CanvasTab>("source");
+  const [canvasSourceId, setCanvasSourceId] = useState<string | null>(null);
+  const [focus, setFocus] = useState<PdfFocus | null>(null);
+  const [diagram, setDiagram] = useState<{ code: string; title: string } | null>(null);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const chatPanel = useRef<ChatPanelHandle>(null);
+  const canvasSource = sources.find((s) => s.id === canvasSourceId) ?? null;
 
-      <div className="grid gap-6 lg:grid-cols-[272px_minmax(0,1fr)]">
-        <SourcesPanel
-          sources={sources}
-          uploads={uploads}
-          selectedId={selectedId}
-          connection={connection}
-          {...handlers}
-        />
-        <div className="min-w-0">
-          {selected ? (
-            <SourceDetail source={selected} onReprocess={handlers.onReprocess} />
-          ) : sources.length > 0 ? (
-            <div className="rounded-md border border-rule">
-              <EmptyState
-                titleAs="h2"
-                icon={FileSearch}
-                title="Select a source"
-                description="See its pages, figures and how reading it went. Asking questions arrives next."
-              />
-            </div>
-          ) : null}
+  const ready = sources.filter((s) => s.stage === "ready");
+  const included = ready.filter((s) => s.included);
+  const blocked =
+    sources.length === 0
+      ? "Add a source to start asking questions about it."
+      : ready.length === 0
+        ? "Your sources are still being read. You can ask as soon as one is ready."
+        : included.length === 0
+          ? "Every source is switched off. Tick one in Sources to ask about it."
+          : null;
+  const titleOf = useCallback(
+    (id: string) => sources.find((s) => s.id === id)?.original_filename ?? "Source",
+    [sources],
+  );
+
+  const showCanvas = (tab: CanvasTab) => {
+    setCanvasTab(tab);
+    setCanvasOpen(true);
+    if (!isWide) setMobilePane("canvas");
+  };
+
+  const openSource = (id: string) => {
+    setSelectedId(id);
+    setCanvasSourceId(id);
+    setFocus(null);
+    showCanvas("source");
+  };
+
+  const onOpenCitation = useCallback(
+    (c: Citation) => {
+      setCanvasSourceId(c.document_id);
+      setFocus({ page: c.page_start ?? 1, boxes: c.bboxes, key: Date.now() });
+      setCanvasTab("source");
+      setCanvasOpen(true);
+      if (!isWide) setMobilePane("canvas");
+    },
+    [isWide],
+  );
+
+  const onOpenDiagram = useCallback(
+    (code: string, title: string) => {
+      setDiagram({ code, title });
+      setCanvasTab("diagram");
+      setCanvasOpen(true);
+      if (!isWide) setMobilePane("canvas");
+    },
+    [isWide],
+  );
+
+  const quote = (source: Source, sel: PdfSelection): Attachment => ({
+    document_id: source.id,
+    page: sel.page,
+    text: sel.text,
+  });
+
+  const onToggleIncluded = async (source: Source, value: boolean) => {
+    setSources((list) => list.map((s) => (s.id === source.id ? { ...s, included: value } : s)));
+    const res = await setSourceIncluded(undefined as never, { documentId: source.id, included: value });
+    if (!res?.ok) {
+      setSources((list) => list.map((s) => (s.id === source.id ? { ...s, included: !value } : s)));
+      toast.error("Couldn't change that source");
+    }
+  };
+
+  const sourcesPane = (
+    <div className="h-full overflow-y-auto p-4">
+      <SourcesPanel
+        sources={sources}
+        uploads={uploads}
+        selectedId={selectedId}
+        connection={connection}
+        {...handlers}
+        onSelect={(id) => openSource(id)}
+        onToggleIncluded={(s, v) => void onToggleIncluded(s, v)}
+      />
+    </div>
+  );
+
+  const chatPane = (
+    <ChatPanel
+      ref={chatPanel}
+      notebookId={notebook.id}
+      initialChats={initialChats}
+      initialChatId={initialChatId}
+      initialMessages={initialMessages}
+      defaultLevel={defaultLevel}
+      sources={ready.map((s) => ({ id: s.id, title: s.original_filename }))}
+      asking={{ k: included.length, n: ready.length }}
+      blocked={blocked}
+      attachments={attachments}
+      onAttachmentsChange={setAttachments}
+      attachmentTitle={titleOf}
+      onOpenCitation={onOpenCitation}
+      onOpenDiagram={onOpenDiagram}
+    />
+  );
+
+  const canvasPane = (
+    <Canvas
+      tab={canvasTab}
+      onTab={setCanvasTab}
+      source={canvasSource}
+      focus={focus}
+      diagram={diagram}
+      onClose={() => {
+        setCanvasOpen(false);
+        if (!isWide) setMobilePane("chat");
+      }}
+      onReprocess={handlers.onReprocess}
+      onAsk={(source, sel) => {
+        setAttachments((a) => [...a, quote(source, sel)].slice(-3));
+        if (!isWide) setMobilePane("chat");
+        requestAnimationFrame(() => chatPanel.current?.focus());
+      }}
+      onExplain={(source, sel) => {
+        if (!isWide) setMobilePane("chat");
+        chatPanel.current?.ask({
+          message: "Explain this passage.",
+          command: "explain",
+          attachments: [quote(source, sel)],
+        });
+      }}
+      onSaveNote={async (source, sel) => {
+        const res = await createNote(undefined as never, {
+          notebookId: notebook.id,
+          documentId: source.id,
+          page: sel.page,
+          quote: sel.text,
+        });
+        if (res?.ok) toast.success("Saved to notes");
+        else toast.error("Couldn't save the note");
+      }}
+    />
+  );
+
+  const separator =
+    "w-px bg-rule outline-none transition-colors hover:bg-rule-strong focus-visible:bg-ink data-[separator=active]:bg-ink";
+
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-3 border-b border-rule px-4 py-2">
+        <ColorDot color={notebook.color} className="size-3 shrink-0" />
+        <h1 className="min-w-0 truncate text-h3 text-ink">{notebook.title}</h1>
+        <div className="hidden min-w-0 items-center gap-x-3 text-small text-graphite md:flex">
+          <StatusWord status={notebook.status} />
+          {notebook.subject && <span className="truncate">{notebook.subject}</span>}
+          {notebook.exam_date && <span>Exam {formatExamDate(notebook.exam_date)}</span>}
         </div>
       </div>
+
+      {isWide ? (
+        <Group orientation="horizontal" id={`notebook-${notebook.id}`} className="min-h-0 flex-1">
+          <Panel id="sources" defaultSize={288} minSize={220} maxSize={440} collapsible collapsedSize={0}>
+            {sourcesPane}
+          </Panel>
+          <Separator className={separator} />
+          <Panel id="chat" minSize={380}>
+            {chatPane}
+          </Panel>
+          {canvasOpen && (
+            <>
+              <Separator className={separator} />
+              <Panel id="canvas" defaultSize="42%" minSize={340}>
+                {canvasPane}
+              </Panel>
+            </>
+          )}
+        </Group>
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div role="tablist" aria-label="Notebook" className="flex shrink-0 border-b border-rule px-2">
+            {(
+              [
+                ["sources", `Sources${sources.length ? ` ${sources.length}` : ""}`],
+                ["chat", "Chat"],
+                ["canvas", canvasTab === "diagram" ? "Diagram" : "Source"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={mobilePane === id}
+                disabled={id === "canvas" && !canvasOpen}
+                onClick={() => setMobilePane(id)}
+                className={cn(
+                  "interactive -mb-px h-10 border-b-2 px-3 text-small disabled:opacity-40",
+                  mobilePane === id
+                    ? "border-primary font-medium text-ink"
+                    : "border-transparent text-graphite",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="min-h-0 flex-1">
+            {mobilePane === "sources"
+              ? sourcesPane
+              : mobilePane === "canvas" && canvasOpen
+                ? canvasPane
+                : chatPane}
+          </div>
+        </div>
+      )}
 
       <UploadDialog
         open={uploadOpen}
@@ -224,7 +416,7 @@ export function NotebookWorkspace({
         notebookId={notebook.id}
         sources={sources}
         onAdd={addFiles}
-        onOpenSource={(id) => setSelectedId(id)}
+        onOpenSource={(id) => openSource(id)}
       />
       <WindowDropZone onFiles={addFiles} disabled={uploadOpen} />
     </div>

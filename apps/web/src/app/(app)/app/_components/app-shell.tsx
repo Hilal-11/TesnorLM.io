@@ -328,9 +328,14 @@ export function AppShell({
         </header>
 
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-8 md:pb-16">
-            {children}
-          </div>
+          {/^\/app\/notebooks\/[^/]+$/.test(pathname) ? (
+            // A notebook is a full-height workspace (sources · chat · canvas), not a page.
+            <div className="h-[calc(100dvh-3.5rem)] min-h-0">{children}</div>
+          ) : (
+            <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-8 md:pb-16">
+              {children}
+            </div>
+          )}
         </main>
       </div>
 
