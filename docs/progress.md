@@ -238,3 +238,7 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 ## 2026-11-20 — P4.2 — Notebook workspace layout
 
 - The notebook page is a full-height workspace: Sources (288px, resizable 220–440, collapsible) · Chat · Canvas (Source / Diagram tabs, opens on a citation, a source or "Open in canvas", closable) with `react-resizable-panels`; under 1024px one pane at a time with Sources / Chat / Source tabs. The page loads chats, the `?chat=` or latest chat's messages and the profile level on the server. Build passes.
+
+## 2026-11-20 — P4.15 — Quality gate (partial)
+
+- `docs/reports/phase-4-verification.md`: 310 unit/component + 121 database tests pass, lint/types/build clean. Added `npm run eval:smoke` (4 real-model cases); blocked: the Anthropic account has no credit. Found and fixed a log leak (the AI SDK printed request bodies, sources included, on model errors). Pending: credits, cloud migration 0005 (needs approval), manual browser pass.
