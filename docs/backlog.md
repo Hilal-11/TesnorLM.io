@@ -103,9 +103,9 @@ Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
 - [ ] P4.2 — Notebook workspace layout (tabs, resizable panes, canvas)
 - [ ] P4.3 — Sources pane: include/exclude, figures, add source
 - [x] P4.4 — Chats + messages persistence; chat list per notebook; new chat
-- [ ] P4.5 — Retrieval and routing pipeline (rewrite, route, numbered context, history)
+- [x] P4.5 — Retrieval and routing pipeline (rewrite, route, numbered context, history)
 - [ ] P4.6 — Chat route v2 (streaming status, levels, prompt caching, tracing, rate limits)
-- [ ] P4.7 — Structured citations (server mapping and validation)
+- [x] P4.7 — Structured citations (server mapping and validation)
 - [ ] P4.8 — LessonRenderer v2 (directives, math, code, charts, sanitize)
 - [ ] P4.9 — Diagram card: self-drawing diagrams + Mermaid auto-repair
 - [ ] P4.10 — Chat UI (states, actions, follow-ups, feedback)
