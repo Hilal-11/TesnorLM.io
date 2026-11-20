@@ -99,7 +99,7 @@ general knowledge. Chats persist and can be stopped, continued, regenerated and 
 Spec: `docs/specs/answers.md`; contract: `contracts/answer-format.json`.
 
 - [x] P4.0 — Answer spec + contract (levels, directives, blocks, citations, commands)
-- [ ] P4.1 — Database: chats, messages, feedback, notes, source selection
+- [x] P4.1 — Database: chats, messages, feedback, notes, source selection
 - [ ] P4.2 — Notebook workspace layout (tabs, resizable panes, canvas)
 - [ ] P4.3 — Sources pane: include/exclude, figures, add source
 - [ ] P4.4 — Chats + messages persistence; chat list per notebook; new chat

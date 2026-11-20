@@ -15,10 +15,12 @@ const COVERED = [
   "chats",
   "chunks",
   "documents",
+  "feedback",
   "figures",
   "lessons",
   "messages",
   "notebooks",
+  "notes",
   "profiles",
 ];
 
@@ -30,6 +32,8 @@ const ids = {
   chat: "",
   message: "",
   lesson: "",
+  feedback: "",
+  note: "",
 };
 let A: Person;
 let B: Person;
@@ -97,10 +101,25 @@ beforeAll(async () => {
       .select("id")
       .single(),
   ).id;
+  // Messages are written by the chat route (service role) after an ownership check.
   ids.message = must(
-    await A.client
+    await admin
       .from("messages")
-      .insert({ chat_id: ids.chat, role: "user", content: "A's private question" })
+      .insert({ chat_id: ids.chat, user_id: A.user.id, role: "assistant", content: "A's private answer" })
+      .select("id")
+      .single(),
+  ).id;
+  ids.feedback = must(
+    await A.client
+      .from("feedback")
+      .insert({ user_id: A.user.id, message_id: ids.message, rating: "down", reason: "unclear" })
+      .select("id")
+      .single(),
+  ).id;
+  ids.note = must(
+    await A.client
+      .from("notes")
+      .insert({ user_id: A.user.id, notebook_id: ids.notebook, quote: "A's private quote", body: "A's note" })
       .select("id")
       .single(),
   ).id;
@@ -195,7 +214,21 @@ const CASES: Record<
     value: () => ids.message,
     patch: { content: "changed by B" },
     column: "content",
-    forged: () => ({ chat_id: ids.chat, role: "user", content: "forged" }),
+    forged: () => ({ chat_id: ids.chat, user_id: B.user.id, role: "user", content: "forged" }),
+  },
+  feedback: {
+    key: "id",
+    value: () => ids.feedback,
+    patch: { comment: "changed by B" },
+    column: "comment",
+    forged: () => ({ user_id: B.user.id, message_id: ids.message, rating: "up" }),
+  },
+  notes: {
+    key: "id",
+    value: () => ids.note,
+    patch: { body: "changed by B" },
+    column: "body",
+    forged: () => ({ user_id: B.user.id, notebook_id: ids.notebook, body: "forged" }),
   },
   lessons: {
     key: "id",

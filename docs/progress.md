@@ -195,3 +195,8 @@ Append-only. One entry per finished task: date, task id, 2–3 lines on what cha
 
 - `docs/specs/answers.md` (flow, routing, context format and prompt-injection rule, answer format, citations, levels, no-match, stop/continue/regenerate, states, feedback, limits, cost, acceptance) and `docs/specs/answers.examples.md` (one question at three levels).
 - `contracts/answer-format.json` → `src/lib/answers/format.generated.ts` (sync script now handles both contracts) + zod loader `src/lib/answers/format.ts` (levels, directives, chart schema, commands, limits); `src/lib/models.ts` (models + prices + cost). 13 tests.
+
+## 2026-11-20 — P4.1 — Database: chats, messages, feedback, notes, source selection
+
+- Migration 0005: chats gain level, title_generated, summary, last_message_at, soft delete (column grants: people insert/rename/level/delete only); messages gain user_id, parts, status, mode, command, selected sources, followups, parent/version, model, prompt_version, usage, latency, flags — **read-only for people** (the chat route writes them with the service role after an ownership check, so citations/usage can't be forged); new `feedback` (one row per person per message) and `notes` tables with RLS; source selection is `documents.included` (one row per source already exists, RLS + Realtime cover it). `messages.content` stays the plain-text copy.
+- Verified on the local stack: `npm run test:rls:local` 102 passed (feedback and notes added to the coverage list; B can't read, change or forge A's chats, messages, feedback, notes). Not yet applied to the cloud project.
