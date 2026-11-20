@@ -598,3 +598,63 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────── Answers (skill 10.2): reading type, headings in the UI face ───────────── */
+@layer components {
+  .answer-prose p {
+    margin: 0 0 0.9em;
+  }
+  .answer-prose h1,
+  .answer-prose h2 {
+    @apply text-h2 text-ink;
+    margin: 1.4em 0 0.5em;
+  }
+  .answer-prose h3,
+  .answer-prose h4 {
+    @apply text-h3 text-ink;
+    margin: 1.2em 0 0.4em;
+  }
+  .answer-prose > :first-child {
+    margin-top: 0;
+  }
+  .answer-prose ul,
+  .answer-prose ol {
+    margin: 0 0 0.9em;
+    padding-left: 1.4em;
+  }
+  .answer-prose ul {
+    list-style: disc;
+  }
+  .answer-prose ol {
+    list-style: decimal;
+  }
+  .answer-prose li + li {
+    margin-top: 0.25em;
+  }
+  .answer-prose li::marker {
+    color: var(--graphite);
+  }
+  .answer-prose blockquote {
+    border-left: 2px solid var(--rule-strong);
+    padding-left: 1em;
+    color: var(--graphite);
+    margin: 0 0 0.9em;
+  }
+  .answer-prose hr {
+    border-color: var(--rule);
+    margin: 1.5em 0;
+  }
+  .answer-prose th,
+  .answer-prose td {
+    border-bottom: 1px solid var(--rule);
+    padding: 0.4em 0.6em;
+    text-align: left;
+  }
+  .answer-prose th {
+    color: var(--graphite);
+    font-weight: 500;
+  }
+  .answer-prose strong {
+    font-weight: 600;
+  }
+}
